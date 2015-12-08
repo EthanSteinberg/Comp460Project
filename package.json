@@ -18,5 +18,8 @@
   "homepage": "https://github.com/Lalaland/Comp460Project#readme",
   "dependencies": {
     "express": "^4.13.3"
+  },
+  "devDependencies": {
+    "webpack": "^1.12.9"
   }
 }
