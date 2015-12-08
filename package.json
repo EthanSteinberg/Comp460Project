@@ -17,7 +17,8 @@
   },
   "homepage": "https://github.com/Lalaland/Comp460Project#readme",
   "dependencies": {
-    "express": "^4.13.3"
+    "express": "^4.13.3",
+    "ws": "^0.8.1"
   },
   "devDependencies": {
     "babel-core": "^6.3.15",

@@ -1,4 +1,5 @@
 var foo = require('./foo.js');
+var blah = require('./websocketexample.js').foo;
 
 console.log("Hello! " + foo);
 
@@ -14,3 +15,6 @@ function draw() {
 }
 
 window.draw = draw;
+
+blah();
+
