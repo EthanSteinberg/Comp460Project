@@ -5,7 +5,7 @@ app.get('/', function (req, res) {
   res.sendFile(__dirname + '/static/index.html');
 });
 
-app.use('/static', express.static('client'));
+app.use('/static', express.static('dist'));
 
 var server = app.listen(3000, function () {
   var host = server.address().address;
