@@ -6,6 +6,5 @@ class Blah {
 
 let b = new Blah();
 
-debugger;
 
 module.exports = 'fooaarst';
