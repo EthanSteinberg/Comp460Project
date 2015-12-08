@@ -1,5 +1,5 @@
 module.exports = {
-    entry: "./client/main",
+    entry: "./app/client/main",
     output: {
         path: __dirname + "/dist",
         filename: "bundle.js"
@@ -8,7 +8,7 @@ module.exports = {
     module: {
       	loaders: [
   		{
-          test: /\.js$/,
+          test: /\.jsx?$/,
           exclude: /(node_modules|bower_components)/,
           loader: 'babel' // 'babel-loader' is also a legal name to reference
         }

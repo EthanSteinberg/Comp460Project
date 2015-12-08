@@ -2,7 +2,7 @@
   "name": "comp460",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Lalaland/Comp460Project#readme",
   "dependencies": {
+    "babel-register": "^6.3.13",
     "express": "^4.13.3",
     "ws": "^0.8.1"
   },
