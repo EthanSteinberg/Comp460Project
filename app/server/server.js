@@ -25,7 +25,7 @@ wss.on('connection', function connection(socket) {
     socket.send('Got it!');
   });
 
-  socket.send('something');
+  socket.send('something2');
 });
 
 server.on('request', app);
