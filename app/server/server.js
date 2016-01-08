@@ -6,7 +6,7 @@ const express = require('express');
 const server = http.createServer();
 
 const WebSocketServer = ws.Server;
-const wss = new WebSocketServer({ server: server });
+const wss = new WebSocketServer({ server });
 
 const app = express();
 

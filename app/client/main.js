@@ -3,14 +3,67 @@
  */
 
 import Map from '../shared/map';
+import loadImages from './images';
+import astar from '../shared/astar';
 
 class Game {
-  constructor() {
+  constructor(images) {
+    this.images = images;
+    this.map = new Map();
 
     this.canvas = document.getElementById('canvas');
     this.width = this.canvas.width;
     this.height = this.canvas.height;
     this.context = this.canvas.getContext('2d');
+
+    this.canvas.addEventListener('contextmenu', (event) => {
+      event.preventDefault();
+    });
+
+    this.canvas.addEventListener('mousedown', (event) => {
+      if (event.button === 2) {
+        this.selectedItem = null;
+      } else if (event.button === 0) {
+        const rect = this.canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left + this.x;
+        const y = event.clientY - rect.top + this.y;
+
+        const mouseRoundedX = Math.floor(x / 50);
+        const mouseRoundedY = Math.floor(y / 50);
+
+        const item = this.map.getItem(mouseRoundedX, mouseRoundedY);
+
+        if (this.selectedItem != null) {
+          // Something is currently selected. Try to move if empty. Otherwise select.
+          if (item == null) {
+            // Try to move to that location.
+
+            const startPosition = { x: this.selectedItem.getX(), y: this.selectedItem.getY() };
+            const goalPosition = { x: mouseRoundedX, y: mouseRoundedY };
+
+            const isEmpty = ({ x: tempX, y: tempY }) => {
+              return this.map.getItem(tempX, tempY) == null && !this.map.isIsland(tempX, tempY);
+            };
+            const isValid = ({ x: tempX, y: tempY }) => {
+              return tempX >= 0 && tempX < this.map.width && tempY >= 0 && tempY < this.map.height;
+            };
+            const moves = astar(startPosition, goalPosition, isEmpty, isValid);
+            if (moves == null) {
+              console.log('no such path');
+            } else {
+              this.selectedItem.setMoves(moves);
+            }
+          } else {
+             // TODO: Add logic for attacking stuff.
+            this.selectedItem = item;
+          }
+        } else {
+          // Simply select the thing that was pressed.
+          // TODO: Add logic for detecting if it is an enemy thingy.
+          this.selectedItem = item;
+        }
+      }
+    });
 
     this.pressedKeys = new Set();
 
@@ -46,33 +99,39 @@ class Game {
         this.actionMap[key]();
       }
     }
+    this.map.tick();
   }
 
   render() {
     const time = performance.now();
 
-    this.frames+=1;
+    this.frames += 1;
 
     this.update(time);
 
-    const map = new Map();
-
     this.context.clearRect(0, 0, this.width, this.height);
-    this.context.save()
+    this.context.save();
 
-    this.context.fillStyle = 'blue';
     this.context.translate(-this.x, -this.y);
-    this.context.fillRect(0, 0, this.width, this.height);
 
-    this.context.font = '50px sans-serif';
-    this.context.fillStyle = 'black';
-    this.context.fillText('FPS: ' + this.frames/ (time - this.start) * 1000, 100, 100);
-    map.render(this.context);
+    this.map.render(this.context, this.images);
+
+    if (this.selectedItem != null) {
+      this.context.strokeStyle = 'cyan';
+      this.context.strokeRect(
+        this.selectedItem.getX() * 50,
+        this.selectedItem.getY() * 50,
+        50,
+        50
+      );
+    }
 
     this.context.restore();
+    this.context.font = '50px sans-serif';
+    this.context.fillStyle = 'black';
+    this.context.fillText('FPS: ' + this.frames / (time - this.start) * 1000, 100, 500);
 
-    if (this.frames == 100) {
-      console.log(this.frames/ (time - this.start) * 1000);
+    if (this.frames === 100) {
       this.start = time;
       this.frames = 0;
     }
@@ -86,17 +145,18 @@ class Game {
     this.pressedKeys.delete(event.keyCode);
   }
 }
-
 document.addEventListener('DOMContentLoaded', function startCanvas() {
-  const game = new Game();
+  loadImages().then((images) => {
+    const game = new Game(images);
 
-  document.addEventListener('keydown', (event) => {
-    game.keydown(event);
-  }, false);
+    document.addEventListener('keydown', (event) => {
+      game.keydown(event);
+    });
 
-  document.addEventListener('keyup', (event) => {
-    game.keyup(event);
-  }, false);
+    document.addEventListener('keyup', (event) => {
+      game.keyup(event);
+    });
 
-  game.start();
+    game.start();
+  });
 });
