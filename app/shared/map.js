@@ -1,9 +1,8 @@
-/**
-  * @flow
-  */
-
 import Ship from './ship';
 
+/**
+ * A map of the game containing islands and all current ships.
+ */
 export default class Map {
 
   constructor() {
@@ -35,6 +34,9 @@ export default class Map {
     this.grid[newPosition.x + ',' + newPosition.y] = item;
   }
 
+  /**
+   * Render both the map and all ships on it.
+   */
   render(context, images) {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {

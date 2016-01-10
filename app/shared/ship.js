@@ -1,7 +1,7 @@
 /**
-  * @flow
-  */
-
+ * A ship entity.
+ */
+ 
 export default class Ship {
 
   constructor(map, x, y) {

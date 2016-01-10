@@ -1,7 +1,3 @@
-/**
- * @flow
- */
-
 import Map from '../shared/map';
 import loadImages from './images';
 import astar from '../shared/astar';

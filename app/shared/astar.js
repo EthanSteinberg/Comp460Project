@@ -1,7 +1,3 @@
-/**
-  * @flow
-  */
-
 function getNeighbers(position) {
   const { x, y } = position;
   return [
@@ -36,7 +32,13 @@ function minSet(set, scoreFunction) {
   return minItem;
 }
 
-// TODO: Switch to priority queue
+/**
+ * A simple implementation of the astar search algorithm.
+ * TODO: Switch to priority queue. Split work between frames.
+ * startPosition and targetPosition are coordinates of the form {x:0, y:0}.
+ * isEmpty marks if a coordinate is empty.
+ * isValid marks if a coordinate is valid for moving onto.
+ */
 export default function astar(startPosition, targetPosition, isEmpty, isValid) {
   const visited = new Set();
   const openset = new Set([startPosition]);
