@@ -6,7 +6,18 @@ import Map from '../shared/map';
 import loadImages from './images';
 import astar from '../shared/astar';
 
+const MILLISECONDS_PER_LOGIC_UPDATE = 5;
+const MILLISECONDS_PER_RENDER_UPDATE = 15;
+
+/**
+ * The central game object for most of the logic.
+ */
 class Game {
+  
+  /**
+   * Contruct the game. 
+   * Takes as input the images object as produced by images.js
+   */
   constructor(images) {
     this.images = images;
     this.map = new Map();
@@ -16,18 +27,21 @@ class Game {
     this.height = this.canvas.height;
     this.context = this.canvas.getContext('2d');
 
+    // Ignore right click events on the canvas
     this.canvas.addEventListener('contextmenu', (event) => {
       event.preventDefault();
     });
 
     this.canvas.addEventListener('mousedown', (event) => {
       if (event.button === 2) {
+        // Deselect on right click
         this.selectedItem = null;
       } else if (event.button === 0) {
         const rect = this.canvas.getBoundingClientRect();
         const x = event.clientX - rect.left + this.x;
         const y = event.clientY - rect.top + this.y;
 
+        // The mouse coordinates in grid coordinatess.
         const mouseRoundedX = Math.floor(x / 50);
         const mouseRoundedY = Math.floor(y / 50);
 
@@ -78,21 +92,30 @@ class Game {
     };
   }
 
+  /**
+   * Start the game by setting up the render intervals.
+   */
   start() {
-    setInterval(this.render.bind(this), 15);
+    setInterval(this.render.bind(this), MILLISECONDS_PER_RENDER_UPDATE);
     this.lastUpdate = performance.now();
 
     this.frames = 0;
     this.start = performance.now();
   }
 
+  /**
+   * Update the game state when necessary.
+   */
   update(currentTime) {
     while (currentTime > this.lastUpdate) {
       this.tick();
-      this.lastUpdate += 5;
+      this.lastUpdate += MILLISECONDS_PER_LOGIC_UPDATE;
     }
   }
 
+  /**
+   * Perform a discrete update of the logic.
+   */
   tick() {
     for (const key in this.actionMap) {
       if (this.pressedKeys.has(+key)) {
@@ -102,6 +125,9 @@ class Game {
     this.map.tick();
   }
 
+  /**
+   * Render the game. Also performs updates if necessary.
+   */
   render() {
     const time = performance.now();
 
@@ -114,6 +140,7 @@ class Game {
 
     this.context.translate(-this.x, -this.y);
 
+    // Render the map and everything on it.
     this.map.render(this.context, this.images);
 
     if (this.selectedItem != null) {
@@ -145,6 +172,7 @@ class Game {
     this.pressedKeys.delete(event.keyCode);
   }
 }
+
 document.addEventListener('DOMContentLoaded', function startCanvas() {
   loadImages().then((images) => {
     const game = new Game(images);
