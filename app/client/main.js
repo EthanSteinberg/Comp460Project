@@ -1,6 +1,5 @@
-import Map from '../shared/map';
+import GameMap from '../shared/gamemap';
 import loadImages from './images';
-import astar from '../shared/astar';
 
 const MILLISECONDS_PER_LOGIC_UPDATE = 5;
 const MILLISECONDS_PER_RENDER_UPDATE = 15;
@@ -9,14 +8,13 @@ const MILLISECONDS_PER_RENDER_UPDATE = 15;
  * The central game object for most of the logic.
  */
 class Game {
-  
   /**
-   * Contruct the game. 
+   * Contruct the game.
    * Takes as input the images object as produced by images.js
    */
   constructor(images) {
     this.images = images;
-    this.map = new Map();
+    this.map = new GameMap();
 
     this.canvas = document.getElementById('canvas');
     this.width = this.canvas.width;
@@ -46,23 +44,9 @@ class Game {
         if (this.selectedItem != null) {
           // Something is currently selected. Try to move if empty. Otherwise select.
           if (item == null) {
+            const targetLocation = { x: mouseRoundedX, y: mouseRoundedY };
+            this.sendMessage({ type: 'MoveShip', shipId: this.selectedItem.getId(), targetLocation });
             // Try to move to that location.
-
-            const startPosition = { x: this.selectedItem.getX(), y: this.selectedItem.getY() };
-            const goalPosition = { x: mouseRoundedX, y: mouseRoundedY };
-
-            const isEmpty = ({ x: tempX, y: tempY }) => {
-              return this.map.getItem(tempX, tempY) == null && !this.map.isIsland(tempX, tempY);
-            };
-            const isValid = ({ x: tempX, y: tempY }) => {
-              return tempX >= 0 && tempX < this.map.width && tempY >= 0 && tempY < this.map.height;
-            };
-            const moves = astar(startPosition, goalPosition, isEmpty, isValid);
-            if (moves == null) {
-              console.log('no such path');
-            } else {
-              this.selectedItem.setMoves(moves);
-            }
           } else {
              // TODO: Add logic for attacking stuff.
             this.selectedItem = item;
@@ -86,17 +70,42 @@ class Game {
       39: () => this.x += 1,
       40: () => this.y += 1,
     };
+
+    this.messageHandlerMap = {
+      'SetShipPosition': this._setShipPositionHandler.bind(this),
+    };
+  }
+
+  _setShipPositionHandler(setShipPositionMessage) {
+    const { shipId, position } = setShipPositionMessage;
+    this.map.getShip(shipId).setPosition(position.x, position.y);
+  }
+
+  sendMessage(message) {
+    console.log('Sending', message);
+    this.ws.send(JSON.stringify(message));
   }
 
   /**
    * Start the game by setting up the render intervals.
    */
   start() {
+    this.ws = new WebSocket('ws://localhost:3000');
+    this.ws.onmessage = this._onMessage.bind(this);
+
     setInterval(this.render.bind(this), MILLISECONDS_PER_RENDER_UPDATE);
     this.lastUpdate = performance.now();
 
     this.frames = 0;
     this.start = performance.now();
+  }
+
+  _onMessage(event) {
+    const messageData = JSON.parse(event.data);
+    if (messageData.type in this.messageHandlerMap) {
+      this.messageHandlerMap[messageData.type](messageData);
+    }
+    console.log('Got' + event.data);
   }
 
   /**
@@ -118,7 +127,6 @@ class Game {
         this.actionMap[key]();
       }
     }
-    this.map.tick();
   }
 
   /**

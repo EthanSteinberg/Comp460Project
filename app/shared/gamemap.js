@@ -3,7 +3,7 @@ import Ship from './ship';
 /**
  * A map of the game containing islands and all current ships.
  */
-export default class Map {
+export default class GameMap {
 
   constructor() {
     this.islands = [
@@ -13,20 +13,23 @@ export default class Map {
       [2, 2],
     ];
 
-    this.ships = [new Ship(this, 0, 0)];
+    this.ships = new Map();
 
     this.grid = {};
 
-    this._initGrid();
+    this.addShip(new Ship(this, 0, 0));
 
     this.width = 8;
     this.height = 8;
   }
 
-  _initGrid() {
-    for (const ship of this.ships) {
-      this.grid[ship.getX() + ',' + ship.getY()] = ship;
-    }
+  addShip(ship) {
+    this.ships.set(ship.getId(), ship);
+    this.grid[ship.getX() + ',' + ship.getY()] = ship;
+  }
+
+  getShip(shipId) {
+    return this.ships.get(shipId);
   }
 
   updatePosition(item, oldPosition, newPosition) {
@@ -51,7 +54,7 @@ export default class Map {
       context.fillRect(x * 50, y * 50, 50, 50);
     }
 
-    for (const ship of this.ships) {
+    for (const ship of this.ships.values()) {
       ship.render(context, images);
     }
   }
@@ -69,9 +72,11 @@ export default class Map {
     return false;
   }
 
-  tick() {
-    for (const ship of this.ships) {
-      ship.tick();
+  getUpdateMessages() {
+    const result = [];
+    for (const ship of this.ships.values()) {
+      result.push(...ship.getUpdateMessages());
     }
+    return result;
   }
 }

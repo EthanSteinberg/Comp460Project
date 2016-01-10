@@ -1,13 +1,15 @@
 /**
  * A ship entity.
  */
- 
+let nextId = 0;
+
 export default class Ship {
 
   constructor(map, x, y) {
     this.map = map;
     this.x = x;
     this.y = y;
+    this.id = nextId++;
   }
 
   render(context, images) {
@@ -38,19 +40,28 @@ export default class Ship {
     this.moveIndex = 0;
   }
 
-  tick() {
+  getUpdateMessages() {
     if (this.moving) {
       this.ticksTillNextMove -= 1;
       if (this.ticksTillNextMove === 0) {
         this.ticksTillNextMove = 20;
         const move = this.moves[this.moveIndex];
+
         this.setPosition(move.x, move.y);
         this.moveIndex += 1;
 
         if (this.moveIndex === this.moves.length) {
           this.moving = false;
         }
+
+        return [{ type: 'SetShipPosition', shipId: this.id, position: move }];
       }
     }
+    return [];
   }
+
+  getId() {
+    return this.id;
+  }
+
 }
