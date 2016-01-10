@@ -70,12 +70,18 @@ const messageHandlers = {
 
 wss.on('connection', function connection(socket) {
   playerSockets.push(socket);
+
   socket.on('message', function incoming(message) {
     console.error('received: "%s"', message);
     const actualMessage = JSON.parse(message);
     if (actualMessage.type in messageHandlers) {
       messageHandlers[actualMessage.type](actualMessage);
     }
+  });
+
+  socket.on('close', function close() {
+    const index = playerSockets.indexOf(socket);
+    playerSockets.splice(index, 1);
   });
 });
 
