@@ -33,7 +33,7 @@ export default class Mine {
   /**
    * Move the ship and perform the corresponding updates.
    */
-  getMoveMessages() {
+  getSetMessage() {
     this.moving = false;
     const pos = { x: this.x, y: this.y };
     return [{ type: 'SetBuildingPosition', building: this.type, position: pos }];
@@ -45,7 +45,7 @@ export default class Mine {
   getUpdateMessages() {
     const result = [];
     if (this.moving) {
-      result.push(...this.getMoveMessages());
+      result.push(...this.getSetMessage());
     }
 
     return result;

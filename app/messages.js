@@ -19,4 +19,15 @@ SetShipPosition: {
 	position: the position of the ship
 }
 
+MakeBuilding: {
+	building: the building type
+	x: x position of the building location
+	y: y position of the building location
+}
+
+SetBuildingPosition: {
+	building: the building type
+	position: the position of the building
+}
+
 */
