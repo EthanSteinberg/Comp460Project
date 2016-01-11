@@ -1,6 +1,8 @@
 import GameMap from '../shared/gamemap';
 import Gui from '../shared/gui';
 import loadImages from './images';
+import Ship from '../shared/ship';
+
 
 const MILLISECONDS_PER_LOGIC_UPDATE = 5;
 const MILLISECONDS_PER_RENDER_UPDATE = 15;
@@ -59,7 +61,7 @@ class Game {
               this.sendMessage({ type: 'MakeBuilding', building: buildingType, x: mouseRoundedX, y: mouseRoundedY });
               this.guiSelected = false;
               this.selectedItem = null;          
-            } else {
+            } else if (this.selectedItem instanceof Ship) {
               // Try to move to that location.
               const targetLocation = { x: mouseRoundedX, y: mouseRoundedY };
               this.sendMessage({ type: 'MoveShip', shipId: this.selectedItem.getId(), targetLocation });
