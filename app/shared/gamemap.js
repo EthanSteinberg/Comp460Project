@@ -1,5 +1,7 @@
 import Ship from './ship';
 import Mine from './mine';
+import Shipyard from './shipyard';
+
 
 export const MAP_WIDTH = 8;
 export const MAP_HEIGHT = 8;
@@ -21,7 +23,7 @@ export default class GameMap {
 
     this.buttons = [] 
 
-    this.buildings = [];
+    this.buildings = new Map();
 
     this.grid = {};
 
@@ -67,7 +69,7 @@ export default class GameMap {
       ship.render(context, images);
     }
 
-    for (const building of this.buildings) {
+    for (const building of this.buildings.values()) {
       building.render(context, images);
     }
   }
@@ -85,11 +87,22 @@ export default class GameMap {
     return false;
   }
 
-  addBuilding(item, x, y) {
-    var building = item.getBuilding(this, x, y);
-    console.log(building);
-    this.buildings.push(building);
+  addBuilding(type, x, y) {
+    switch(type) {
+      case 'mine': 
+        var building = new Mine(this, x, y);
+        break;
+      case 'shipyard': 
+        var building = new Shipyard(this, x, y);
+        break;
+    }
+
+    this.buildings.set(building.getId(), building);
     this.grid[building.getX() + ',' + building.getY()] = building;
+  }
+
+  getBuilding(buildingId) {
+    return this.buildings.get(buildingId);
   }
 
   /**
@@ -99,6 +112,9 @@ export default class GameMap {
     const result = [];
     for (const ship of this.ships.values()) {
       result.push(...ship.getUpdateMessages());
+    }
+    for (const building of this.buildings.values()) {
+      result.push(...building.getUpdateMessages());
     }
     return result;
   }

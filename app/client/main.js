@@ -55,9 +55,8 @@ class Game {
           if (item == null) {
             if (this.guiSelected) {
               // If an empty tile on an island is selected then add a building
-              if (this.map.isIsland(mouseRoundedX, mouseRoundedY)) {
-                this.map.addBuilding(this.selectedItem, mouseRoundedX, mouseRoundedY);
-              }
+              var buildingType = this.selectedItem.getBuilding();
+              this.sendMessage({ type: 'MakeBuilding', building: buildingType, x: mouseRoundedX, y: mouseRoundedY });
               this.guiSelected = false;
               this.selectedItem = null;          
             } else {
@@ -91,12 +90,18 @@ class Game {
 
     this.messageHandlerMap = {
       'SetShipPosition': this._setShipPositionHandler.bind(this),
+      'SetBuildingPosition': this._setBuildingPositionHandler.bind(this),
     };
   }
 
   _setShipPositionHandler(setShipPositionMessage) {
     const { shipId, position } = setShipPositionMessage;
     this.map.getShip(shipId).setPosition(position.x, position.y);
+  }
+
+  _setBuildingPositionHandler(setBuildingPositionMessage) {
+    const { building, position } = setBuildingPositionMessage;
+    this.map.addBuilding(building, position.x, position.y);
   }
 
   sendMessage(message) {

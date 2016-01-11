@@ -35,12 +35,12 @@ export default class Button {
     return this.y;
   }
 
-  getBuilding(map, x, y) {
+  getBuilding() {
     switch(this.type) {
       case 'mine': 
-        return new Mine(map, x, y);
+        return 'mine';
       case 'shipyard': 
-        return new Shipyard(map, x, y);
+        return 'shipyard';
     }
   }
 }
