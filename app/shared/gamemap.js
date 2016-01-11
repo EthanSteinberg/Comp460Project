@@ -1,4 +1,8 @@
 import Ship from './ship';
+import Mine from './mine';
+
+export const MAP_WIDTH = 8;
+export const MAP_HEIGHT = 8;
 
 /**
  * A map of the game containing islands and all current ships.
@@ -15,13 +19,17 @@ export default class GameMap {
 
     this.ships = new Map();
 
+    this.buttons = [] 
+
+    this.buildings = [];
+
     this.grid = {};
 
     this.addShip(new Ship(this, 0, 4));
     this.addShip(new Ship(this, 4, 4));
 
-    this.width = 8;
-    this.height = 8;
+    this.width = MAP_WIDTH;
+    this.height = MAP_HEIGHT;
   }
 
   addShip(ship) {
@@ -58,6 +66,10 @@ export default class GameMap {
     for (const ship of this.ships.values()) {
       ship.render(context, images);
     }
+
+    for (const building of this.buildings) {
+      building.render(context, images);
+    }
   }
 
   getItem(x, y) {
@@ -71,6 +83,13 @@ export default class GameMap {
       }
     }
     return false;
+  }
+
+  addBuilding(item, x, y) {
+    var building = item.getBuilding(this, x, y);
+    console.log(building);
+    this.buildings.push(building);
+    this.grid[building.getX() + ',' + building.getY()] = building;
   }
 
   /**

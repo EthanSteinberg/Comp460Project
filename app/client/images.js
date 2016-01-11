@@ -1,6 +1,8 @@
 // A mapping of image name to image source location.
 const sources = {
   ship: 'ship.png',
+  mine: 'mine.png',
+  shipyard: 'shipyard.png',
 };
 
 /**

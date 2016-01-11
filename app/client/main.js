@@ -1,4 +1,5 @@
 import GameMap from '../shared/gamemap';
+import Gui from '../shared/gui';
 import loadImages from './images';
 
 const MILLISECONDS_PER_LOGIC_UPDATE = 5;
@@ -15,6 +16,7 @@ class Game {
   constructor(images) {
     this.images = images;
     this.map = new GameMap();
+    this.gui = new Gui();
 
     this.canvas = document.getElementById('canvas');
     this.width = this.canvas.width;
@@ -39,22 +41,38 @@ class Game {
         const mouseRoundedX = Math.floor(x / 50);
         const mouseRoundedY = Math.floor(y / 50);
 
-        const item = this.map.getItem(mouseRoundedX, mouseRoundedY);
-
+        var item = this.map.getItem(mouseRoundedX, mouseRoundedY);
+        // Check if we have clicked an item in the gui
+        if (item == null) {
+          item = this.gui.getItem(mouseRoundedX, mouseRoundedY);
+          if (item != null) {
+            this.guiSelected = true;
+          }
+        }
+        
         if (this.selectedItem != null) {
           // Something is currently selected. Try to move if empty. Otherwise select.
           if (item == null) {
-            const targetLocation = { x: mouseRoundedX, y: mouseRoundedY };
-            this.sendMessage({ type: 'MoveShip', shipId: this.selectedItem.getId(), targetLocation });
-            // Try to move to that location.
+            if (this.guiSelected) {
+              // If an empty tile on an island is selected then add a building
+              if (this.map.isIsland(mouseRoundedX, mouseRoundedY)) {
+                this.map.addBuilding(this.selectedItem, mouseRoundedX, mouseRoundedY);
+              }
+              this.guiSelected = false;
+              this.selectedItem = null;          
+            } else {
+              // Try to move to that location.
+              const targetLocation = { x: mouseRoundedX, y: mouseRoundedY };
+              this.sendMessage({ type: 'MoveShip', shipId: this.selectedItem.getId(), targetLocation });
+            }
           } else {
-             // TODO: Add logic for attacking stuff.
+            // TODO: Add logic for attacking stuff.
             this.selectedItem = item;
           }
         } else {
           // Simply select the thing that was pressed.
-          // TODO: Add logic for detecting if it is an enemy thingy.
           this.selectedItem = item;
+          // TODO: Add logic for detecting if it is an enemy thingy.
         }
       }
     });
@@ -146,6 +164,8 @@ class Game {
 
     // Render the map and everything on it.
     this.map.render(this.context, this.images);
+    // Render the gui
+    this.gui.render(this.context, this.images);
 
     if (this.selectedItem != null) {
       this.context.strokeStyle = 'cyan';
