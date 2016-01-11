@@ -19,8 +19,4 @@ SetShipPosition: {
 	position: the position of the ship
 }
 
-MoveNotPossible: {
-	message
-}
-
 */

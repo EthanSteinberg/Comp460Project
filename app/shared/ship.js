@@ -41,6 +41,9 @@ export default class Ship {
     this.moveIndex = 0;
   }
 
+  /**
+   * Move the ship and perform the corresponding updates.
+   */
   getMoveMessages() {
     this.ticksTillNextMove += 1;
     if (this.ticksTillNextMove === 20) {
@@ -73,6 +76,9 @@ export default class Ship {
     return [{ type: 'SetShipPosition', shipId: this.id, position: interpolatedPosition }];
   }
 
+  /**
+   * Update the ship and get the corresponding update messages.
+   */
   getUpdateMessages() {
     const result = [];
     if (this.moving) {

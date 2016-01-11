@@ -73,6 +73,9 @@ export default class GameMap {
     return false;
   }
 
+  /**
+   * Update the map and get the corresponding update messages.
+   */
   getUpdateMessages() {
     const result = [];
     for (const ship of this.ships.values()) {
