@@ -45,7 +45,7 @@ function moveShipHandler(moveShipMessage) {
 
   const ship = map.getShip(shipId);
 
-  const startPosition = { x: ship.getX(), y: ship.getY() };
+  const startPosition = { x: Math.round(ship.getX()), y: Math.round(ship.getY()) };
 
   const isEmpty = ({ x: tempX, y: tempY }) => {
     return map.getItem(tempX, tempY) == null && !map.isIsland(tempX, tempY);

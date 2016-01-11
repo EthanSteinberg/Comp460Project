@@ -17,7 +17,8 @@ export default class GameMap {
 
     this.grid = {};
 
-    this.addShip(new Ship(this, 0, 0));
+    this.addShip(new Ship(this, 0, 4));
+    this.addShip(new Ship(this, 4, 4));
 
     this.width = 8;
     this.height = 8;
@@ -33,8 +34,8 @@ export default class GameMap {
   }
 
   updatePosition(item, oldPosition, newPosition) {
-    this.grid[oldPosition.x + ',' + oldPosition.y] = null;
-    this.grid[newPosition.x + ',' + newPosition.y] = item;
+    this.grid[Math.round(oldPosition.x) + ',' + Math.round(oldPosition.y)] = null;
+    this.grid[Math.round(newPosition.x) + ',' + Math.round(newPosition.y)] = item;
   }
 
   /**

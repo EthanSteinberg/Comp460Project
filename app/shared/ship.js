@@ -36,28 +36,50 @@ export default class Ship {
   setMoves(moves) {
     this.moving = true;
     this.moves = moves;
-    this.ticksTillNextMove = 1;
+    this.moves[0] = { x: this.getX(), y: this.getY() };
+    this.ticksTillNextMove = 0;
     this.moveIndex = 0;
   }
 
-  getUpdateMessages() {
-    if (this.moving) {
-      this.ticksTillNextMove -= 1;
-      if (this.ticksTillNextMove === 0) {
-        this.ticksTillNextMove = 20;
-        const move = this.moves[this.moveIndex];
+  getMoveMessages() {
+    this.ticksTillNextMove += 1;
+    if (this.ticksTillNextMove === 20) {
+      this.ticksTillNextMove = 0;
 
-        this.setPosition(move.x, move.y);
-        this.moveIndex += 1;
+      this.moveIndex += 1;
 
-        if (this.moveIndex === this.moves.length) {
-          this.moving = false;
-        }
+      if (this.moveIndex === this.moves.length - 1) {
+        this.moving = false;
+        const lastMove = this.moves[this.moves.length - 1];
 
-        return [{ type: 'SetShipPosition', shipId: this.id, position: move }];
+        this.setPosition(lastMove.x, lastMove.y);
+
+        return [{ type: 'SetShipPosition', shipId: this.id, position: lastMove }];
       }
     }
-    return [];
+
+    const currentMove = this.moves[this.moveIndex];
+    const nextMove = this.moves[this.moveIndex + 1];
+
+    const nextMoveFactor = this.ticksTillNextMove / 20.0;
+    const currentMoveFactor = 1 - nextMoveFactor;
+
+    const interpolatedPosition = {
+      x: currentMove.x * currentMoveFactor + nextMove.x * nextMoveFactor,
+      y: currentMove.y * currentMoveFactor + nextMove.y * nextMoveFactor,
+    };
+
+    this.setPosition(interpolatedPosition.x, interpolatedPosition.y);
+    return [{ type: 'SetShipPosition', shipId: this.id, position: interpolatedPosition }];
+  }
+
+  getUpdateMessages() {
+    const result = [];
+    if (this.moving) {
+      result.push(...this.getMoveMessages());
+    }
+
+    return result;
   }
 
   getId() {

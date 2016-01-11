@@ -61,6 +61,7 @@ export default function astar(startPosition, targetPosition, isEmpty, isValid) {
         result.push(currentItem);
         currentItem = backtrackMap[serialize(currentItem)];
       }
+      result.push(startPosition);
       result.reverse();
       return result;
     }
