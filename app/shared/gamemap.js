@@ -23,7 +23,9 @@ export default class GameMap {
 
     this.buttons = [] 
 
-    this.buildings = new Map();
+    this.mines = new Map();
+    this.shipyards = new Map();
+
 
     this.grid = {};
 
@@ -69,8 +71,12 @@ export default class GameMap {
       ship.render(context, images);
     }
 
-    for (const building of this.buildings.values()) {
-      building.render(context, images);
+    for (const mine of this.mines.values()) {
+      mine.render(context, images);
+    }
+
+    for (const shipyard of this.shipyards.values()) {
+      shipyard.render(context, images);
     }
   }
 
@@ -90,19 +96,16 @@ export default class GameMap {
   addBuilding(type, x, y) {
     switch(type) {
       case 'mine': 
-        var building = new Mine(this, x, y);
+        var mine = new Mine(this, x, y);
+        this.mines.set(mine.getId(), mine);
+        this.grid[mine.getX() + ',' + mine.getY()] = mine;
         break;
       case 'shipyard': 
-        var building = new Shipyard(this, x, y);
+        var shipyard = new Shipyard(this, x, y);
+        this.shipyards.set(shipyard.getId(), shipyard);
+        this.grid[shipyard.getX() + ',' + shipyard.getY()] = shipyard;
         break;
     }
-
-    this.buildings.set(building.getId(), building);
-    this.grid[building.getX() + ',' + building.getY()] = building;
-  }
-
-  getBuilding(buildingId) {
-    return this.buildings.get(buildingId);
   }
 
   /**
@@ -113,8 +116,11 @@ export default class GameMap {
     for (const ship of this.ships.values()) {
       result.push(...ship.getUpdateMessages());
     }
-    for (const building of this.buildings.values()) {
-      result.push(...building.getUpdateMessages());
+    for (const mine of this.mines.values()) {
+      result.push(...mine.getUpdateMessages());
+    }
+    for (const shipyard of this.shipyards.values()) {
+      result.push(...shipyard.getUpdateMessages());
     }
     return result;
   }
