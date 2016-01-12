@@ -1,7 +1,7 @@
 import Ship from './ship';
 import Mine from './mine';
 import Shipyard from './shipyard';
-
+import Island from './island';
 
 export const MAP_WIDTH = 8;
 export const MAP_HEIGHT = 8;
@@ -12,20 +12,21 @@ export const MAP_HEIGHT = 8;
 export default class GameMap {
 
   constructor() {
-    this.islands = [
+    var island1coordinates = [
       [1, 1],
       [1, 2],
       [2, 1],
       [2, 2],
     ];
 
+    this.islands = [new Island(this, island1coordinates)];
+
     this.ships = new Map();
 
-    this.buttons = [] 
+    this.buttons = [];
 
     this.mines = new Map();
     this.shipyards = new Map();
-
 
     this.grid = {};
 
@@ -62,9 +63,8 @@ export default class GameMap {
       }
     }
 
-    for (const [x, y] of this.islands) {
-      context.fillStyle = 'green';
-      context.fillRect(x * 50, y * 50, 50, 50);
+    for (const island of this.islands) {
+      island.render(context);
     }
 
     for (const ship of this.ships.values()) {
@@ -85,12 +85,21 @@ export default class GameMap {
   }
 
   isIsland(x, y) {
-    for (const [iX, iY] of this.islands) {
-      if (x === iX && y === iY) {
+    for (const island of this.islands) {
+      if (island.isIsland(x,y)) {
         return true;
       }
     }
     return false;
+  }
+
+  getIsland(x, y) {
+    for (const island of this.islands) {
+      if (island.isIsland(x,y)) {
+        return island.getId();
+      }
+    }
+    return -1;
   }
 
   addBuilding(type, x, y) {
