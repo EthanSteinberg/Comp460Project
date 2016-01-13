@@ -1,7 +1,7 @@
 import Ship from './ship';
 import Mine from './mine';
 import Shipyard from './shipyard';
-
+import Island from './island';
 
 export const MAP_WIDTH = 8;
 export const MAP_HEIGHT = 8;
@@ -12,12 +12,7 @@ export const MAP_HEIGHT = 8;
 export default class GameMap {
 
   constructor() {
-    this.islands = [
-      [1, 1],
-      [1, 2],
-      [2, 1],
-      [2, 2],
-    ];
+    this.islands = new Map();
 
     this.ships = new Map();
 
@@ -26,11 +21,18 @@ export default class GameMap {
     this.mines = new Map();
     this.shipyards = new Map();
 
-
     this.grid = {};
 
     this.addShip(new Ship(this, 0, 4));
     this.addShip(new Ship(this, 4, 4));
+
+    var island1coordinates = [
+      [1, 1],
+      [1, 2],
+      [2, 1],
+      [2, 2],
+    ];
+    this.addIsland(new Island(this, island1coordinates));
 
     this.width = MAP_WIDTH;
     this.height = MAP_HEIGHT;
@@ -38,6 +40,10 @@ export default class GameMap {
 
   addShip(ship) {
     this.ships.set(ship.getId(), ship);
+  }
+
+  addIsland(island) {
+    this.islands.set(island.getId(), island);
   }
 
   getShip(shipId) {
@@ -56,9 +62,8 @@ export default class GameMap {
       }
     }
 
-    for (const [x, y] of this.islands) {
-      context.fillStyle = 'green';
-      context.fillRect((x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
+    for (const island of this.islands.values()) {
+      island.render(context);
     }
 
     for (const ship of this.ships.values()) {
@@ -91,15 +96,29 @@ export default class GameMap {
   }
 
   isIsland(x, y) {
-    for (const [iX, iY] of this.islands) {
-      if (x === iX && y === iY) {
+    for (const island of this.islands.values()) {
+      if (island.isIsland(x,y)) {
         return true;
       }
     }
     return false;
   }
 
-  addBuilding(type, x, y) {
+  isNextToIsland(islandID, x, y) {
+    var island = this.islands.get(islandID);
+    return island.isNextToIsland(x, y);
+  }
+
+  getIsland(x, y) {
+    for (const island of this.islands.values()) {
+      if (island.isIsland(x,y)) {
+        return island.getId();
+      }
+    }
+    return -1;
+  }
+
+  addBuilding(type, x, y, islandID) {
     switch(type) {
       case 'mine': 
         var mine = new Mine(this, x, y);
@@ -107,9 +126,12 @@ export default class GameMap {
         this.grid[mine.getX() + ',' + mine.getY()] = mine;
         break;
       case 'shipyard': 
-        var shipyard = new Shipyard(this, x, y);
+        var shipyard = new Shipyard(this, x, y, islandID);
         this.shipyards.set(shipyard.getId(), shipyard);
         this.grid[shipyard.getX() + ',' + shipyard.getY()] = shipyard;
+        break;
+      case 'shiptemplate': 
+        this.addShip(new Ship(this, x, y));
         break;
     }
   }

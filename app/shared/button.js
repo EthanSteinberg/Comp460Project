@@ -24,6 +24,9 @@ export default class Button {
       case 'shipyard':
         context.drawImage(images.shipyard, (this.x - 0.5) * 50, (this.y - 0.5) * 50, 50, 50);
         break;
+      case 'shiptemplate':
+        context.drawImage(images.ship, (this.x - 0.5) * 50, (this.y - 0.5) * 50, 50, 50);
+        break;
       default:
         console.error('Trying to render unknown button');
     }
@@ -47,5 +50,9 @@ export default class Button {
         console.error('unknown building type');
         return null;
     }
+  }
+
+  getType() {
+    return this.type;
   }
 }

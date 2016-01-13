@@ -45,4 +45,20 @@ export default class Gui {
   getItem(x, y) {
     return this.grid[x + ',' + y];
   }
+
+  displayShipyard() {
+    this.buttons.push(new Button('shiptemplate', MAP_WIDTH, 5));
+    for (const button of this.buttons) {
+      this.grid[button.getX() + ',' + button.getY()] = button;
+    }
+  }
+
+  removeShipyardDisplay() {
+    for(var i = this.buttons.length - 1; i >= 0; i--) {
+      if(this.buttons[i].getType() === 'shiptemplate') {
+         this.grid[this.buttons[i].getX() + ',' + this.buttons[i].getY()] = null;
+         this.buttons.splice(i, 1);
+      }
+    }
+  }
 }

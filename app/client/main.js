@@ -1,6 +1,10 @@
 import GameMap from '../shared/gamemap';
 import Gui from '../shared/gui';
 import loadImages from './images';
+import Ship from '../shared/ship';
+import Shipyard from '../shared/shipyard';
+import Button from '../shared/button';
+
 
 const MILLISECONDS_PER_LOGIC_UPDATE = 5;
 const MILLISECONDS_PER_RENDER_UPDATE = 15;
@@ -31,6 +35,9 @@ class Game {
     this.canvas.addEventListener('mousedown', (event) => {
       if (event.button === 2) {
         // Deselect on right click
+        if (this.selectedItem instanceof Shipyard) {
+          this.gui.removeShipyardDisplay();
+        }
         this.selectedItem = null;
       } else if (event.button === 0) {
         const rect = this.canvas.getBoundingClientRect();
@@ -58,23 +65,39 @@ class Game {
           if (item == null) {
             if (this.guiSelected) {
               // If an empty tile on an island is selected then add a building
-              const buildingType = this.selectedItem.getBuilding();
-              this.sendMessage({ type: 'MakeBuilding', building: buildingType, x: mouseRoundedX, y: mouseRoundedY });
+              if (this.selectedItem.getType() == 'shiptemplate') {
+                this.sendMessage({ type: 'MakeShip', islandID: this.selectedShipyard.getIslandID(), x: mouseRoundedX, y: mouseRoundedY });
+                this.gui.removeShipyardDisplay();
+              } else {
+                var buildingType = this.selectedItem.getType();
+                this.sendMessage({ type: 'MakeBuilding', building: buildingType, x: mouseRoundedX, y: mouseRoundedY });
+              }      
               this.guiSelected = false;
-              this.selectedItem = null;
-            } else {
+              this.selectedItem = null;   
+            } else if (this.selectedItem instanceof Ship) {
               // Try to move to that location.
               const targetLocation = { x: mouseX, y: mouseY };
               this.sendMessage({ type: 'MoveShip', shipId: this.selectedItem.getId(), targetLocation });
-            }
+            } 
           } else {
             // TODO: Add logic for attacking stuff.
+            if (this.selectedItem instanceof Shipyard && this.guiSelected == false) {
+              this.gui.removeShipyardDisplay();
+            }
             this.selectedItem = item;
           }
         } else {
           // Simply select the thing that was pressed.
+         if (this.selectedItem instanceof Shipyard && this.guiSelected == false) {
+            this.gui.removeShipyardDisplay();
+          }
           this.selectedItem = item;
           // TODO: Add logic for detecting if it is an enemy thingy.
+        }
+
+        if (this.selectedItem instanceof Shipyard) {
+            this.gui.displayShipyard();
+            this.selectedShipyard = this.selectedItem;
         }
       }
     });
@@ -93,7 +116,7 @@ class Game {
 
     this.messageHandlerMap = {
       'SetShipPosition': this._setShipPositionHandler.bind(this),
-      'SetBuildingPosition': this._setBuildingPositionHandler.bind(this),
+      'SetPosition': this._setPositionHandler.bind(this),
     };
   }
 
@@ -102,9 +125,9 @@ class Game {
     this.map.getShip(shipId).setPosition(position.x, position.y);
   }
 
-  _setBuildingPositionHandler(setBuildingPositionMessage) {
-    const { building, position } = setBuildingPositionMessage;
-    this.map.addBuilding(building, position.x, position.y);
+  _setPositionHandler(setPositionMessage) {
+    const { object, position, islandID } = setPositionMessage;
+    this.map.addBuilding(object, position.x, position.y, islandID);
   }
 
   sendMessage(message) {
