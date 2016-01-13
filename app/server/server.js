@@ -65,14 +65,23 @@ function moveShipHandler(moveShipMessage) {
 
 function makeBuildingHandler(makeBuildingMessage) {
   const { building, x, y } = makeBuildingMessage;
-  if (map.isIsland(x, y)) {
-    map.addBuilding(building, x, y);
+  var islandID = map.getIsland(x,y);
+  if (islandID != -1) {
+    map.addBuilding(building, x, y, islandID);
+  }
+}
+
+function makeShipHandler(makeShipMessage) {
+  const { islandID, x, y } = makeShipMessage;
+  if (map.isNextToIsland(islandID,x,y)) {
+    map.addBuilding('shiptemplate', x, y);
   }
 }
 
 const messageHandlers = {
   'MoveShip': moveShipHandler,
   'MakeBuilding': makeBuildingHandler,
+  'MakeShip': makeShipHandler,
 };
 
 wss.on('connection', function connection(socket) {

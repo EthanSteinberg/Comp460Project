@@ -24,6 +24,9 @@ export default class Button {
       case 'shipyard': 
         context.drawImage(images.shipyard, this.x * 50, this.y * 50, 50, 50);
         break;
+      case 'shiptemplate':
+        context.drawImage(images.ship, this.x * 50, this.y * 50, 50, 50);
+        break;
     }
   }
 
@@ -35,12 +38,7 @@ export default class Button {
     return this.y;
   }
 
-  getBuilding() {
-    switch(this.type) {
-      case 'mine': 
-        return 'mine';
-      case 'shipyard': 
-        return 'shipyard';
-    }
+  getType() {
+    return this.type;
   }
 }

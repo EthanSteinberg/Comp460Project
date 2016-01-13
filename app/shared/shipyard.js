@@ -6,13 +6,14 @@ let nextId = 0;
  
 export default class Shipyard {
 
-  constructor(map, x, y) {
+  constructor(map, x, y, islandID) {
     this.map = map;
     this.x = x;
     this.y = y;
     this.id = nextId++;
-    this.moving = true;
+    this.set = true;
     this.type = 'shipyard';
+    this.islandID = islandID;
   }
 
   render(context, images) {
@@ -31,13 +32,17 @@ export default class Shipyard {
     return this.id;
   }
 
+  getIslandID() {
+    return this.islandID;
+  }
+
   /**
    * Move the ship and perform the corresponding updates.
    */
   getSetMessage() {
-    this.moving = false;
+    this.set = false;
     const pos = { x: this.x, y: this.y };
-    return [{ type: 'SetBuildingPosition', building: this.type, position: pos }];
+    return [{ type: 'SetPosition', object: this.type, position: pos, islandID: this.islandID }];
   }
 
   /**
@@ -45,7 +50,7 @@ export default class Shipyard {
    */
   getUpdateMessages() {
     const result = [];
-    if (this.moving) {
+    if (this.set) {
       result.push(...this.getSetMessage());
     }
 

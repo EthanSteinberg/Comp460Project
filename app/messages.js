@@ -25,9 +25,9 @@ MakeBuilding: {
 	y: y position of the building location
 }
 
-SetBuildingPosition: {
-	building: the building type
-	position: the position of the building
+SetPosition: {
+	object: the object type
+	position: the position of the object
 }
 
 */

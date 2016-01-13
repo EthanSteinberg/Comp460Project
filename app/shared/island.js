@@ -1,3 +1,6 @@
+import {MAP_WIDTH} from './gamemap';
+import {MAP_HEIGHT} from './gamemap';
+
 /**
  * An island entity.
  */
@@ -9,6 +12,25 @@ export default class Island {
     this.map = map;
     this.coordinates = coordinates;
     this.id = nextId++;
+
+    this.perimeter = [];
+    for (const [iX, iY] of this.coordinates) {
+      this.addToPerimeter(iX-1, iY-1);
+      this.addToPerimeter(iX, iY-1);
+      this.addToPerimeter(iX+1, iY-1);
+      this.addToPerimeter(iX-1, iY);
+      this.addToPerimeter(iX+1, iY);
+      this.addToPerimeter(iX-1, iY+1);
+      this.addToPerimeter(iX, iY+1);
+      this.addToPerimeter(iX-1, iY+1);
+    }
+    console.log(this.perimeter);
+  }
+
+  addToPerimeter(x, y) {
+    if (x > 0 && x < MAP_WIDTH && y > 0 && y < MAP_HEIGHT && this.map.isIsland(x,y) == false) {
+      this.perimeter.push([x,y]);
+    }
   }
 
   render(context) {
@@ -27,13 +49,13 @@ export default class Island {
     return false;
   }
 
-  getIsland(x, y) {
-    for (const [iX, iY] of this.coordinates) {
+  isNextToIsland(x, y) {
+    for (const [iX, iY] of this.perimeter) {
       if (x === iX && y === iY) {
-        return this.id;
+        return true;
       }
     }
-    return -1;
+    return false;
   }
 
   getId() {
