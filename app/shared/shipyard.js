@@ -3,7 +3,7 @@
  */
 let nextId = 0;
 
- 
+
 export default class Shipyard {
 
   constructor(map, x, y) {
@@ -16,7 +16,7 @@ export default class Shipyard {
   }
 
   render(context, images) {
-    context.drawImage(images.shipyard, this.x * 50, this.y * 50, 50, 50);
+    context.drawImage(images.shipyard, (this.x - 0.5) * 50, (this.y - 0.5) * 50, 50, 50);
   }
 
   getX() {

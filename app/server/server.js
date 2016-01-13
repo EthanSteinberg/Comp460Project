@@ -47,6 +47,7 @@ function moveShipHandler(moveShipMessage) {
 
   // TODO: Instead of rounding the start position, pick a better one.
   const startPosition = { x: Math.round(ship.getX()), y: Math.round(ship.getY()) };
+  const endPosition = { x: Math.round(targetLocation.x), y: Math.round(targetLocation.y) };
 
   const isEmpty = ({ x: tempX, y: tempY }) => {
     return map.getItem(tempX, tempY) == null && !map.isIsland(tempX, tempY);
@@ -54,11 +55,12 @@ function moveShipHandler(moveShipMessage) {
   const isValid = ({ x: tempX, y: tempY }) => {
     return tempX >= 0 && tempX < map.width && tempY >= 0 && tempY < map.height;
   };
-  const moves = astar(startPosition, targetLocation, isEmpty, isValid);
+  const moves = astar(startPosition, endPosition, isEmpty, isValid);
 
   if (moves == null) {
     console.log('no such path');
   } else {
+    moves.push(targetLocation);
     ship.setMoves(moves);
   }
 }

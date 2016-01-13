@@ -15,7 +15,7 @@ export default class Mine {
   }
 
   render(context, images) {
-    context.drawImage(images.mine, this.x * 50, this.y * 50, 50, 50);
+    context.drawImage(images.mine, (this.x - 0.5) * 50, (this.y - 0.5) * 50, 50, 50);
   }
 
   getX() {

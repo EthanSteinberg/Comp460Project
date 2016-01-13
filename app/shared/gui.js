@@ -32,8 +32,8 @@ export default class Gui {
     for (let x = MAP_WIDTH; x < this.width + MAP_WIDTH; x++) {
       for (let y = 0; y < this.height; y++) {
         context.fillStyle = 'gray';
-        context.fillRect(x * 50, y * 50, 50, 50);
-        context.strokeRect(x * 50, y * 50, 50, 50);
+        context.fillRect((x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
+        context.strokeRect((x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
       }
     }
 

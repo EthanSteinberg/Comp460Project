@@ -34,14 +34,17 @@ class Game {
         this.selectedItem = null;
       } else if (event.button === 0) {
         const rect = this.canvas.getBoundingClientRect();
-        const x = event.clientX - rect.left + this.x;
-        const y = event.clientY - rect.top + this.y;
+        const x = event.clientX - rect.left + this.x - 25;
+        const y = event.clientY - rect.top + this.y - 25;
 
         // The mouse coordinates in grid coordinatess.
-        const mouseRoundedX = Math.floor(x / 50);
-        const mouseRoundedY = Math.floor(y / 50);
+        const mouseX = x / 50;
+        const mouseY = y / 50;
 
-        var item = this.map.getItem(mouseRoundedX, mouseRoundedY);
+        const mouseRoundedX = Math.round(mouseX);
+        const mouseRoundedY = Math.round(mouseY);
+
+        let item = this.map.getItem(mouseX, mouseY);
         // Check if we have clicked an item in the gui
         if (item == null) {
           item = this.gui.getItem(mouseRoundedX, mouseRoundedY);
@@ -49,19 +52,19 @@ class Game {
             this.guiSelected = true;
           }
         }
-        
+
         if (this.selectedItem != null) {
           // Something is currently selected. Try to move if empty. Otherwise select.
           if (item == null) {
             if (this.guiSelected) {
               // If an empty tile on an island is selected then add a building
-              var buildingType = this.selectedItem.getBuilding();
+              const buildingType = this.selectedItem.getBuilding();
               this.sendMessage({ type: 'MakeBuilding', building: buildingType, x: mouseRoundedX, y: mouseRoundedY });
               this.guiSelected = false;
-              this.selectedItem = null;          
+              this.selectedItem = null;
             } else {
               // Try to move to that location.
-              const targetLocation = { x: mouseRoundedX, y: mouseRoundedY };
+              const targetLocation = { x: mouseX, y: mouseY };
               this.sendMessage({ type: 'MoveShip', shipId: this.selectedItem.getId(), targetLocation });
             }
           } else {
@@ -165,6 +168,8 @@ class Game {
     this.context.clearRect(0, 0, this.width, this.height);
     this.context.save();
 
+    this.context.translate(25, 25);
+
     this.context.translate(-this.x, -this.y);
 
     // Render the map and everything on it.
@@ -175,8 +180,8 @@ class Game {
     if (this.selectedItem != null) {
       this.context.strokeStyle = 'cyan';
       this.context.strokeRect(
-        this.selectedItem.getX() * 50,
-        this.selectedItem.getY() * 50,
+        (this.selectedItem.getX() - 0.5) * 50,
+        (this.selectedItem.getY() - 0.5) * 50,
         50,
         50
       );

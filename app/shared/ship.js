@@ -13,7 +13,7 @@ export default class Ship {
   }
 
   render(context, images) {
-    context.drawImage(images.ship, this.x * 50, this.y * 50, 50, 50);
+    context.drawImage(images.ship, (this.x - 0.5) * 50, (this.y - 0.5) * 50, 50, 50);
   }
 
   getX() {
@@ -25,10 +25,6 @@ export default class Ship {
   }
 
   setPosition(x, y) {
-    const oldPosition = { x: this.x, y: this.y };
-    const newPosition = { x, y };
-    this.map.updatePosition(this, oldPosition, newPosition);
-
     this.x = x;
     this.y = y;
   }
@@ -39,6 +35,31 @@ export default class Ship {
     this.moves[0] = { x: this.getX(), y: this.getY() };
     this.ticksTillNextMove = 0;
     this.moveIndex = 0;
+  }
+
+  canMove(move) {
+    for (const ship of this.map.getShips()) {
+      if (ship.getId() === this.id) {
+        continue;
+      }
+
+      const xDistance = move.x - ship.getX();
+      const yDistance = move.y - ship.getY();
+      const distanceSquared = xDistance * xDistance + yDistance * yDistance;
+      if (distanceSquared < 1) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  tryMove(move) {
+    if (!this.canMove(move)) {
+      this.moving = false;
+      return [];
+    }
+    this.setPosition(move.x, move.y);
+    return [{ type: 'SetShipPosition', shipId: this.id, position: move }];
   }
 
   /**
@@ -55,9 +76,7 @@ export default class Ship {
         this.moving = false;
         const lastMove = this.moves[this.moves.length - 1];
 
-        this.setPosition(lastMove.x, lastMove.y);
-
-        return [{ type: 'SetShipPosition', shipId: this.id, position: lastMove }];
+        return this.tryMove(lastMove);
       }
     }
 
@@ -72,8 +91,7 @@ export default class Ship {
       y: currentMove.y * currentMoveFactor + nextMove.y * nextMoveFactor,
     };
 
-    this.setPosition(interpolatedPosition.x, interpolatedPosition.y);
-    return [{ type: 'SetShipPosition', shipId: this.id, position: interpolatedPosition }];
+    return this.tryMove(interpolatedPosition);
   }
 
   /**

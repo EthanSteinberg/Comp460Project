@@ -21,7 +21,7 @@ export default class GameMap {
 
     this.ships = new Map();
 
-    this.buttons = [] 
+    this.buttons = [];
 
     this.mines = new Map();
     this.shipyards = new Map();
@@ -38,16 +38,10 @@ export default class GameMap {
 
   addShip(ship) {
     this.ships.set(ship.getId(), ship);
-    this.grid[ship.getX() + ',' + ship.getY()] = ship;
   }
 
   getShip(shipId) {
     return this.ships.get(shipId);
-  }
-
-  updatePosition(item, oldPosition, newPosition) {
-    this.grid[Math.round(oldPosition.x) + ',' + Math.round(oldPosition.y)] = null;
-    this.grid[Math.round(newPosition.x) + ',' + Math.round(newPosition.y)] = item;
   }
 
   /**
@@ -57,14 +51,14 @@ export default class GameMap {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         context.fillStyle = 'blue';
-        context.fillRect(x * 50, y * 50, 50, 50);
-        context.strokeRect(x * 50, y * 50, 50, 50);
+        context.fillRect((x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
+        context.strokeRect((x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
       }
     }
 
     for (const [x, y] of this.islands) {
       context.fillStyle = 'green';
-      context.fillRect(x * 50, y * 50, 50, 50);
+      context.fillRect((x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
     }
 
     for (const ship of this.ships.values()) {
@@ -81,7 +75,19 @@ export default class GameMap {
   }
 
   getItem(x, y) {
-    return this.grid[x + ',' + y];
+    if (this.grid[Math.round(x) + ',' + Math.round(y)] != null) {
+      return this.grid[Math.round(x) + ',' + Math.round(y)];
+    }
+
+    for (const ship of this.ships.values()) {
+      const distanceSquared = (ship.getX() - x) * (ship.getX() - x) + (ship.getY() - y) * (ship.getY() - y);
+      const distance = Math.sqrt(distanceSquared);
+      if (distance <= 0.5) {
+        return ship;
+      }
+    }
+
+    return null;
   }
 
   isIsland(x, y) {
@@ -106,6 +112,10 @@ export default class GameMap {
         this.grid[shipyard.getX() + ',' + shipyard.getY()] = shipyard;
         break;
     }
+  }
+
+  getShips() {
+    return [...this.ships.values()];
   }
 
   /**
