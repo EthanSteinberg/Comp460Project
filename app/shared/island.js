@@ -24,11 +24,9 @@ export default class Island {
       this.addToPerimeter(iX, iY+1);
       this.addToPerimeter(iX+1, iY+1);
     }
-    console.log(this.perimeter);
   }
 
   addToPerimeter(x, y) {
-    console.log(x, y);
     if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT && this.isIsland(x,y) == false) {
       this.perimeter.push([x,y]);
     }
