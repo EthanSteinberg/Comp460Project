@@ -2,7 +2,7 @@
  * A mine entity.
  */
 let nextId = 0;
- 
+
 export default class Mine {
 
   constructor(map, x, y, islandID) {

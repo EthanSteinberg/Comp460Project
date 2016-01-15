@@ -11,11 +11,22 @@ export default class Ship {
     this.y = y;
     this.id = nextId++;
     this.set = true;
-    this.type = "shiptemplate";
+    this.type = 'shiptemplate';
+    this.isSelected = false;
   }
 
   render(context, images) {
     context.drawImage(images.ship, (this.x - 0.5) * 50, (this.y - 0.5) * 50, 50, 50);
+
+    if (this.isSelected) {
+      context.strokeStyle = 'cyan';
+      context.strokeRect(
+        (this.x - 0.5) * 50,
+        (this.y - 0.5) * 50,
+        50,
+        50
+      );
+    }
   }
 
   getX() {
@@ -115,7 +126,7 @@ export default class Ship {
     }
 
     if (this.set) {
-      result.push(...this.getSetMessage())
+      result.push(...this.getSetMessage());
     }
 
     return result;

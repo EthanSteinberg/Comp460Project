@@ -14,21 +14,32 @@ export default class Button {
     this.type = type;
     this.x = x;
     this.y = y;
+    this.isSelected = false;
   }
 
   render(context, images) {
     switch (this.type) {
       case 'mine':
-        context.drawImage(images.mine, (this.x - 0.5) * 50, (this.y - 0.5) * 50, 50, 50);
+        context.drawImage(images.mine, this.x * 50, this.y * 50, 50, 50);
         break;
       case 'shipyard':
-        context.drawImage(images.shipyard, (this.x - 0.5) * 50, (this.y - 0.5) * 50, 50, 50);
+        context.drawImage(images.shipyard, this.x * 50, this.y * 50, 50, 50);
         break;
       case 'shiptemplate':
-        context.drawImage(images.ship, (this.x - 0.5) * 50, (this.y - 0.5) * 50, 50, 50);
+        context.drawImage(images.ship, this.x * 50, this.y * 50, 50, 50);
         break;
       default:
         console.error('Trying to render unknown button');
+    }
+
+    if (this.isSelected) {
+      context.strokeStyle = 'cyan';
+      context.strokeRect(
+        this.x * 50,
+        this.y * 50,
+        50,
+        50
+      );
     }
   }
 

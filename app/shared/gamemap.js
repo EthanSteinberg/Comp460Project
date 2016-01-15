@@ -57,6 +57,7 @@ export default class GameMap {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         context.fillStyle = 'blue';
+        context.strokeStyle = 'black';
         context.fillRect((x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
         context.strokeRect((x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
       }
