@@ -3,6 +3,7 @@ const sources = {
   ship: 'ship.png',
   mine: 'mine.png',
   shipyard: 'shipyard.png',
+  money: 'money.png',
 };
 
 /**

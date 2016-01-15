@@ -60,7 +60,7 @@ function moveShipHandler(moveShipMessage) {
   if (moves == null) {
     console.log('no such path');
   } else {
-    moves.push(targetLocation);
+    moves[moves.length -1] = targetLocation;
     ship.setMoves(moves);
   }
 }

@@ -36,6 +36,17 @@ export default class Gui {
       }
     }
 
+    context.fillStyle = 'black';
+    context.textBaseline = 'top';
+    context.font = '24px sans-serif';
+    context.fillText('100', 435, 6);
+
+    const width = context.measureText('100').width;
+
+    context.strokeStyle = 'black';
+    context.strokeRect(400, 1, width + 40, 35);
+    context.drawImage(images.money, 405, 6, 25, 25);
+
     for (const button of this.buttons) {
       button.render(context, images);
     }

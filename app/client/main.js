@@ -229,7 +229,7 @@ class Game {
 
     this.context.font = '50px sans-serif';
     this.context.fillStyle = 'black';
-    this.context.fillText('FPS: ' + this.frames / (time - this.start) * 1000, 100, 500);
+    this.context.fillText('FPS: ' + this.frames / (time - this.start) * 1000, 0, 400);
 
     if (this.frames === 100) {
       this.start = time;
