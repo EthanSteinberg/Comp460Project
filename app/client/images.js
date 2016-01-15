@@ -4,6 +4,14 @@ const sources = {
   mine: 'mine.png',
   shipyard: 'shipyard.png',
   money: 'money.png',
+  shipskeleton: 'shipskeleton.png',
+  roundshot: 'roundshot.png',
+  chainshot: 'chainshot.png',
+  grapeshot: 'grapeshot.png',
+  shell: 'shell.png',
+  gunboat: 'gunboat.png',
+  frigate: 'frigate.png',
+  galleon: 'galleon.png',
 };
 
 /**

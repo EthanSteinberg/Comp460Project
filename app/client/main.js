@@ -1,11 +1,15 @@
 import GameMap from '../shared/gamemap';
 import Gui from '../shared/gui';
+import ShipbuilderGui from '../shared/shipbuildergui';
+
 import loadImages from './images';
 import Ship from '../shared/ship';
 import Shipyard from '../shared/shipyard';
 
 const MILLISECONDS_PER_LOGIC_UPDATE = 5;
 const MILLISECONDS_PER_RENDER_UPDATE = 15;
+
+const SHIPBUILDMODE = true;
 
 /**
  * The central game object for most of the logic.
@@ -246,6 +250,122 @@ class Game {
   }
 }
 
+class Shipbuilder {
+  /**
+   * Contruct the shipbuilder menu
+   */
+  constructor(images) {
+    this.images = images;
+    this.shipbuildergui = new ShipbuilderGui();
+    this.canvas = document.getElementById('canvas');
+    this.width = this.canvas.width;
+    this.height = this.canvas.height;
+    this.context = this.canvas.getContext('2d');
+
+    // Ignore right click events on the canvas
+    this.canvas.addEventListener('contextmenu', (event) => {
+      event.preventDefault();
+    });
+
+    this.canvas.addEventListener('mousedown', (event) => {
+      const rect = this.canvas.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left + this.x - 25;
+      const mouseY = event.clientY - rect.top + this.y - 25;
+
+      if (event.button === 2) {
+        // Deselect on right click
+        this.shipbuildergui.deselect();
+        this.shipbuildergui.emptyslot(mouseX, mouseY);
+      } else if (event.button === 0) {
+        this.shipbuildergui.select(mouseX, mouseY);
+      }
+    });
+
+    this.pressedKeys = new Set();
+
+    this.x = 0;
+    this.y = 0;
+
+    this.actionMap = {
+      37: () => this.x -= 1,
+      38: () => this.y -= 1,
+      39: () => this.x += 1,
+      40: () => this.y += 1,
+    };
+  }
+
+  /**
+   * Start the game by setting up the render intervals.
+   */
+  start() {
+    // this.ws = new WebSocket('ws://localhost:3000');
+    // this.ws.onmessage = this._onMessage.bind(this);
+
+    setInterval(this.render.bind(this), MILLISECONDS_PER_RENDER_UPDATE);
+    this.lastUpdate = performance.now();
+
+    this.frames = 0;
+    this.start = performance.now();
+  }
+
+  _onMessage(event) {
+    const messageData = JSON.parse(event.data);
+    if (messageData.type in this.messageHandlerMap) {
+      this.messageHandlerMap[messageData.type](messageData);
+    }
+    console.log('Got' + event.data);
+  }
+
+  /**
+   * Update the game state when necessary.
+   */
+  update(currentTime) {
+    while (currentTime > this.lastUpdate) {
+      this.tick();
+      this.lastUpdate += MILLISECONDS_PER_LOGIC_UPDATE;
+    }
+  }
+
+  /**
+   * Perform a discrete update of the logic.
+   */
+  tick() {
+    for (const key in this.actionMap) {
+      if (this.pressedKeys.has(+key)) {
+        this.actionMap[key]();
+      }
+    }
+  }
+
+  /**
+   * Render the game. Also performs updates if necessary.
+   */
+  render() {
+    const time = performance.now();
+
+    this.frames += 1;
+
+    this.update(time);
+
+    this.context.clearRect(0, 0, this.width, this.height);
+    this.context.save();
+
+    this.context.translate(25, 25);
+
+    this.context.translate(-this.x, -this.y);
+
+    // Render the gui
+    this.shipbuildergui.render(this.context, this.images);
+
+    this.context.restore();
+
+    if (this.frames === 100) {
+      this.start = time;
+      this.frames = 0;
+    }
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function startCanvas() {
   loadImages().then((images) => {
     const game = new Game(images);
@@ -258,6 +378,9 @@ document.addEventListener('DOMContentLoaded', function startCanvas() {
       game.keyup(event);
     });
 
-    game.start();
+    // game.start();
+
+    const shipbuilder = new Shipbuilder(images);
+    shipbuilder.start();
   });
 });
