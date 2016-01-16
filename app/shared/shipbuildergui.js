@@ -75,9 +75,10 @@ export default class ShipbuilderGui {
     for (const button of this.buttons.values()) {
       var item = button.select(mouseX, mouseY);
       if(item != -1) {
-        this.selectionLogic(item);
+        return this.selectionLogic(item);
       }
     }
+    return 'shipbuilder';
   }
 
   selectionLogic(item) {
@@ -116,7 +117,9 @@ export default class ShipbuilderGui {
     this.selected = item;
 
     if (newbutton.getType() == 'save') {
-      console.log("Saving ship");
+      return 'game';
+    } else {
+      return 'shipbuilder';
     }
   }
 

@@ -9,7 +9,11 @@ import {MAP_HEIGHT} from './gamemap';
 export default class Gui {
 
   constructor() {
-    this.buttons = [new Button('mine', 1+MAP_WIDTH, 1), new Button('shipyard', 1+MAP_WIDTH, 3)];
+    this.buttons = [
+      new Button('mine', 1+MAP_WIDTH, 1), 
+      new Button('shipyard', 1+MAP_WIDTH, 3),
+      new Button('shipbuilder',1+MAP_WIDTH, 6)
+    ];
 
     this.grid = {};
 

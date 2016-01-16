@@ -28,6 +28,14 @@ export default class Button {
       case 'shiptemplate':
         context.drawImage(images.ship, this.x * 50, this.y * 50, 50, 50);
         break;
+      case 'shipbuilder':
+        context.fillStyle = 'red';
+        context.fillRect(this.x * 50, this.y * 50, 50, 50);
+        context.font="10px Arial"
+        context.fillStyle = 'black';
+        context.fillText('SHIP', this.x * 50 + 15, this.y * 50 + 10);
+        context.fillText('BUILDER', this.x * 50 + 5, this.y * 50 + 20);
+        break;
       default:
         console.error('Trying to render unknown button');
     }

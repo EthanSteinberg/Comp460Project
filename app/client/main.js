@@ -24,7 +24,7 @@ class Main {
 
     this.images = images;
     this.game = new Game(images);
-    const shipbuilder = new Shipbuilder(images);
+    this.shipbuilder = new Shipbuilder(images);
 
     this.canvas = document.getElementById('canvas');
     this.width = this.canvas.width;
@@ -55,9 +55,9 @@ class Main {
 
     this.canvas.addEventListener('mousedown', (event) => {
       if (this.mode == 'game') {
-        this.game.mousedown(event, this.sendMessage.bind(this));
+        this.mode = this.game.mousedown(event, this.sendMessage.bind(this));
       } else if (this.mode == 'shipbuilder') {
-        this.shipbuilder.mousedown(event);
+        this.mode = this.shipbuilder.mousedown(event);
       }
     });
 
@@ -170,20 +170,27 @@ class Game {
       const rawY = event.clientY - rect.top;
 
       if (rawX > 400) {
-        this.processGuiMouseClick(rawX, rawY);
+        return this.processGuiMouseClick(rawX, rawY);
       } else {
         this.processMapMouseClick(rawX, rawY, sendMessage);
       }
     }
+
+    return 'game';
   }
 
   processGuiMouseClick(rawX, rawY) {
     // In the gui
     const item = this.gui.getItem(Math.floor(rawX / 50), Math.floor(rawY / 50));
     if (item != null) {
+      if (item.getType() == 'shipbuilder') {
+        return 'shipbuilder';
+      }
       this.guiSelected = true;
       this.setSelectedItem(item);
     }
+
+    return 'game';
   }
 
   processMapMouseClick(rawX, rawY, sendMessage) {
@@ -304,6 +311,9 @@ class Shipbuilder {
     this.width = this.canvas.width;
     this.height = this.canvas.height;
     this.context = this.canvas.getContext('2d');
+
+    this.x = 0;
+    this.y = 0;
   }
 
   mousedown(event) {
@@ -316,8 +326,9 @@ class Shipbuilder {
       this.shipbuildergui.deselect();
       this.shipbuildergui.emptyslot(mouseX, mouseY);
     } else if (event.button === 0) {
-      this.shipbuildergui.select(mouseX, mouseY);
+      return this.shipbuildergui.select(mouseX, mouseY);
     }
+    return 'shipbuilder';
   }
 
   /**

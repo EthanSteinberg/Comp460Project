@@ -59,7 +59,7 @@ export default class GuiButton {
         context.fillStyle = 'red';
         context.fillRect(this.x, this.y, 50, 50);
         context.fillStyle = 'black';
-        context.fillText('SAVE', this.x + 5, this.y + 30);
+        context.fillText('SAVE', this.x + 5, this.y + 15);
         break;
       default:
         console.error('Trying to render unknown button');
