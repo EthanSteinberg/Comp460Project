@@ -74,9 +74,9 @@ function makeBuildingHandler(makeBuildingMessage) {
 }
 
 function makeShipHandler(makeShipMessage) {
-  const { islandID, x, y } = makeShipMessage;
+  const { islandID, x, y, shipstats } = makeShipMessage;
   if (map.isNextToIsland(islandID,x,y)) {
-    map.addBuilding('shiptemplate', x, y);
+    map.addBuilding('ship', x, y, islandID, shipstats);
   }
 }
 

@@ -1,3 +1,4 @@
+
 /**
  * A ship entity.
  */
@@ -5,14 +6,15 @@ let nextId = 0;
 
 export default class Ship {
 
-  constructor(map, x, y) {
+  constructor(map, x, y, stats) {
     this.map = map;
     this.x = x;
     this.y = y;
     this.id = nextId++;
     this.set = true;
-    this.type = 'shiptemplate';
+    this.type = 'ship';
     this.isSelected = false;
+    this.stats = stats;
   }
 
   render(context, images) {
@@ -35,6 +37,14 @@ export default class Ship {
 
   getY() {
     return this.y;
+  }
+
+  getStats() {
+    return this.stats;
+  }
+
+  getType() {
+    return this.type;
   }
 
   setPosition(x, y) {
@@ -113,7 +123,7 @@ export default class Ship {
   getSetMessage() {
     this.set = false;
     const pos = { x: this.x, y: this.y };
-    return [{ type: 'SetPosition', object: this.type, position: pos }];
+    return [{ type: 'SetPosition', object: this.type, position: pos, islandID: 0, stats: this.stats }];
   }
 
   /**

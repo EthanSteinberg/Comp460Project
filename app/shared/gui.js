@@ -21,6 +21,9 @@ export default class Gui {
 
     this.width = 3;
     this.height = 8;
+    this.displayStats = false;
+
+    this.stats = null;
   }
 
   _initGrid() {
@@ -51,6 +54,17 @@ export default class Gui {
     context.strokeRect(400, 1, width + 40, 35);
     context.drawImage(images.money, 405, 6, 25, 25);
 
+    if (this.displayStats) {
+      context.font = '15px sans-serif';
+      context.fillText('Health: ' + this.stats.health, 700, 175);
+      context.fillText('Damage: ' + this.stats.damage, 700, 190);
+      context.fillText('Speed: ' + this.stats.speed, 700, 205);
+      context.fillText('Weight: ' + this.stats.weight, 700, 220);
+      context.fillText('Wood Cost: ' + this.stats.wcost, 700, 235);
+      context.fillText('Coin Cost: ' + this.stats.ccost, 700, 250);
+      context.fillText('Production Time: ' + this.stats.tcost, 700, 265);
+    }
+
     for (const button of this.buttons) {
       button.render(context, images);
     }
@@ -60,7 +74,20 @@ export default class Gui {
     return this.grid[x + ',' + y];
   }
 
-  displayShipyard() {
+  displayShipStats(stats){
+    console.log(stats)
+    this.displayStats = true;
+    this.stats = stats;
+  }
+
+  removeShipStats(){
+    this.displayStats = false;
+  }
+
+  displayShipyard(stats) {
+    console.log(stats)
+    this.stats = stats;
+    this.displayStats = true;
     this.buttons.push(new Button('shiptemplate', MAP_WIDTH, 5));
     for (const button of this.buttons) {
       this.grid[button.getX() + ',' + button.getY()] = button;
@@ -68,6 +95,7 @@ export default class Gui {
   }
 
   removeShipyardDisplay() {
+    this.displayStats = false;
     for(var i = this.buttons.length - 1; i >= 0; i--) {
       if(this.buttons[i].getType() === 'shiptemplate') {
          this.grid[this.buttons[i].getX() + ',' + this.buttons[i].getY()] = null;

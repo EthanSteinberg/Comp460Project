@@ -140,4 +140,8 @@ export default class ShipbuilderGui {
     }
   }
 
+  getStats() {
+    return this.stats;
+  }
+
 }

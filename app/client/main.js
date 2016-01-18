@@ -55,7 +55,7 @@ class Main {
 
     this.canvas.addEventListener('mousedown', (event) => {
       if (this.mode == 'game') {
-        this.mode = this.game.mousedown(event, this.sendMessage.bind(this));
+        this.mode = this.game.mousedown(event, this.sendMessage.bind(this), this.shipbuilder.getStats());
       } else if (this.mode == 'shipbuilder') {
         this.mode = this.shipbuilder.mousedown(event);
       }
@@ -157,7 +157,7 @@ class Game {
     this.context = this.canvas.getContext('2d');
   }
 
-  mousedown(event, sendMessage) {
+  mousedown(event, sendMessage, stats) {
     if (event.button === 2) {
       // Deselect on right click
       if (this.selectedItem instanceof Shipyard) {
@@ -172,7 +172,7 @@ class Game {
       if (rawX > 400) {
         return this.processGuiMouseClick(rawX, rawY);
       } else {
-        this.processMapMouseClick(rawX, rawY, sendMessage);
+        this.processMapMouseClick(rawX, rawY, sendMessage, stats);
       }
     }
 
@@ -193,7 +193,7 @@ class Game {
     return 'game';
   }
 
-  processMapMouseClick(rawX, rawY, sendMessage) {
+  processMapMouseClick(rawX, rawY, sendMessage, stats) {
     const x = rawX + this.x - 25;
     const y = rawY + this.y - 25;
 
@@ -212,7 +212,7 @@ class Game {
         if (this.guiSelected) {
           // If an empty tile on an island is selected then add a building
           if (this.selectedItem.getType() == 'shiptemplate') {
-            sendMessage({ type: 'MakeShip', islandID: this.selectedShipyard.getIslandID(), x: mouseRoundedX, y: mouseRoundedY });
+            sendMessage({ type: 'MakeShip', islandID: this.selectedShipyard.getIslandID(), x: mouseRoundedX, y: mouseRoundedY, shipstats: stats });
             this.gui.removeShipyardDisplay();
           } else {
             var buildingType = this.selectedItem.getType();
@@ -242,14 +242,17 @@ class Game {
     }
 
     if (this.selectedItem instanceof Shipyard) {
-        this.gui.displayShipyard();
-        this.selectedShipyard = this.selectedItem;
+      this.gui.displayShipyard(stats);
+      this.selectedShipyard = this.selectedItem;
     }
        
   }
 
   setSelectedItem(item) {
     if (this.selectedItem != null) {
+      if (this.selectedItem.getType() == 'ship') {
+        this.gui.removeShipStats();
+      }
       this.selectedItem.isSelected = false;
     }
 
@@ -257,6 +260,9 @@ class Game {
 
     if (item != null) {
       item.isSelected = true;
+      if (item.getType() == 'ship') {
+        this.gui.displayShipStats(item.getStats());
+      }
     }
   }
 
@@ -266,8 +272,8 @@ class Game {
   }
 
   _setPositionHandler(setPositionMessage) {
-    const { object, position, islandID } = setPositionMessage;
-    this.map.addBuilding(object, position.x, position.y, islandID);
+    const { object, position, islandID, stats } = setPositionMessage;
+    this.map.addBuilding(object, position.x, position.y, islandID, stats);
   }
 
   /**
@@ -329,6 +335,10 @@ class Shipbuilder {
       return this.shipbuildergui.select(mouseX, mouseY);
     }
     return 'shipbuilder';
+  }
+
+  getStats() {
+    return this.shipbuildergui.getStats();
   }
 
   /**

@@ -17,6 +17,16 @@ export default class Mine {
 
   render(context, images) {
     context.drawImage(images.mine, (this.x - 0.5) * 50, (this.y - 0.5) * 50, 50, 50);
+
+    if (this.isSelected) {
+      context.strokeStyle = 'cyan';
+      context.strokeRect(
+        (this.x - 0.5) * 50,
+        (this.y - 0.5) * 50,
+        50,
+        50
+      );
+    }
   }
 
   getX() {
@@ -29,6 +39,10 @@ export default class Mine {
 
   getId() {
     return this.id;
+  }
+
+  getType() {
+    return this.type;
   }
 
   /**

@@ -46,13 +46,17 @@ export default class Shipyard {
     return this.islandID;
   }
 
+  getType() {
+    return this.type;
+  }
+
   /**
    * Move the ship and perform the corresponding updates.
    */
   getSetMessage() {
     this.set = false;
     const pos = { x: this.x, y: this.y };
-    return [{ type: 'SetPosition', object: this.type, position: pos, islandID: this.islandID }];
+    return [{ type: 'SetPosition', object: this.type, position: pos, islandID: this.islandID, stats: null }];
   }
 
   /**
