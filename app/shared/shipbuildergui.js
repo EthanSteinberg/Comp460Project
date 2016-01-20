@@ -95,7 +95,7 @@ export default class ShipbuilderGui {
             || oldbutton.getType() == 'grapeshot'
             || oldbutton.getType() == 'shell') {
           newbutton.placeItem(oldbutton.getType());
-          this.stats.applyItemEffect(oldbutton.getType(), 1);
+          this.stats.applyItemEffect(oldbutton.getType());
           this.selected = -1;
         }
       }
@@ -108,7 +108,7 @@ export default class ShipbuilderGui {
             || oldbutton.getType() == 'frigate' 
             || oldbutton.getType() == 'galleon') {
           newbutton.placeItem(oldbutton.getType());
-          this.stats.applyItemEffect(oldbutton.getType(), 1);
+          this.stats.applyItemEffect(oldbutton.getType());
           this.selected = -1;
         }
       }
@@ -134,7 +134,7 @@ export default class ShipbuilderGui {
       if (button.getType() == 'gunslot' || button.getType() == 'hullslot') {
         var slotType = button.emptyslot(x, y);
         if (slotType != null) {
-          this.stats.applyItemEffect(slotType, -1);
+          this.stats.removeItemEffect(slotType);
         }
       }
     }

@@ -3,6 +3,76 @@
  */
 let nextId = 0;
 
+var roundshot = {
+  health: 100,
+  damage: 10,
+  speed: 0,
+  weight: -10,
+  wcost: 10,
+  ccost: 10,
+  tcost: 10,
+}
+
+var chainshot = {
+  health: 100,
+  damage: 5,
+  speed: 0,
+  weight: -20,
+  wcost: 25,
+  ccost: 10,
+  tcost: 10,
+}
+
+var grapeshot = {
+  health: 100,
+  damage: 20,
+  speed: 0,
+  weight: -5,
+  wcost: 50,
+  ccost: 50,
+  tcost: 20,
+}
+
+var shell = {
+  health: 100,
+  damage: 5,
+  speed: 0,
+  weight: -20,
+  wcost: 50,
+  ccost: 100,
+  tcost: 20,
+}
+
+var gunboat = {
+  health: 100,
+  damage: 0,
+  speed: 20,
+  weight: 25,
+  wcost: 100,
+  ccost: 10,
+  tcost: 60,
+}
+
+var frigate = {
+  health: 300,
+  damage: 0,
+  speed: 10,
+  weight: 50,
+  wcost: 200,
+  ccost: 50,
+  tcost: 120,
+}
+
+var galleon = {
+  health: 600,
+  damage: 0,
+  speed: 5,
+  weight: 100,
+  wcost: 300,
+  ccost: 100,
+  tcost: 180,
+}
+
 export default class Stats {
 
   constructor() {
@@ -17,67 +87,26 @@ export default class Stats {
     this.tcost = 0;
   }
 
-  applyItemEffect(type, mult) {
-    switch (type) {
-      case 'roundshot':
-        this.damage += 10 * mult;  
-        this.health += 100 * mult;
-        this.weight -= 10 * mult;
-        this.wcost += 10 * mult;
-        this.ccost += 10 * mult;
-        this.tcost += 10 * mult;
-        break;
-      case 'chainshot':
-        this.damage += 5 * mult;  
-        this.health += 100 * mult;
-        this.weight -= 20 * mult;
-        this.wcost += 50 * mult;
-        this.ccost += 50 * mult;
-        this.tcost += 20 * mult;
-        break;
-      case 'grapeshot':
-        this.damage += 20 * mult;  
-        this.health += 100 * mult;
-        this.weight -= 5 * mult;
-        this.wcost += 25 * mult;
-        this.ccost += 10 * mult;
-        this.tcost += 10 * mult;
-        break;
-      case 'shell':
-        this.damage += 5 * mult;  
-        this.health += 100 * mult;
-        this.weight -= 20 * mult;
-        this.wcost += 50 * mult;
-        this.ccost += 100 * mult;
-        this.tcost += 20 * mult;
-        break;
-      case 'gunboat':
-        this.health += 100 * mult;
-        this.weight += 25 * mult;
-        this.speed += 20 * mult;
-        this.wcost += 100 * mult;
-        this.ccost += 10 * mult;
-        this.tcost += 60 * mult;
-        break;
-      case 'frigate':
-        this.health += 300 * mult;
-        this.weight += 50 * mult;
-        this.speed += 10 * mult;
-        this.wcost += 200 * mult;
-        this.ccost += 50 * mult;
-        this.tcost += 120 * mult;
-        break;
-      case 'galleon':
-        this.health += 600 * mult;
-        this.weight += 100 * mult;
-        this.speed += 5 * mult;
-        this.wcost += 300 * mult;
-        this.ccost += 100 * mult;
-        this.tcost += 180 * mult;
-        break;      
-      default:
-        console.error('Trying to update by unknown type');
-    }
+  applyItemEffect(type) {
+    var obj = eval(type);
+    this.health += obj.health;
+    this.damage += obj.damage;  
+    this.speed += obj.speed;
+    this.weight += obj.weight;
+    this.wcost += obj.wcost;
+    this.ccost += obj.ccost;
+    this.tcost += obj.tcost;
+  }
+
+  removeItemEffect(type) {
+    var obj = eval(type);
+    this.health -= obj.health;
+    this.damage -= obj.damage;  
+    this.speed -= obj.speed;
+    this.weight -= obj.weight;
+    this.wcost -= obj.wcost;
+    this.ccost -= obj.ccost;
+    this.tcost -= obj.tcost;
   }
 
   getHealth() {
