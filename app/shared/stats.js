@@ -85,6 +85,8 @@ export default class Stats {
     this.wcost = 0;
     this.ccost = 0;
     this.tcost = 0;
+
+    this.templateNum = "None";
   }
 
   applyItemEffect(type) {
@@ -99,6 +101,11 @@ export default class Stats {
   }
 
   removeItemEffect(type) {
+    if (type == "templateSelected") {
+      this.templateNum = "None";
+      return;
+    }
+
     var obj = eval(type);
     this.health -= obj.health;
     this.damage -= obj.damage;  
@@ -107,6 +114,10 @@ export default class Stats {
     this.wcost -= obj.wcost;
     this.ccost -= obj.ccost;
     this.tcost -= obj.tcost;
+  }
+
+  setTemplateNum(templateNum) {
+    this.templateNum = templateNum;
   }
 
   getHealth() {
@@ -135,6 +146,10 @@ export default class Stats {
 
   getTcost() {
     return this.tcost;
+  }
+
+  getTemplateNum() {
+    return this.templateNum;
   }
 
 }

@@ -10,11 +10,13 @@ import Shipyard from './shipyard';
 
 export default class Button {
 
-  constructor(type, x, y) {
+  constructor(type, x, y, templateNum) {
     this.type = type;
     this.x = x;
     this.y = y;
     this.isSelected = false;
+
+    this.templateNum = templateNum;
   }
 
   render(context, images) {
@@ -57,6 +59,10 @@ export default class Button {
 
   getY() {
     return this.y;
+  }
+
+  getTemplateNum() {
+    return this.templateNum;
   }
 
   getBuilding() {

@@ -10,13 +10,17 @@ let nextId = 0;
 
 export default class GuiButton {
 
-  constructor(type, x, y) {
+  constructor(type, x, y, templateNum) {
     this.type = type;
     this.rendertype = type;
     this.x = x;
     this.y = y;
     this.selected = false;
     this.id = nextId++;
+
+    if (this.type == 'template') {
+      this.templateNum = templateNum;
+    }
   }
 
   render(context, images) {
@@ -61,6 +65,15 @@ export default class GuiButton {
         context.fillStyle = 'black';
         context.fillText('SAVE', this.x + 5, this.y + 15);
         break;
+      case 'template':
+        context.fillStyle = 'cornsilk';
+        context.fillRect(this.x, this.y, 50, 50);
+        break;
+      case 'templateSelected':
+        context.fillStyle = 'cornsilk';
+        context.fillRect(this.x, this.y, 50, 50);
+        context.drawImage(images.template, this.x, this.y, 50, 50);
+        break;
       default:
         console.error('Trying to render unknown button');
     }
@@ -82,12 +95,16 @@ export default class GuiButton {
     return this.type;
   }
 
+  getTemplateNum() {
+    return this.templateNum;
+  }
+
   getRenderType() {
     return this.rendertype;
   }
 
   placeItem(type) {
-    if(this.type != 'gunslot' && this.type != 'hullslot') {
+    if(this.type != 'gunslot' && this.type != 'hullslot' && this.type != 'template') {
       console.error('Not a slot. Improper placement.');
     }
     this.rendertype = type;

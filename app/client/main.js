@@ -158,6 +158,7 @@ class Game {
   }
 
   mousedown(event, sendMessage, stats) {
+    this.gui.addStats(stats);
     if (event.button === 2) {
       // Deselect on right click
       if (this.selectedItem instanceof Shipyard) {
@@ -172,7 +173,7 @@ class Game {
       if (rawX > 400) {
         return this.processGuiMouseClick(rawX, rawY);
       } else {
-        this.processMapMouseClick(rawX, rawY, sendMessage, stats);
+        this.processMapMouseClick(rawX, rawY, sendMessage);
       }
     }
 
@@ -193,7 +194,7 @@ class Game {
     return 'game';
   }
 
-  processMapMouseClick(rawX, rawY, sendMessage, stats) {
+  processMapMouseClick(rawX, rawY, sendMessage) {
     const x = rawX + this.x - 25;
     const y = rawY + this.y - 25;
 
@@ -212,7 +213,7 @@ class Game {
         if (this.guiSelected) {
           // If an empty tile on an island is selected then add a building
           if (this.selectedItem.getType() == 'shiptemplate') {
-            sendMessage({ type: 'MakeShip', islandID: this.selectedShipyard.getIslandID(), x: mouseRoundedX, y: mouseRoundedY, shipstats: stats });
+            sendMessage({ type: 'MakeShip', islandID: this.selectedShipyard.getIslandID(), x: mouseRoundedX, y: mouseRoundedY, shipstats: this.gui.getStats() });
             this.gui.removeShipyardDisplay();
           } else {
             var buildingType = this.selectedItem.getType();
@@ -242,7 +243,7 @@ class Game {
     }
 
     if (this.selectedItem instanceof Shipyard) {
-      this.gui.displayShipyard(stats);
+      this.gui.displayShipyard();
       this.selectedShipyard = this.selectedItem;
     }
        

@@ -2,7 +2,6 @@ import Button from './button';
 import {MAP_WIDTH} from './gamemap';
 import {MAP_HEIGHT} from './gamemap';
 
-
 /**
  * A map of the game containing islands and all current ships.
  */
@@ -15,6 +14,8 @@ export default class Gui {
       new Button('shipbuilder',1+MAP_WIDTH, 6)
     ];
 
+    this.templates = [];
+
     this.grid = {};
 
     this._initGrid();
@@ -24,6 +25,7 @@ export default class Gui {
     this.displayStats = false;
 
     this.stats = null;
+    this.templateStats = new Map();
   }
 
   _initGrid() {
@@ -55,18 +57,34 @@ export default class Gui {
     context.drawImage(images.money, 405, 6, 25, 25);
 
     if (this.displayStats) {
-      context.font = '15px sans-serif';
-      context.fillText('Health: ' + this.stats.health, 700, 175);
-      context.fillText('Damage: ' + this.stats.damage, 700, 190);
-      context.fillText('Speed: ' + this.stats.speed, 700, 205);
-      context.fillText('Weight: ' + this.stats.weight, 700, 220);
-      context.fillText('Wood Cost: ' + this.stats.wcost, 700, 235);
-      context.fillText('Coin Cost: ' + this.stats.ccost, 700, 250);
-      context.fillText('Production Time: ' + this.stats.tcost, 700, 265);
+      for (const template of this.templates) {
+        if (template.isSelected) {
+          var num = template.getTemplateNum();
+          this.stats = this.templateStats.get(num);
+        }
+      }
+
+      if (this.stats != null) {      
+        context.font = '15px sans-serif';
+        context.fillText('Health: ' + this.stats.health, 700, 175);
+        context.fillText('Damage: ' + this.stats.damage, 700, 190);
+        context.fillText('Speed: ' + this.stats.speed, 700, 205);
+        context.fillText('Weight: ' + this.stats.weight, 700, 220);
+        context.fillText('Wood Cost: ' + this.stats.wcost, 700, 235);
+        context.fillText('Coin Cost: ' + this.stats.ccost, 700, 250);
+        context.fillText('Production Time: ' + this.stats.tcost, 700, 265);
+      }
+
     }
 
     for (const button of this.buttons) {
       button.render(context, images);
+    }
+
+    for (const template of this.templates) {
+      if (template != undefined) {
+        template.render(context, images);
+      }
     }
   }
 
@@ -75,32 +93,52 @@ export default class Gui {
   }
 
   displayShipStats(stats){
-    console.log(stats)
-    this.displayStats = true;
     this.stats = stats;
+    this.displayStats = true;
   }
 
   removeShipStats(){
     this.displayStats = false;
   }
 
-  displayShipyard(stats) {
-    console.log(stats)
-    this.stats = stats;
+  addStats(stats) {
+    var num = stats.getTemplateNum();
+    if (num != 'None') {
+      this.templateStats.set(num, stats);
+      console.log(stats);
+      console.log(this.templateStats)
+      console.log(num)
+    }
+  }
+
+  getStats() {
+    for (const template of this.templates) {
+      if (template.isSelected) {
+        var num = template.getTemplateNum();
+        return this.templateStats.get(num);
+      }
+    }
+  }
+
+  displayShipyard() {
+    console.log("displayShipyard")
     this.displayStats = true;
-    this.buttons.push(new Button('shiptemplate', MAP_WIDTH, 5));
-    for (const button of this.buttons) {
-      this.grid[button.getX() + ',' + button.getY()] = button;
+    this.templates.push(new Button('shiptemplate', MAP_WIDTH, 5, 1));
+    this.templates.push(new Button('shiptemplate', MAP_WIDTH+1, 5, 2));
+    this.templates.push(new Button('shiptemplate', MAP_WIDTH+2, 5, 3));
+
+    for (const template of this.templates) {
+      this.grid[template.getX() + ',' + template.getY()] = template;
     }
   }
 
   removeShipyardDisplay() {
+    console.log("removeShipyardDisplay")
     this.displayStats = false;
-    for(var i = this.buttons.length - 1; i >= 0; i--) {
-      if(this.buttons[i].getType() === 'shiptemplate') {
-         this.grid[this.buttons[i].getX() + ',' + this.buttons[i].getY()] = null;
-         this.buttons.splice(i, 1);
-      }
+
+    while(this.templates.length > 0) {
+      var template = this.templates.pop();
+      this.grid[template.getX() + ',' + template.getY()] = null;
     }
   }
 }

@@ -12,7 +12,9 @@ export default class ShipbuilderGui {
     this.width = this.canvas.width;
     this.height = this.canvas.height;
     this.selected = null;
+    this.selectedTemplate = null;
     this.stats = new Stats();
+    this.returnedStats = new Stats();
 
     this.buttons = new Map();
     this.addButton(new GuiButton('roundshot', 700, 100));
@@ -29,8 +31,11 @@ export default class ShipbuilderGui {
     this.addButton(new GuiButton('gunslot', this.width/2 + 50, this.height/2-75)); //uppper right
     this.addButton(new GuiButton('gunslot', this.width/2 - 100, this.height/2+75)); //bottom left
     this.addButton(new GuiButton('gunslot', this.width/2 + 50, this.height/2+75)); //bottom right
-    
-    this.addButton(new GuiButton('save', 50, 300));
+                
+    this.addButton(new GuiButton('template', 50, 100, 1));
+    this.addButton(new GuiButton('template', 50, 200, 2)); 
+    this.addButton(new GuiButton('template', 50, 300, 3));
+    this.addButton(new GuiButton('save', 50, 400));
   }
 
   addButton(button) {
@@ -49,20 +54,29 @@ export default class ShipbuilderGui {
     context.fillText('SHIPBUILDMODE', this.width/2-100, 25);
 
     context.font = '20px sans-serif';
-    context.fillText('CANNONS', 700, 80);
+    context.fillText('CANNONS', 700, 70);
 
-    context.fillText('HULLS', 700, 180);
+    context.fillText('HULLS', 700, 170);
 
-    context.fillText('STATS', 700, 350);
+    context.fillText('STATS', 700, 310);
 
     context.font = '15px sans-serif';
-    context.fillText('Health: ' + this.stats.getHealth(), 700, 375);
-    context.fillText('Damage: ' + this.stats.getDamage(), 700, 390);
-    context.fillText('Speed: ' + this.stats.getSpeed(), 700, 405);
-    context.fillText('Weight: ' + this.stats.getWeight(), 700, 420);
-    context.fillText('Wood Cost: ' + this.stats.getWcost(), 700, 435);
-    context.fillText('Coin Cost: ' + this.stats.getCcost(), 700, 450);
-    context.fillText('Production Time: ' + this.stats.getTcost(), 700, 465);
+    context.fillText('Health: ' + this.stats.getHealth(), 700, 335);
+    context.fillText('Damage: ' + this.stats.getDamage(), 700, 350);
+    context.fillText('Speed: ' + this.stats.getSpeed(), 700, 365);
+    context.fillText('Weight: ' + this.stats.getWeight(), 700, 380);
+    context.fillText('Wood Cost: ' + this.stats.getWcost(), 700, 395);
+    context.fillText('Coin Cost: ' + this.stats.getCcost(), 700, 410);
+    context.fillText('Production Time: ' + this.stats.getTcost(), 700, 425);
+
+    context.fillText('Template Number: ' + this.stats.getTemplateNum(), 700, 450);
+
+
+    //Numbers for templates
+    context.fillText('1', 40, 100);
+    context.fillText('2', 40, 200);   
+    context.fillText('3', 40, 300);
+
 
     context.drawImage(images.shipskeleton, this.width/2 - 100, this.height/2 - 200, 200, 400);
 
@@ -116,7 +130,24 @@ export default class ShipbuilderGui {
 
     this.selected = item;
 
+    if (newbutton.getType() == 'template') {
+      if (this.selectedTemplate != null) {
+        this.selectedTemplate.placeItem('template');
+      }
+      newbutton.placeItem('templateSelected');
+      this.selectedTemplate = newbutton;
+      this.stats.setTemplateNum(newbutton.getTemplateNum());
+    }
+
     if (newbutton.getType() == 'save') {
+      if (this.selectedTemplate == null) {
+        alert("Please select a template number");
+        return 'shipbuilder';
+      }
+
+      this.returnedStats = this.stats;
+      this.emptySlots();
+      this.stats = new Stats();
       return 'game';
     } else {
       return 'shipbuilder';
@@ -129,9 +160,17 @@ export default class ShipbuilderGui {
     }
   }
 
+  emptySlots() {
+    for (const button of this.buttons.values()) {
+      if (button.getType() == 'gunslot' || button.getType() == 'hullslot' || button.getType() == 'template') {
+        button.emptyslot(button.getX()+1, button.getY()+1);
+      }
+    }
+  }
+
   emptyslot(x, y) {
     for (const button of this.buttons.values()) {
-      if (button.getType() == 'gunslot' || button.getType() == 'hullslot') {
+      if (button.getType() == 'gunslot' || button.getType() == 'hullslot' || button.getType() == 'template') {
         var slotType = button.emptyslot(x, y);
         if (slotType != null) {
           this.stats.removeItemEffect(slotType);
@@ -141,7 +180,7 @@ export default class ShipbuilderGui {
   }
 
   getStats() {
-    return this.stats;
+    return this.returnedStats;
   }
 
 }
