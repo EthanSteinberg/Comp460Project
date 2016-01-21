@@ -46,6 +46,7 @@ export default class ShipbuilderGui {
    * Render both the map and all ships on it.
    */
   render(context, images) {
+
     context.fillStyle = 'gray';
     context.fillRect(0, 0, this.width, this.height);
 
@@ -125,6 +126,9 @@ export default class ShipbuilderGui {
           this.stats.applyItemEffect(oldbutton.getType());
           this.selected = -1;
         }
+      }
+      if (newbutton != oldbutton) {
+        oldbutton.deselect();
       }
     }
 

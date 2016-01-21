@@ -73,6 +73,16 @@ var galleon = {
   tcost: 180,
 }
 
+var item = {
+  roundshot,
+  chainshot,
+  grapeshot,
+  shell,
+  gunboat,
+  frigate,
+  galleon,
+}
+
 export default class Stats {
 
   constructor() {
@@ -90,7 +100,7 @@ export default class Stats {
   }
 
   applyItemEffect(type) {
-    var obj = eval(type);
+    var obj = item[type];
     this.health += obj.health;
     this.damage += obj.damage;  
     this.speed += obj.speed;
@@ -106,7 +116,7 @@ export default class Stats {
       return;
     }
 
-    var obj = eval(type);
+    var obj = item[type];
     this.health -= obj.health;
     this.damage -= obj.damage;  
     this.speed -= obj.speed;
