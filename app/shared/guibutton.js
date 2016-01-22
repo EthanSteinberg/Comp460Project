@@ -13,6 +13,8 @@ export default class GuiButton {
   constructor(type, x, y, templateNum) {
     this.type = type;
     this.rendertype = type;
+    this.originalX = x;
+    this.originalY = y;
     this.x = x;
     this.y = y;
     this.selected = false;
@@ -29,6 +31,9 @@ export default class GuiButton {
       context.strokeRect(this.x, this.y, 50, 50);
     }
 
+    context.font = '20px sans-serif';
+    context.fillStyle = 'black';
+
     switch (this.rendertype) {
       case 'roundshot':
         context.drawImage(images.roundshot, this.x, this.y, 50, 50);
@@ -44,12 +49,15 @@ export default class GuiButton {
         break;
       case 'gunboat':
         context.drawImage(images.gunboat, this.x, this.y, 50, 50);
+        context.fillText('GUNBOAT', this.x, this.y + 60);
         break;
       case 'frigate':
         context.drawImage(images.frigate, this.x, this.y, 50, 50);
+        context.fillText('FRIGATE', this.x, this.y + 60);     
         break;
       case 'galleon':
         context.drawImage(images.galleon, this.x, this.y, 50, 50);
+        context.fillText('GALLEON', this.x, this.y + 60);    
         break;
       case 'gunslot':
         context.fillStyle = 'coral';
@@ -101,6 +109,11 @@ export default class GuiButton {
 
   getRenderType() {
     return this.rendertype;
+  }
+
+  restorePos() {
+    this.x = this.originalX;
+    this.y = this.originalY;
   }
 
   placeItem(type) {

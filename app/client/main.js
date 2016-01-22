@@ -61,6 +61,20 @@ class Main {
       }
     });
 
+    this.canvas.addEventListener('mouseup', (event) => {
+      if (this.mode == 'game') {
+      } else if (this.mode == 'shipbuilder') {
+        this.shipbuilder.mouseup(event);
+      }
+    });
+
+    this.canvas.addEventListener('mousemove', (event) => {
+      if (this.mode == 'game') {
+      } else if (this.mode == 'shipbuilder') {
+        this.shipbuilder.mousemove(event);
+      }
+    });
+
     this.messageHandlerMap = {
       'SetShipPosition': this._setShipPositionHandler.bind(this),
       'SetPosition': this._setPositionHandler.bind(this),
@@ -336,6 +350,22 @@ class Shipbuilder {
       return this.shipbuildergui.select(mouseX, mouseY);
     }
     return 'shipbuilder';
+  }
+
+  mouseup(event) {
+    const rect = this.canvas.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left + this.x - 25;
+    const mouseY = event.clientY - rect.top + this.y - 25;
+
+    this.shipbuildergui.releaseItem(mouseX, mouseY);
+  }
+
+  mousemove(event) {
+    const rect = this.canvas.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left + this.x - 25;
+    const mouseY = event.clientY - rect.top + this.y - 25;
+
+    this.shipbuildergui.updatePos(mouseX, mouseY);
   }
 
   getStats() {
