@@ -25,67 +25,67 @@ export default class GuiButton {
     }
   }
 
-  render(context, images) {
-    if (this.selected) {
-      context.strokeStyle = 'cyan';
-      context.strokeRect(this.x, this.y, 50, 50);
-    }
+  // render(context, images) {
+  //   if (this.selected) {
+  //     context.strokeStyle = 'cyan';
+  //     context.strokeRect(this.x, this.y, 50, 50);
+  //   }
 
-    context.font = '20px sans-serif';
-    context.fillStyle = 'black';
+  //   context.font = '20px sans-serif';
+  //   context.fillStyle = 'black';
 
-    switch (this.rendertype) {
-      case 'roundshot':
-        context.drawImage(images.roundshot, this.x, this.y, 50, 50);
-        break;
-      case 'chainshot':
-        context.drawImage(images.chainshot, this.x, this.y, 50, 50);
-        break;
-      case 'grapeshot':
-        context.drawImage(images.grapeshot, this.x, this.y, 50, 50);
-        break;
-      case 'shell':
-        context.drawImage(images.shell, this.x, this.y, 50, 50);
-        break;
-      case 'gunboat':
-        context.drawImage(images.gunboat, this.x, this.y, 50, 50);
-        context.fillText('GUNBOAT', this.x, this.y + 60);
-        break;
-      case 'frigate':
-        context.drawImage(images.frigate, this.x, this.y, 50, 50);
-        context.fillText('FRIGATE', this.x, this.y + 60);     
-        break;
-      case 'galleon':
-        context.drawImage(images.galleon, this.x, this.y, 50, 50);
-        context.fillText('GALLEON', this.x, this.y + 60);    
-        break;
-      case 'gunslot':
-        context.fillStyle = 'coral';
-        context.fillRect(this.x, this.y, 50, 50);
-        break;
-      case 'hullslot':
-        context.fillStyle = 'cornflowerblue';
-        context.fillRect(this.x, this.y, 50, 50);
-        break;
-      case 'save':
-        context.fillStyle = 'red';
-        context.fillRect(this.x, this.y, 50, 50);
-        context.fillStyle = 'black';
-        context.fillText('SAVE', this.x + 5, this.y + 15);
-        break;
-      case 'template':
-        context.fillStyle = 'cornsilk';
-        context.fillRect(this.x, this.y, 50, 50);
-        break;
-      case 'templateSelected':
-        context.fillStyle = 'cornsilk';
-        context.fillRect(this.x, this.y, 50, 50);
-        context.drawImage(images.template, this.x, this.y, 50, 50);
-        break;
-      default:
-        console.error('Trying to render unknown button');
-    }
-  }
+  //   switch (this.rendertype) {
+  //     case 'roundshot':
+  //       context.drawImage(images.roundshot, this.x, this.y, 50, 50);
+  //       break;
+  //     case 'chainshot':
+  //       context.drawImage(images.chainshot, this.x, this.y, 50, 50);
+  //       break;
+  //     case 'grapeshot':
+  //       context.drawImage(images.grapeshot, this.x, this.y, 50, 50);
+  //       break;
+  //     case 'shell':
+  //       context.drawImage(images.shell, this.x, this.y, 50, 50);
+  //       break;
+  //     case 'gunboat':
+  //       context.drawImage(images.gunboat, this.x, this.y, 50, 50);
+  //       context.fillText('GUNBOAT', this.x, this.y + 60);
+  //       break;
+  //     case 'frigate':
+  //       context.drawImage(images.frigate, this.x, this.y, 50, 50);
+  //       context.fillText('FRIGATE', this.x, this.y + 60);     
+  //       break;
+  //     case 'galleon':
+  //       context.drawImage(images.galleon, this.x, this.y, 50, 50);
+  //       context.fillText('GALLEON', this.x, this.y + 60);    
+  //       break;
+  //     case 'gunslot':
+  //       context.fillStyle = 'coral';
+  //       context.fillRect(this.x, this.y, 50, 50);
+  //       break;
+  //     case 'hullslot':
+  //       context.fillStyle = 'cornflowerblue';
+  //       context.fillRect(this.x, this.y, 50, 50);
+  //       break;
+  //     case 'save':
+  //       context.fillStyle = 'red';
+  //       context.fillRect(this.x, this.y, 50, 50);
+  //       context.fillStyle = 'black';
+  //       context.fillText('SAVE', this.x + 5, this.y + 15);
+  //       break;
+  //     case 'template':
+  //       context.fillStyle = 'cornsilk';
+  //       context.fillRect(this.x, this.y, 50, 50);
+  //       break;
+  //     case 'templateSelected':
+  //       context.fillStyle = 'cornsilk';
+  //       context.fillRect(this.x, this.y, 50, 50);
+  //       context.drawImage(images.template, this.x, this.y, 50, 50);
+  //       break;
+  //     default:
+  //       console.error('Trying to render unknown button');
+  //   }
+  // }
 
   getX() {
     return this.x;

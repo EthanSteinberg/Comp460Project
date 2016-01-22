@@ -1,5 +1,15 @@
 import GuiButton from './guibutton';
 import Stats from './stats';
+import Roundshot from './guibuttons/roundshot';
+import Grapeshot from './guibuttons/grapeshot';
+import Chainshot from './guibuttons/chainshot';
+import Shell from './guibuttons/shell';
+import Gunboat from './guibuttons/gunboat';
+import Frigate from './guibuttons/frigate';
+import Galleon from './guibuttons/galleon';
+import Gunslot from './guibuttons/gunslot';
+import Template from './guibuttons/template';
+import Save from './guibuttons/save';
 
 
 /**
@@ -22,9 +32,9 @@ export default class ShipbuilderGui {
     this.hullButtons = new Map();
     this.buttons = new Map();
 
-    this.addHullButton(new GuiButton('gunboat', 200, 200));
-    this.addHullButton(new GuiButton('frigate', 400, 200));
-    this.addHullButton(new GuiButton('galleon', 600, 200));
+    this.addHullButton(new Gunboat('gunboat', 200, 200));
+    this.addHullButton(new Frigate('frigate', 400, 200));
+    this.addHullButton(new Galleon('galleon', 600, 200));
 
   }
 
@@ -84,12 +94,10 @@ export default class ShipbuilderGui {
 
     context.fillText('Template Number: ' + this.stats.getTemplateNum(), 700, 450);
 
-
     //Numbers for templates
     context.fillText('1', 40, 100);
     context.fillText('2', 40, 200);   
     context.fillText('3', 40, 300);
-
 
     context.drawImage(images.shipskeleton, this.width/2 - 100, this.height/2 - 200, 200, 400);
 
@@ -119,7 +127,7 @@ export default class ShipbuilderGui {
   }
 
   updatePos(mouseX, mouseY) {
-    if (this.selectedButton != null) {
+    if (this.isCannonButton(this.selectedButton)) {
       this.selectedButton.x = mouseX - 25;
       this.selectedButton.y = mouseY - 25;
     }
@@ -143,6 +151,20 @@ export default class ShipbuilderGui {
     this.selected = null;
   }
 
+  isCannonButton(button) {
+    if (button == null) {
+      return false;
+    }
+
+    if (button.getType() == 'roundshot'
+        || button.getType() == 'chainshot' 
+        || button.getType() == 'grapeshot'
+        || button.getType() == 'shell') {
+      return true;
+    }
+    return false;
+  }
+
   releaseLogic(item) {
     var newbutton = this.buttons.get(item);
     var oldbutton = this.buttons.get(this.selected);
@@ -152,10 +174,7 @@ export default class ShipbuilderGui {
           && oldbutton.getType() != 'hullslot'
           && newbutton.getType() == newbutton.getRenderType()) {
 
-        if (oldbutton.getType() == 'roundshot'
-            || oldbutton.getType() == 'chainshot' 
-            || oldbutton.getType() == 'grapeshot'
-            || oldbutton.getType() == 'shell') {
+        if (this.isCannonButton(oldbutton)) {
           newbutton.placeItem(oldbutton.getType());
           this.stats.applyItemEffect(oldbutton.getType());
           this.selected = -1;
@@ -188,21 +207,20 @@ export default class ShipbuilderGui {
     var newbutton = this.hullButtons.get(item);
     this.stats.applyItemEffect(newbutton.getType());
 
-    this.addButton(new GuiButton('hullslot', this.width/2 - 25, this.height/2)); //center
-    this.addButton(new GuiButton('gunslot', this.width/2 - 100, this.height/2-75)); //upper left
-    this.addButton(new GuiButton('gunslot', this.width/2 + 50, this.height/2-75)); //uppper right
-    this.addButton(new GuiButton('gunslot', this.width/2 - 100, this.height/2+75)); //bottom left
-    this.addButton(new GuiButton('gunslot', this.width/2 + 50, this.height/2+75)); //bottom right
+    this.addButton(new Gunslot('gunslot', this.width/2 - 100, this.height/2-75)); //upper left
+    this.addButton(new Gunslot('gunslot', this.width/2 + 50, this.height/2-75)); //uppper right
+    this.addButton(new Gunslot('gunslot', this.width/2 - 100, this.height/2+75)); //bottom left
+    this.addButton(new Gunslot('gunslot', this.width/2 + 50, this.height/2+75)); //bottom right
 
-    this.addButton(new GuiButton('roundshot', 700, 100));
-    this.addButton(new GuiButton('chainshot', 760, 100));
-    this.addButton(new GuiButton('grapeshot', 820, 100));
-    this.addButton(new GuiButton('shell', 880, 100));
+    this.addButton(new Roundshot('roundshot', 700, 100));
+    this.addButton(new Chainshot('chainshot', 760, 100));
+    this.addButton(new Grapeshot('grapeshot', 820, 100));
+    this.addButton(new Shell('shell', 880, 100));
 
-    this.addButton(new GuiButton('template', 50, 100, 1));
-    this.addButton(new GuiButton('template', 50, 200, 2)); 
-    this.addButton(new GuiButton('template', 50, 300, 3));
-    this.addButton(new GuiButton('save', 50, 400));
+    this.addButton(new Template('template', 50, 100, 1));
+    this.addButton(new Template('template', 50, 200, 2)); 
+    this.addButton(new Template('template', 50, 300, 3));
+    this.addButton(new Save('save', 50, 400));
   }
 
   selectionLogicCustomize(item) {
