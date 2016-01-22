@@ -17,7 +17,7 @@ export default class ShipbuilderGui {
     this.stats = new Stats();
     this.returnedStats = new Stats();
 
-    this.phase = "hullSelect"
+    this.phase = "hullSelect";
 
     this.hullButtons = new Map();
     this.buttons = new Map();
@@ -230,6 +230,7 @@ export default class ShipbuilderGui {
       this.returnedStats = this.stats;
       this.emptySlots();
       this.stats = new Stats();
+      this.phase = 'hullSelect';
       return 'game';
     } else {
       return 'shipbuilder';
