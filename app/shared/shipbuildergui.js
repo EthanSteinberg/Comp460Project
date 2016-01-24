@@ -401,7 +401,7 @@ export default class ShipbuilderGui {
       this.chosenstats = new Stats();
       this.statsdisplay.setStats(this.chosenstats);
       this.emptyTemplateSlots();
-      this.selectedTemplate == null;
+      this.selectedTemplate = null;
       this.phase = 'templateSelect';
       return 'game';
     } else {
