@@ -105,9 +105,6 @@ export default class Gui {
     var num = stats.getTemplateNum();
     if (num != 'None') {
       this.templateStats.set(num, stats);
-      console.log(stats);
-      console.log(this.templateStats)
-      console.log(num)
     }
   }
 

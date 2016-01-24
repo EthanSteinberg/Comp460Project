@@ -10,6 +10,10 @@ import Galleon from './guibuttons/galleon';
 import Gunslot from './guibuttons/gunslot';
 import Template from './guibuttons/template';
 import Save from './guibuttons/save';
+import StatsDisplay from './guibuttons/statsdisplay';
+import InfoDisplay from './guibuttons/infodisplay';
+import Customize from './guibuttons/customize';
+import Overwrite from './guibuttons/overwrite';
 
 
 /**
@@ -24,18 +28,51 @@ export default class ShipbuilderGui {
     this.selected = null;
     this.selectedButton = null;
     this.selectedTemplate = null;
-    this.stats = new Stats();
+    this.stats = [new Stats(), new Stats(), new Stats()];
+    this.chosenstats = new Stats();
+    this.itemstats = new Stats();
     this.returnedStats = new Stats();
 
-    this.phase = "hullSelect";
+    this.phase = "templateSelect";
 
+    this.templateButtons = new Map();
     this.hullButtons = new Map();
     this.buttons = new Map();
+
+    this.addTemplateButton(new Template('template', 50, 100, 1));
+    this.addTemplateButton(new Template('template', 50, 200, 2)); 
+    this.addTemplateButton(new Template('template', 50, 300, 3));
+    this.addTemplateButton(new Customize('customize', 700, 300));
+    this.addTemplateButton(new Overwrite('overwrite', 700, 200));
 
     this.addHullButton(new Gunboat('gunboat', 200, 200));
     this.addHullButton(new Frigate('frigate', 400, 200));
     this.addHullButton(new Galleon('galleon', 600, 200));
 
+    this.addButton(new Gunslot('gunslot', this.width/2 - 100, this.height/2-75, 1)); //upper left
+    this.addButton(new Gunslot('gunslot', this.width/2 + 50, this.height/2-75, 2)); //uppper right
+    this.addButton(new Gunslot('gunslot', this.width/2 - 100, this.height/2+75, 3)); //bottom left
+    this.addButton(new Gunslot('gunslot', this.width/2 + 50, this.height/2+75, 4)); //bottom right
+
+    this.addButton(new Roundshot('roundshot', 700, 100));
+    this.addButton(new Chainshot('chainshot', 760, 100));
+    this.addButton(new Grapeshot('grapeshot', 820, 100));
+    this.addButton(new Shell('shell', 880, 100));
+
+    this.addButton(new Save('save', 50, 400));
+
+    this.statsdisplay = new StatsDisplay("statsdisplay", 150, 250);
+    this.statsdisplay.setStats(this.chosenstats);
+
+    this.itemstatsdisplay = new StatsDisplay("statsdisplay", 700, 250);
+    this.itemstatsdisplay.setStats(this.itemstats);
+
+    this.infodisplay = new InfoDisplay("infodisplay", 650, 180);
+    this.infodisplay.setMessage("");
+  }
+
+  addTemplateButton(button) {
+    this.templateButtons.set(button.getId(), button);
   }
 
   addHullButton(button) {
@@ -50,12 +87,32 @@ export default class ShipbuilderGui {
    * Render both the map and all ships on it.
    */
   render(context, images) {
-    if (this.phase == "hullSelect") {
+    if (this.phase == "templateSelect") {
+      this.templateSelect(context, images);
+    } else if (this.phase == "hullSelect") {
       this.hullSelect(context, images);
     } else if (this.phase == "customizeShip") {
       this.customizeShip(context, images);
     }
+  }
 
+  templateSelect(context, images) {
+    context.font = '25px sans-serif';
+    context.fillStyle = 'black';
+    context.fillText('SELECT A SHIP TO CUSTOMIZE', this.width/2-200, 25);
+
+    //Numbers for templates
+    context.font = '20px Comic Sans MS';
+    context.fillText('1', 40, 100);
+    context.fillText('2', 40, 200);   
+    context.fillText('3', 40, 300);
+
+    context.drawImage(images.shipskeleton, this.width/2 - 100, this.height/2 - 200, 200, 400);
+    this.statsdisplay.render(context, images);
+
+    for (const button of this.templateButtons.values()) {
+      button.render(context, images);
+    }
   }
 
   hullSelect(context, images) {
@@ -69,35 +126,23 @@ export default class ShipbuilderGui {
   }
 
   customizeShip(context, images) {
-    context.fillStyle = 'gray';
+    context.fillStyle = 'SlateGrey';
     context.fillRect(0, 0, this.width, this.height);
 
-    context.font = '25px sans-serif';
+    context.font = '25px Comic Sans MS';
     context.fillStyle = 'black';
     context.fillText('', this.width/2-100, 25);
 
-    context.font = '20px sans-serif';
+    context.font = '20px Comic Sans MS';
     context.fillText('CANNONS', 700, 70);
 
-    context.fillText('HULLS', 700, 170);
+    context.fillText('SHIP STATS', 150, 220);
 
-    context.fillText('STATS', 700, 310);
+    context.fillText('ITEM STATS', 700, 220);
 
-    context.font = '15px sans-serif';
-    context.fillText('Health: ' + this.stats.getHealth(), 700, 335);
-    context.fillText('Damage: ' + this.stats.getDamage(), 700, 350);
-    context.fillText('Speed: ' + this.stats.getSpeed(), 700, 365);
-    context.fillText('Weight: ' + this.stats.getWeight(), 700, 380);
-    context.fillText('Wood Cost: ' + this.stats.getWcost(), 700, 395);
-    context.fillText('Coin Cost: ' + this.stats.getCcost(), 700, 410);
-    context.fillText('Production Time: ' + this.stats.getTcost(), 700, 425);
-
-    context.fillText('Template Number: ' + this.stats.getTemplateNum(), 700, 450);
-
-    //Numbers for templates
-    context.fillText('1', 40, 100);
-    context.fillText('2', 40, 200);   
-    context.fillText('3', 40, 300);
+    this.itemstatsdisplay.render(context, images);
+    this.statsdisplay.render(context, images);
+    this.infodisplay.render(context, images);
 
     context.drawImage(images.shipskeleton, this.width/2 - 100, this.height/2 - 200, 200, 400);
 
@@ -107,11 +152,18 @@ export default class ShipbuilderGui {
   }
 
   select(mouseX, mouseY) {
-    if (this.phase == "hullSelect") {
+    if (this.phase == "templateSelect") {
+      for (const button of this.templateButtons.values()) {
+        var item = button.select(mouseX, mouseY);
+        if(item != -1) {
+          this.selectionLogicTemplateSelect(item);
+        }
+      }
+    } else if (this.phase == "hullSelect") {
       for (const button of this.hullButtons.values()) {
         var item = button.select(mouseX, mouseY);
         if(item != -1) {
-        this.selectionLogicHullSelect(item);
+          this.selectionLogicHullSelect(item);
         }
       }
     } else if (this.phase == "customizeShip") {
@@ -175,21 +227,15 @@ export default class ShipbuilderGui {
           && newbutton.getType() == newbutton.getRenderType()) {
 
         if (this.isCannonButton(oldbutton)) {
-          newbutton.placeItem(oldbutton.getType());
-          this.stats.applyItemEffect(oldbutton.getType());
-          this.selected = -1;
-        }
-      }
+          var belowZero = this.chosenstats.applySlotEffect(oldbutton.getType(), newbutton.getSlotNum());
 
-      if (newbutton.getType() == 'hullslot' && oldbutton.getType() != 'hullslot'
-          && oldbutton.getType() != 'gunslot'
-          && newbutton.getType() == newbutton.getRenderType()) {
+          if (belowZero) {
+            this.infodisplay.setMessage("Capacity exceeded. Choose another item.");
+            this.chosenstats.removeItemEffect(oldbutton.getType());
+          } else {
+            newbutton.placeItem(oldbutton.getType());
+          }
 
-        if (oldbutton.getType() == 'gunboat'
-            || oldbutton.getType() == 'frigate' 
-            || oldbutton.getType() == 'galleon') {
-          newbutton.placeItem(oldbutton.getType());
-          this.stats.applyItemEffect(oldbutton.getType());
           this.selected = -1;
         }
       }
@@ -200,27 +246,65 @@ export default class ShipbuilderGui {
     }
   }
 
+  selectionLogicTemplateSelect(item) {
+    var newbutton = this.templateButtons.get(item);
+    var oldbutton = this.templateButtons.get(this.selected);
+
+    this.selected = item;
+    this.selectedButton = newbutton;
+
+    if (newbutton.getType() == 'template') {
+      if (this.selectedTemplate != null) {
+        this.selectedTemplate.placeItem('template');
+      }
+      newbutton.placeItem('templateSelected');
+      this.selectedTemplate = newbutton;
+      this.chosenstats = this.stats[this.selectedTemplate.getSlotNum() - 1];
+      this.chosenstats.setTemplateNum(newbutton.getSlotNum());
+    }
+
+    if (newbutton.getType() == 'customize') {
+      if (this.selectedTemplate == null) {
+        alert("Please select a template number");
+      } else {
+        if (this.chosenstats.getHealth() == 0) {
+          this.phase = "hullSelect";
+        } else {
+          this.phase = "customizeShip";
+          this.loadShip();
+        }
+        this.selectedTemplate.placeItem('template');
+        this.selectedTemplate == null;
+      }
+    } else if (newbutton.getType() == 'overwrite') {
+      if (this.selectedTemplate == null) {
+        alert("Please select a template number");
+      } else  {
+        this.chosenstats.zeroStats();
+        this.phase = "hullSelect";
+        this.selectedTemplate.placeItem('template');
+        this.selectedTemplate == null;
+      }
+    }
+
+    this.statsdisplay.setStats(this.chosenstats);
+  }
+
+  loadShip() {
+    for (const button of this.buttons.values()) {
+      if (button.getType() == 'gunslot') {
+        this.chosenstats.fillSlot(button);
+      }
+    }
+  }
+
   selectionLogicHullSelect(item) {
     this.phase = "customizeShip";
     this.buttons.length = 1;
 
     var newbutton = this.hullButtons.get(item);
-    this.stats.applyItemEffect(newbutton.getType());
-
-    this.addButton(new Gunslot('gunslot', this.width/2 - 100, this.height/2-75)); //upper left
-    this.addButton(new Gunslot('gunslot', this.width/2 + 50, this.height/2-75)); //uppper right
-    this.addButton(new Gunslot('gunslot', this.width/2 - 100, this.height/2+75)); //bottom left
-    this.addButton(new Gunslot('gunslot', this.width/2 + 50, this.height/2+75)); //bottom right
-
-    this.addButton(new Roundshot('roundshot', 700, 100));
-    this.addButton(new Chainshot('chainshot', 760, 100));
-    this.addButton(new Grapeshot('grapeshot', 820, 100));
-    this.addButton(new Shell('shell', 880, 100));
-
-    this.addButton(new Template('template', 50, 100, 1));
-    this.addButton(new Template('template', 50, 200, 2)); 
-    this.addButton(new Template('template', 50, 300, 3));
-    this.addButton(new Save('save', 50, 400));
+    this.chosenstats.applyItemEffect(newbutton.getType());
+    this.statsdisplay.setStats(this.chosenstats);
   }
 
   selectionLogicCustomize(item) {
@@ -236,19 +320,20 @@ export default class ShipbuilderGui {
       }
       newbutton.placeItem('templateSelected');
       this.selectedTemplate = newbutton;
-      this.stats.setTemplateNum(newbutton.getTemplateNum());
+      this.chosenstats.setTemplateNum(newbutton.getSlotNum());
+    }
+
+    if (this.isCannonButton(newbutton)) {
+      this.itemstats.zeroStats();
+      this.itemstats.applyItemEffect(newbutton.getType());
     }
 
     if (newbutton.getType() == 'save') {
-      if (this.selectedTemplate == null) {
-        alert("Please select a template number");
-        return 'shipbuilder';
-      }
-
-      this.returnedStats = this.stats;
+      this.returnedStats = this.chosenstats;
       this.emptySlots();
-      this.stats = new Stats();
-      this.phase = 'hullSelect';
+      this.chosenstats = new Stats();
+      this.statsdisplay.setStats(this.chosenstats);
+      this.phase = 'templateSelect';
       return 'game';
     } else {
       return 'shipbuilder';
@@ -274,7 +359,7 @@ export default class ShipbuilderGui {
       if (button.getType() == 'gunslot' || button.getType() == 'hullslot' || button.getType() == 'template') {
         var slotType = button.emptyslot(x, y);
         if (slotType != null) {
-          this.stats.removeItemEffect(slotType);
+          this.chosenstats.removeSlotEffect(slotType, button.getSlotNum());
         }
       }
     }

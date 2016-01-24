@@ -96,6 +96,8 @@ export default class Stats {
     this.ccost = 0;
     this.tcost = 0;
 
+    this.slotItems = new Map();
+
     this.templateNum = "None";
   }
 
@@ -108,6 +110,12 @@ export default class Stats {
     this.wcost += obj.wcost;
     this.ccost += obj.ccost;
     this.tcost += obj.tcost;
+
+    if (this.weight < 0) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   removeItemEffect(type) {
@@ -126,8 +134,64 @@ export default class Stats {
     this.tcost -= obj.tcost;
   }
 
+  applySlotEffect(type, slotNum) {
+    this.slotItems.set(slotNum, type);
+
+    var obj = item[type];
+    this.health += obj.health;
+    this.damage += obj.damage;  
+    this.speed += obj.speed;
+    this.weight += obj.weight;
+    this.wcost += obj.wcost;
+    this.ccost += obj.ccost;
+    this.tcost += obj.tcost;
+
+    if (this.weight < 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  removeSlotEffect(type, slotNum) {
+    if (type == "templateSelected") {
+      this.templateNum = "None";
+      return;
+    }
+
+    this.slotItems.set(slotNum, null);
+
+    var obj = item[type];
+    this.health -= obj.health;
+    this.damage -= obj.damage;  
+    this.speed -= obj.speed;
+    this.weight -= obj.weight;
+    this.wcost -= obj.wcost;
+    this.ccost -= obj.ccost;
+    this.tcost -= obj.tcost;
+  }
+
+  zeroStats() {
+    this.health = 0;
+    this.damage = 0;
+    this.speed = 0;
+    this.weight = 0;
+    this.wcost = 0;
+    this.ccost = 0;
+    this.tcost = 0;
+  }
+
   setTemplateNum(templateNum) {
     this.templateNum = templateNum;
+  }
+
+  fillSlot(button) {
+    var type = this.slotItems.get(button.getSlotNum());
+    console.log(button.getSlotNum());
+    console.log(this.slotItems);
+    if (type != undefined) {
+      button.placeItem(type);
+    }
   }
 
   getHealth() {

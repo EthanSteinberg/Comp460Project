@@ -13,6 +13,8 @@ const sources = {
   frigate: 'frigate.png',
   galleon: 'galleon.png',
   template: 'template.png',
+  stats: 'stats.png',
+  info: 'info.png',
 };
 
 /**
