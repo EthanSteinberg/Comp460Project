@@ -187,8 +187,6 @@ export default class Stats {
 
   fillSlot(button) {
     var type = this.slotItems.get(button.getSlotNum());
-    console.log(button.getSlotNum());
-    console.log(this.slotItems);
     if (type != undefined) {
       button.placeItem(type);
     }

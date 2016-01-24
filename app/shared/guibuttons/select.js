@@ -1,7 +1,7 @@
 import GuiButton from '../guibutton';
 
 
-export default class Customize extends GuiButton {
+export default class Select extends GuiButton {
 
   render(context, images) {
     if (this.selected) {
@@ -13,7 +13,7 @@ export default class Customize extends GuiButton {
     context.fillStyle = 'crimson';
     context.fillRect(this.x, this.y, this.width, this.height);
     context.fillStyle = 'black';
-    context.fillText('CUSTOMIZE', this.x, this.y + 15);   
+    context.fillText('SELECT', this.x + 5, this.y + 15);   
   }
 
 }

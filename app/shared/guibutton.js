@@ -10,13 +10,15 @@ let nextId = 0;
 
 export default class GuiButton {
 
-  constructor(type, x, y, slotNum) {
+  constructor(type, x, y, width, height, slotNum) {
     this.type = type;
     this.rendertype = type;
     this.originalX = x;
     this.originalY = y;
     this.x = x;
     this.y = y;
+    this.width = width;
+    this.height = height;
     this.selected = false;
     this.id = nextId++;
 
@@ -60,8 +62,8 @@ export default class GuiButton {
   }
 
   emptyslot(mouseX, mouseY) {
-    if (mouseX > this.x && mouseX < this.x + 50) {
-      if (mouseY > this.y && mouseY < this.y + 50) {
+    if (mouseX > this.x && mouseX < this.x + this.width) {
+      if (mouseY > this.y && mouseY < this.y + this.height) {
         var oldtype = this.rendertype;
         this.rendertype = this.type;
         return oldtype;
@@ -71,8 +73,8 @@ export default class GuiButton {
   }
 
   select(mouseX, mouseY) {
-    if (mouseX > this.x && mouseX < this.x + 50) {
-      if (mouseY > this.y && mouseY < this.y + 50) {
+    if (mouseX > this.x && mouseX < this.x + this.width) {
+      if (mouseY > this.y && mouseY < this.y + this.height) {
         this.selected = true;
         return this.id;
       }
