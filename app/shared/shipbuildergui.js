@@ -120,7 +120,7 @@ export default class ShipbuilderGui {
 
     context.font = '15px Courier New';
     context.fillText('Modify the template in', 700, 250);
-    context.fillText('selected save slot.', 700, 270);
+    context.fillText('the selected save slot.', 700, 270);
     context.fillText('Create a new template', 700, 350);
     context.fillText('in the selected save slot.', 700, 370);
 

@@ -1,6 +1,8 @@
 import Button from './button';
 import {MAP_WIDTH} from './gamemap';
 import {MAP_HEIGHT} from './gamemap';
+import StatsDisplay from './guibuttons/statsdisplay';
+
 
 /**
  * A map of the game containing islands and all current ships.
@@ -13,6 +15,7 @@ export default class Gui {
       new Button('shipyard', 1+MAP_WIDTH, 3),
       new Button('shipbuilder',1+MAP_WIDTH, 6)
     ];
+    this.statsdisplay = new StatsDisplay("statsdisplay", 570, 150, 50, 50);
 
     this.templates = [];
 
@@ -20,7 +23,7 @@ export default class Gui {
 
     this._initGrid();
 
-    this.width = 3;
+    this.width = 8;
     this.height = 8;
     this.displayStats = false;
 
@@ -57,22 +60,22 @@ export default class Gui {
     context.drawImage(images.money, 405, 6, 25, 25);
 
     if (this.displayStats) {
+      var selectedTemplate;
       for (const template of this.templates) {
         if (template.isSelected) {
+          selectedTemplate = template;
           var num = template.getTemplateNum();
           this.stats = this.templateStats.get(num);
         }
       }
 
-      if (this.stats != null) {      
-        context.font = '15px sans-serif';
-        context.fillText('Health: ' + this.stats.health, 700, 175);
-        context.fillText('Damage: ' + this.stats.damage, 700, 190);
-        context.fillText('Speed: ' + this.stats.speed, 700, 205);
-        context.fillText('Weight: ' + this.stats.weight, 700, 220);
-        context.fillText('Wood Cost: ' + this.stats.wcost, 700, 235);
-        context.fillText('Coin Cost: ' + this.stats.ccost, 700, 250);
-        context.fillText('Production Time: ' + this.stats.tcost, 700, 265);
+      if (this.stats != null) {   
+        this.statsdisplay.setStats(this.stats);
+        this.statsdisplay.render(context, images);
+      } else if (selectedTemplate != null) {
+        context.font = '20px Courier New';
+        context.fillText('No template in', 600, 170);
+        context.fillText('this save slot.', 600, 190);
       }
 
     }

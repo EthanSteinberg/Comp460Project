@@ -1,10 +1,10 @@
 import GameMap from '../shared/gamemap';
 import Gui from '../shared/gui';
 import ShipbuilderGui from '../shared/shipbuildergui';
-
 import loadImages from './images';
 import Ship from '../shared/ship';
 import Shipyard from '../shared/shipyard';
+import StatsDisplay from '../shared/guibuttons/statsdisplay';
 
 const MILLISECONDS_PER_LOGIC_UPDATE = 5;
 const MILLISECONDS_PER_RENDER_UPDATE = 15;
