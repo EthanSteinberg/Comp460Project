@@ -224,4 +224,8 @@ export default class Stats {
     return this.templateNum;
   }
 
+  getItems() {
+    return this.slotItems;
+  }
+
 }

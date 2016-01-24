@@ -4,6 +4,10 @@ import GuiButton from '../guibutton';
 export default class Gunslot extends GuiButton {
 
   render(context, images) {
+    if (this.visible == false) {
+      return;
+    }
+
     if (this.selected) {
       context.strokeStyle = 'cyan';
       context.strokeRect(this.x, this.y, 50, 50);

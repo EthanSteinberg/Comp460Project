@@ -10,9 +10,17 @@ export default class Overwrite extends GuiButton {
     }
 
     context.font = '20px Courier New';
-    context.fillStyle = 'crimson';
+    if (this.visible == false) {
+      context.fillStyle = 'gray';
+    } else {
+      context.fillStyle = 'crimson';
+    }
     context.fillRect(this.x, this.y, this.width, this.height);
-    context.fillStyle = 'black';
+    if (this.visible == false) {
+      context.fillStyle = 'silver';
+    } else {
+      context.fillStyle = 'black';
+    }
     context.fillText('OVERWRITE', this.x, this.y + 15);   
   }
 

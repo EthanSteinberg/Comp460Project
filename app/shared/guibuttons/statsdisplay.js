@@ -9,6 +9,10 @@ export default class StatsDisplay extends GuiButton {
 
 
  	render(context, images) {
+	    if (this.visible == false) {
+	      return;
+	    }
+ 		
 	    context.drawImage(images.stats, this.x, this.y, 210, 210);
 	    context.font = '15px Comic Sans MS';
 	    context.textAlign = 'end';
@@ -21,6 +25,16 @@ export default class StatsDisplay extends GuiButton {
 	    context.fillText(this.stats.getTcost(), this.x + 150, this.y + 150);  
 
 	    context.textAlign = 'start';
+	}
+
+	getItemType() {
+		var items = this.stats.getItems();
+	    var item = items.get(0);
+	    if (item == null) {
+	    	return "";
+	    } else {
+	    	return item;
+	    }
 	}
 
 }

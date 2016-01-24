@@ -21,6 +21,7 @@ export default class GuiButton {
     this.height = height;
     this.selected = false;
     this.id = nextId++;
+    this.visible = true;
 
     this.slotNum = slotNum;
   }
@@ -47,6 +48,10 @@ export default class GuiButton {
 
   getRenderType() {
     return this.rendertype;
+  }
+
+  setVisible(visible) {
+    this.visible = visible;
   }
 
   restorePos() {
