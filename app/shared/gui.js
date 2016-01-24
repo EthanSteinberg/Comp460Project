@@ -2,6 +2,7 @@ import Button from './button';
 import {MAP_WIDTH} from './gamemap';
 import {MAP_HEIGHT} from './gamemap';
 import StatsDisplay from './guibuttons/statsdisplay';
+import Stats from './stats';
 
 
 /**
@@ -96,7 +97,7 @@ export default class Gui {
   }
 
   displayShipStats(stats){
-    this.stats = stats;
+    this.stats = Object.setPrototypeOf(stats, Stats.prototype);
     this.displayStats = true;
   }
 
