@@ -15,6 +15,7 @@ const sources = {
   template: 'template.png',
   stats: 'stats.png',
   info: 'info.png',
+  exit: 'exit.png',
 };
 
 /**

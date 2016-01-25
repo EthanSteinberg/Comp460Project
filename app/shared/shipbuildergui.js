@@ -15,6 +15,7 @@ import InfoDisplay from './guibuttons/infodisplay';
 import Customize from './guibuttons/customize';
 import Overwrite from './guibuttons/overwrite';
 import Select from './guibuttons/select';
+import Exit from './guibuttons/exit';
 
 /**
  * A menu for building and customizing ships
@@ -48,6 +49,7 @@ export default class ShipbuilderGui {
     this.addTemplateButton(new Gunslot('gunslot', this.width/2 + 50, this.height/2-75, 50, 50, 2)); //uppper right
     this.addTemplateButton(new Gunslot('gunslot', this.width/2 - 100, this.height/2+75, 50, 50, 3)); //bottom left
     this.addTemplateButton(new Gunslot('gunslot', this.width/2 + 50, this.height/2+75, 50, 50, 4)); //bottom right
+    this.addTemplateButton(new Exit('exit', 900, 5, 25, 25));
 
     this.showTemplateElements(false);
 
@@ -185,18 +187,25 @@ export default class ShipbuilderGui {
   }
 
   select(mouseX, mouseY) {
+    var phase;
     if (this.phase == "templateSelect") {
       for (const button of this.templateButtons.values()) {
         var item = button.select(mouseX, mouseY);
         if(item != -1) {
-          this.selectionLogicTemplateSelect(item);
+          phase = this.selectionLogicTemplateSelect(item);
+          if (phase == 'game') {
+            return 'game';
+          }
         }
       }
     } else if (this.phase == "hullSelect") {
       for (const button of this.hullButtons.values()) {
         var item = button.select(mouseX, mouseY);
         if(item != -1) {
-          this.selectionLogicHullSelect(item);
+          phase = this.selectionLogicHullSelect(item);
+          if (phase == 'game') {
+            return 'game';
+          }
         }
       }
     } else if (this.phase == "customizeShip") {
@@ -288,6 +297,15 @@ export default class ShipbuilderGui {
     this.selected = item;
     this.selectedButton = newbutton;
 
+    if (newbutton.getType() == 'exit') {
+      if (this.selectedTemplate != null) {
+        this.selectedTemplate.placeItem('template');
+        this.selectedTemplate == null;
+        this.showTemplateElements(false);
+      }
+      return this.exit();
+    }
+
     if (newbutton.getType() == 'template') {
       if (this.selectedTemplate != null) {
         this.selectedTemplate.placeItem('template');
@@ -361,6 +379,10 @@ export default class ShipbuilderGui {
   selectionLogicHullSelect(item) {
     var newbutton = this.hullButtons.get(item);
 
+    if (newbutton.getType() == 'exit') {
+      return this.exit();
+    }
+
     if (newbutton.getType() == 'select') {
       if (this.chosenstats.getHealth() == 0) {
         this.infodisplay.setMessage("Please select a hull.");
@@ -381,6 +403,10 @@ export default class ShipbuilderGui {
     this.selected = item;
     this.selectedButton = newbutton;
 
+    if (newbutton.getType() == 'exit') {
+      return this.exit();
+    }
+
     if (newbutton.getType() == 'template') {
       if (this.selectedTemplate != null) {
         this.selectedTemplate.placeItem('template');
@@ -397,16 +423,21 @@ export default class ShipbuilderGui {
 
     if (newbutton.getType() == 'save') {
       this.returnedStats = this.chosenstats;
-      this.emptySlots();
-      this.chosenstats = new Stats();
-      this.statsdisplay.setStats(this.chosenstats);
-      this.emptyTemplateSlots();
-      this.selectedTemplate = null;
-      this.phase = 'templateSelect';
-      return 'game';
+      return this.exit();
     } else {
       return 'shipbuilder';
     }
+  }
+
+  exit() {
+    console.log("exiting");
+    this.emptySlots();
+    this.chosenstats = new Stats();
+    this.statsdisplay.setStats(this.chosenstats);
+    this.emptyTemplateSlots();
+    this.selectedTemplate = null;
+    this.phase = 'templateSelect';
+    return 'game';
   }
 
   deselect() {

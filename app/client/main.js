@@ -4,7 +4,6 @@ import ShipbuilderGui from '../shared/shipbuildergui';
 import loadImages from './images';
 import Ship from '../shared/ship';
 import Shipyard from '../shared/shipyard';
-import StatsDisplay from '../shared/guibuttons/statsdisplay';
 
 const MILLISECONDS_PER_LOGIC_UPDATE = 5;
 const MILLISECONDS_PER_RENDER_UPDATE = 15;
@@ -226,7 +225,7 @@ class Game {
       if (item == null) {
         if (this.guiSelected) {
           // If an empty tile on an island is selected then add a building
-          if (this.selectedItem.getType() == 'shiptemplate') {
+          if (this.selectedItem.getType() == 'shiptemplate' && this.gui.getStats() != undefined) {
             sendMessage({ type: 'MakeShip', islandID: this.selectedShipyard.getIslandID(), x: mouseRoundedX, y: mouseRoundedY, shipstats: this.gui.getStats() });
             this.gui.removeShipyardDisplay();
           } else {
