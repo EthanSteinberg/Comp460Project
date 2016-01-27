@@ -1,8 +1,9 @@
 import Button from './button';
-import {MAP_WIDTH} from './gamemap';
-import {MAP_HEIGHT} from './gamemap';
+import { MAP_WIDTH } from './gamemap';
+import { MAP_HEIGHT } from './gamemap';
 import StatsDisplay from './guibuttons/statsdisplay';
 import Stats from './stats';
+import buildingConstants from './buildingconstants';
 
 
 /**
@@ -41,7 +42,7 @@ export default class Gui {
   /**
    * Render the gui
    */
-  render(context, images) {
+  render(context, images, map, hoverCoords) {
     for (let x = MAP_WIDTH; x < this.width + MAP_WIDTH; x++) {
       for (let y = 0; y < this.height; y++) {
         context.fillStyle = 'gray';
@@ -49,10 +50,36 @@ export default class Gui {
       }
     }
 
+    if (hoverCoords != null) {
+      const roundedX = Math.floor(hoverCoords.x / 50);
+      const roundedY = Math.floor(hoverCoords.y / 50);
+
+      const item = this.getItem(roundedX, roundedY);
+
+      if (item != null && item.isBuilding()) {
+        const buildingType = item.getBuilding();
+
+        const details = buildingConstants[buildingType];
+
+        // Display a tooltip
+        context.fillStyle = 'white';
+        context.strokeStyle = 'black';
+        context.strokeRect((roundedX - 2) * 50, (roundedY + 1) * 50, 200, 50);
+        context.fillRect((roundedX - 2) * 50, (roundedY + 1) * 50, 200, 50);
+
+        context.fillStyle = 'black';
+        context.textBaseline = 'top';
+        context.font = '14px sans-serif';
+        context.fillText(details.name, (roundedX - 2) * 50, (roundedY + 1) * 50);
+        context.fillText(details.description, (roundedX - 2) * 50, (roundedY + 1) * 50 + 20);
+        context.fillText('Cost: ' + details.coinCost + ' coin, ' + details.buildTime + ' seconds', (roundedX - 2) * 50, (roundedY + 1) * 50 + 34);
+      }
+    }
+
     context.fillStyle = 'black';
     context.textBaseline = 'top';
     context.font = '24px sans-serif';
-    context.fillText('100', 435, 6);
+    context.fillText(Math.floor(map.getCoins()).toString(), 435, 6);
 
     const width = context.measureText('100').width;
 

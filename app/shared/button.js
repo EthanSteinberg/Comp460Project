@@ -33,7 +33,7 @@ export default class Button {
       case 'shipbuilder':
         context.fillStyle = 'red';
         context.fillRect(this.x * 50, this.y * 50, 50, 50);
-        context.font="10px Arial"
+        context.font = '10px Arial';
         context.fillStyle = 'black';
         context.fillText('SHIP', this.x * 50 + 15, this.y * 50 + 10);
         context.fillText('BUILDER', this.x * 50 + 5, this.y * 50 + 20);
@@ -63,6 +63,16 @@ export default class Button {
 
   getTemplateNum() {
     return this.templateNum;
+  }
+
+  isBuilding() {
+    switch (this.type) {
+      case 'mine':
+      case 'shipyard':
+        return true;
+      default:
+        return false;
+    }
   }
 
   getBuilding() {

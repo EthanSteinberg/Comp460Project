@@ -27,7 +27,7 @@ export default class GameMap {
     this.addShip(new Ship(this, 0, 4, new Stats()));
     this.addShip(new Ship(this, 4, 4, new Stats()));
 
-    var island1coordinates = [
+    const island1coordinates = [
       [1, 1],
       [1, 2],
       [2, 1],
@@ -37,6 +37,16 @@ export default class GameMap {
 
     this.width = MAP_WIDTH;
     this.height = MAP_HEIGHT;
+
+    this.coins = 100; // Start with 100 coin.
+  }
+
+  setCoins(coins) {
+    this.coins = coins;
+  }
+
+  getCoins() {
+    return this.coins;
   }
 
   addShip(ship) {

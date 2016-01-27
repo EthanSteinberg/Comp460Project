@@ -1,5 +1,6 @@
 import GameMap from '../shared/gamemap';
 import astar from '../shared/astar';
+import buildingConstants from '../shared/buildingconstants';
 
 const http = require('http');
 const ws = require('ws');
@@ -21,8 +22,14 @@ const map = new GameMap();
 
 const playerSockets = [];
 
+let pendingUpdates = [];
+
 function updateGameState() {
-  const updateMessages = map.getUpdateMessages();
+  const updateMessages = map.getUpdateMessages().concat(pendingUpdates);
+
+  // Clear the pending updates list.
+  pendingUpdates = [];
+
   for (const updateMessage of updateMessages) {
     for (const playerSocket of playerSockets) {
       playerSocket.send(JSON.stringify(updateMessage));
@@ -60,16 +67,26 @@ function moveShipHandler(moveShipMessage) {
   if (moves == null) {
     console.log('no such path');
   } else {
-    moves[moves.length -1] = targetLocation;
+    moves[moves.length - 1] = targetLocation;
     ship.setMoves(moves);
   }
 }
 
 function makeBuildingHandler(makeBuildingMessage) {
   const { building, x, y } = makeBuildingMessage;
-  var islandID = map.getIsland(x,y);
-  if (islandID != -1) {
+  const islandID = map.getIsland(x, y);
+  if (islandID !== -1) {
+    const buildingStats = buildingConstants[building];
+    if (buildingStats.coinCost > map.getCoins()) {
+      console.error('Trying to build a buildng you cant afford');
+      return;
+    }
+    map.setCoins(map.getCoins() - buildingStats.coinCost);
     map.addBuilding(building, x, y, islandID);
+
+    const position = { x, y };
+    pendingUpdates.push({ type: 'SetPosition', object: building, position, islandID });
+    pendingUpdates.push({ type: 'SetResources', coin: map.getCoins() });
   }
 }
 

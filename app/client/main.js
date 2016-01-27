@@ -53,23 +53,24 @@ class Main {
     });
 
     this.canvas.addEventListener('mousedown', (event) => {
-      if (this.mode == 'game') {
+      if (this.mode === 'game') {
         this.mode = this.game.mousedown(event, this.sendMessage.bind(this), this.shipbuilder.getStats());
-      } else if (this.mode == 'shipbuilder') {
+      } else if (this.mode === 'shipbuilder') {
         this.mode = this.shipbuilder.mousedown(event);
       }
     });
 
     this.canvas.addEventListener('mouseup', (event) => {
-      if (this.mode == 'game') {
-      } else if (this.mode == 'shipbuilder') {
+      if (this.mode === 'game') {
+      } else if (this.mode === 'shipbuilder') {
         this.shipbuilder.mouseup(event);
       }
     });
 
     this.canvas.addEventListener('mousemove', (event) => {
-      if (this.mode == 'game') {
-      } else if (this.mode == 'shipbuilder') {
+      if (this.mode === 'game') {
+        this.game.mousemove(event);
+      } else if (this.mode === 'shipbuilder') {
         this.shipbuilder.mousemove(event);
       }
     });
@@ -77,7 +78,12 @@ class Main {
     this.messageHandlerMap = {
       'SetShipPosition': this._setShipPositionHandler.bind(this),
       'SetPosition': this._setPositionHandler.bind(this),
+      'SetResources': this._setResourcesHandler.bind(this),
     };
+  }
+
+  _setResourcesHandler({ coin }) {
+    this.game.map.setCoins(coin);
   }
 
   _setShipPositionHandler(setShipPositionMessage) {
@@ -143,9 +149,9 @@ class Main {
 
     this.update(time);
 
-    if (this.mode == 'game') {
+    if (this.mode === 'game') {
       this.game.render();
-    } else if (this.mode == 'shipbuilder') {
+    } else if (this.mode === 'shipbuilder') {
       this.shipbuilder.render();
     }
   }
@@ -179,9 +185,7 @@ class Game {
       }
       this.setSelectedItem(null);
     } else if (event.button === 0) {
-      const rect = this.canvas.getBoundingClientRect();
-      const rawX = event.clientX - rect.left;
-      const rawY = event.clientY - rect.top;
+      const { rawX, rawY } = this.getRawMouseCords(event);
 
       if (rawX > 400) {
         return this.processGuiMouseClick(rawX, rawY);
@@ -193,11 +197,24 @@ class Game {
     return 'game';
   }
 
+  mousemove(event) {
+    const { rawX, rawY } = this.getRawMouseCords(event);
+    this.hoveredCoords = { x: rawX, y: rawY };
+  }
+
+  getRawMouseCords(event) {
+    const rect = this.canvas.getBoundingClientRect();
+    return {
+      rawX: event.clientX - rect.left,
+      rawY: event.clientY - rect.top,
+    };
+  }
+
   processGuiMouseClick(rawX, rawY) {
     // In the gui
     const item = this.gui.getItem(Math.floor(rawX / 50), Math.floor(rawY / 50));
     if (item != null) {
-      if (item.getType() == 'shipbuilder') {
+      if (item.getType() === 'shipbuilder') {
         return 'shipbuilder';
       }
       this.guiSelected = true;
@@ -306,8 +323,12 @@ class Game {
     this.map.render(this.context, this.images);
 
     this.context.restore();
-     // Render the gui
-    this.gui.render(this.context, this.images);
+
+    if (this.hoveredCoords && this.hoveredCoords.x >= 400) {
+      this.gui.render(this.context, this.images, this.map, this.hoveredCoords);
+    } else {
+      this.gui.render(this.context, this.images, this.map, null);
+    }
   }
 
   keydown(event, pressedKeys) {

@@ -58,11 +58,8 @@ export default class Mine {
    * Update the ship and get the corresponding update messages.
    */
   getUpdateMessages() {
-    const result = [];
-    if (this.set) {
-      result.push(...this.getSetMessage());
-    }
+    this.map.setCoins(this.map.getCoins() + 0.2);
 
-    return result;
+    return [{ type: 'SetResources', coin: this.map.getCoins() }];
   }
 }

@@ -18,7 +18,7 @@ export default class Shipyard {
 
   render(context, images) {
     context.drawImage(images.shipyard, (this.x - 0.5) * 50, (this.y - 0.5) * 50, 50, 50);
-  
+
     if (this.isSelected) {
       context.strokeStyle = 'cyan';
       context.strokeRect(
@@ -63,11 +63,6 @@ export default class Shipyard {
    * Update the ship and get the corresponding update messages.
    */
   getUpdateMessages() {
-    const result = [];
-    if (this.set) {
-      result.push(...this.getSetMessage());
-    }
-
-    return result;
+    return [];
   }
 }
