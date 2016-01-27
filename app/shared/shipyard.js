@@ -1,3 +1,5 @@
+import buildingConstants from './buildingconstants';
+
 /**
  * A shipyard entity.
  */
@@ -14,9 +16,17 @@ export default class Shipyard {
     this.set = true;
     this.type = 'shipyard';
     this.islandID = islandID;
+    this.timeLeftToBuild = buildingConstants[this.type].buildTime;
   }
 
   render(context, images) {
+
+    //TODO: Building indication
+    // const color = Math.floor(this.timeLeftToBuild/buildingConstants[this.type].buildTime * 256);
+    // console.log(color);
+    // context.fillStyle = `rgb(${color},${color}, ${color})`;
+    // context.fillRect((this.x - 0.5) * 50, (this.y - 0.5) * 50, 50, 50);
+
     context.drawImage(images.shipyard, (this.x - 0.5) * 50, (this.y - 0.5) * 50, 50, 50);
 
     if (this.isSelected) {
@@ -63,6 +73,12 @@ export default class Shipyard {
    * Update the ship and get the corresponding update messages.
    */
   getUpdateMessages() {
-    return [];
+    if (this.timeLeftToBuild > 0) {
+      this.timeLeftToBuild -= 1;
+      return [{ type: 'UpdateTimeLeftToBuild', id: this.id, timeLeftToBuild: this.timeLeftToBuild, object: this.type }];
+    }
+
+    // Done building
+    return [{}];
   }
 }

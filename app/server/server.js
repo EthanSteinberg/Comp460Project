@@ -25,7 +25,7 @@ const playerSockets = [];
 let pendingUpdates = [];
 
 function updateGameState() {
-  const updateMessages = map.getUpdateMessages().concat(pendingUpdates);
+  const updateMessages = pendingUpdates.concat(map.getUpdateMessages());
 
   // Clear the pending updates list.
   pendingUpdates = [];
@@ -92,7 +92,7 @@ function makeBuildingHandler(makeBuildingMessage) {
 
 function makeShipHandler(makeShipMessage) {
   const { islandID, x, y, shipstats } = makeShipMessage;
-  if (map.isNextToIsland(islandID,x,y)) {
+  if (map.isNextToIsland(islandID, x, y)) {
     map.addBuilding('ship', x, y, islandID, shipstats);
   }
 }

@@ -109,7 +109,7 @@ export default class GameMap {
 
   isIsland(x, y) {
     for (const island of this.islands.values()) {
-      if (island.isIsland(x,y)) {
+      if (island.isIsland(x, y)) {
         return true;
       }
     }
@@ -117,13 +117,13 @@ export default class GameMap {
   }
 
   isNextToIsland(islandID, x, y) {
-    var island = this.islands.get(islandID);
+    const island = this.islands.get(islandID);
     return island.isNextToIsland(x, y);
   }
 
   getIsland(x, y) {
     for (const island of this.islands.values()) {
-      if (island.isIsland(x,y)) {
+      if (island.isIsland(x, y)) {
         return island.getId();
       }
     }
@@ -131,25 +131,38 @@ export default class GameMap {
   }
 
   addBuilding(type, x, y, islandID, stats) {
-    switch(type) {
-      case 'mine': 
-        var mine = new Mine(this, x, y);
+    switch (type) {
+      case 'mine':
+        const mine = new Mine(this, x, y);
         this.mines.set(mine.getId(), mine);
         this.grid[mine.getX() + ',' + mine.getY()] = mine;
         break;
-      case 'shipyard': 
-        var shipyard = new Shipyard(this, x, y, islandID);
+      case 'shipyard':
+        const shipyard = new Shipyard(this, x, y, islandID);
         this.shipyards.set(shipyard.getId(), shipyard);
         this.grid[shipyard.getX() + ',' + shipyard.getY()] = shipyard;
         break;
-      case 'ship': 
+      case 'ship':
         this.addShip(new Ship(this, x, y, stats));
         break;
+      default:
+        console.error('Unexpected building type: ', type);
     }
   }
 
   getShips() {
     return [...this.ships.values()];
+  }
+
+  getBuilding(id, type) {
+    switch (type) {
+      case 'shipyard':
+        return this.shipyards.get(id);
+      case 'mine':
+        return this.mines.get(id);
+      default:
+        console.error('Unexpected building type: ', type);
+    }
   }
 
   /**

@@ -43,4 +43,11 @@ SetResources: {
 	coin: the amount of coin you have
 }
 
+
+UpdateTimeLeftToBuildHandler: {
+	id: The building id,
+	timeLeftToBuild: the number of ticks left to build,
+	object: The building type
+}
+
 */
