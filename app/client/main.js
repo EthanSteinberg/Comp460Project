@@ -243,7 +243,16 @@ class Game {
         } else if (this.selectedItem instanceof Ship) {
           // Try to move to that location.
           const targetLocation = { x: mouseX, y: mouseY };
-          sendMessage({ type: 'MoveShip', shipId: this.selectedItem.getId(), targetLocation });
+
+          if (item == null) {
+            // Move to an empty place
+            sendMessage({ type: 'MoveShip', shipId: this.selectedItem.getId(), targetLocation });
+          }
+
+          if (item instanceof Ship) {
+            // Trying to attack a ship
+            sendMessage({ type: 'AttackShip', id: this.selectedItem.getId(), targetId: item.getId() });
+          }
         }
       } else {
         // TODO: Add logic for attacking stuff.

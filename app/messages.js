@@ -50,4 +50,8 @@ UpdateTimeLeftToBuildHandler: {
 	object: The building type
 }
 
+AttackShip: {
+	id: the ship to attack with,
+	targetId: the ship to attack
+}
 */

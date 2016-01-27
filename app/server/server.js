@@ -57,12 +57,13 @@ function moveShipHandler(moveShipMessage) {
   const endPosition = { x: Math.round(targetLocation.x), y: Math.round(targetLocation.y) };
 
   const isEmpty = ({ x: tempX, y: tempY }) => {
-    return map.getItem(tempX, tempY) == null && !map.isIsland(tempX, tempY);
+    return !map.isIsland(tempX, tempY);
   };
   const isValid = ({ x: tempX, y: tempY }) => {
     return tempX >= 0 && tempX < map.width && tempY >= 0 && tempY < map.height;
   };
   const moves = astar(startPosition, endPosition, isEmpty, isValid);
+  console.log(moves);
 
   if (moves == null) {
     console.log('no such path');
@@ -94,13 +95,24 @@ function makeShipHandler(makeShipMessage) {
   const { islandID, x, y, shipstats } = makeShipMessage;
   if (map.isNextToIsland(islandID, x, y)) {
     map.addBuilding('ship', x, y, islandID, shipstats);
+    pendingUpdates.push(
+      { type: 'SetPosition', object: 'ship', position: { x, y }, islandID: 0, stats: shipstats }
+    );
   }
+}
+
+function attackShipHandler({ id, targetId }) {
+  const sourceShip = map.getShip(id);
+  const targetShip = map.getShip(targetId);
+
+  sourceShip.setTarget(targetShip);
 }
 
 const messageHandlers = {
   'MoveShip': moveShipHandler,
   'MakeBuilding': makeBuildingHandler,
   'MakeShip': makeShipHandler,
+  'AttackShip': attackShipHandler,
 };
 
 wss.on('connection', function connection(socket) {

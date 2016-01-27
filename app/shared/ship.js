@@ -1,3 +1,4 @@
+const shipMoveSpeed = 0.05;
 
 /**
  * A ship entity.
@@ -11,10 +12,13 @@ export default class Ship {
     this.x = x;
     this.y = y;
     this.id = nextId++;
-    this.set = true;
     this.type = 'ship';
     this.isSelected = false;
     this.stats = stats;
+
+    this.mode = {
+      type: 'IDLE',
+    };
   }
 
   render(context, images) {
@@ -53,11 +57,12 @@ export default class Ship {
   }
 
   setMoves(moves) {
-    this.moving = true;
-    this.moves = moves;
-    this.moves[0] = { x: this.getX(), y: this.getY() };
-    this.ticksTillNextMove = 0;
-    this.moveIndex = 0;
+    this.mode = {
+      type: 'MOVING',
+      moves: moves,
+      ticksTillNextMove: 0,
+      moveIndex: 1,
+    };
   }
 
   canMove(move) {
@@ -78,7 +83,6 @@ export default class Ship {
 
   tryMove(move) {
     if (!this.canMove(move)) {
-      this.moving = false;
       return [];
     }
     this.setPosition(move.x, move.y);
@@ -86,9 +90,50 @@ export default class Ship {
   }
 
   /**
+   * Are you close enough to the current waypoint?
+   */
+  closeEnoughToWayPoint() {
+    return this.getDistanceToTarget() <= 0.01;
+  }
+
+  getDistanceToTarget() {
+    const { x, y } = this.mode.moves[this.mode.moveIndex];
+
+    const distance = Math.sqrt((this.x - x) * (this.x - x) + (this.y - y) * (this.y - y));
+    return distance;
+  }
+
+  /**
    * Move the ship and perform the corresponding updates.
    */
   getMoveMessages() {
+    if (this.closeEnoughToWayPoint()) {
+      this.mode.moveIndex += 1;
+    }
+
+    if (this.mode.moveIndex === this.mode.moves.length) {
+      this.mode = {
+        type: 'IDLE',
+      };
+      return [{}];
+    }
+
+    const currentMove = this.mode.moves[this.mode.moveIndex];
+
+    const scale = Math.min(shipMoveSpeed, this.getDistanceToTarget());
+
+    const move = {
+      x: this.x + (currentMove.x - this.x) / this.getDistanceToTarget() * scale,
+      y: this.y + (currentMove.y - this.y) / this.getDistanceToTarget() * scale,
+    };
+
+    return this.tryMove(move);
+  }
+
+  /**
+   * Try to attack if in range, or move into range otherwise
+   */
+  getAttackMessages() {
     this.ticksTillNextMove += 1;
     if (this.ticksTillNextMove === 20) {
       this.ticksTillNextMove = 0;
@@ -118,25 +163,25 @@ export default class Ship {
   }
 
   /**
-   * Move the ship and perform the corresponding updates.
-   */
-  getSetMessage() {
-    this.set = false;
-    const pos = { x: this.x, y: this.y };
-    return [{ type: 'SetPosition', object: this.type, position: pos, islandID: 0, stats: this.stats }];
-  }
-
-  /**
    * Update the ship and get the corresponding update messages.
    */
   getUpdateMessages() {
     const result = [];
-    if (this.moving) {
-      result.push(...this.getMoveMessages());
-    }
 
-    if (this.set) {
-      result.push(...this.getSetMessage());
+    switch (this.mode.type) {
+      case 'MOVING':
+        result.push(...this.getMoveMessages());
+        break;
+
+      case 'ATTACKING':
+        result.push(...this.getAttackMessages());
+        break;
+
+      case 'IDLE':
+        break;
+
+      default:
+        console.error('Unexcepted type ' + this.mode.type);
     }
 
     return result;
