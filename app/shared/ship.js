@@ -18,6 +18,8 @@ export default class Ship {
     this.isSelected = false;
     this.stats = stats;
 
+    this.ticsNextAttack = 0;
+
     this.smoke1Y = 0;
     this.smoke2Y = 0;
     this.lastDx = 0;
@@ -40,14 +42,14 @@ export default class Ship {
 
 
     if (this.enemyTarget != null) {
-      if (this.attackTime % 50 == 0) {
+      if (this.ticsNextAttack % 50 == 0) {
         this.smoke1Y = Math.floor((Math.random() * 35) + 1) / 100;
         this.smoke2Y = Math.floor((Math.random() * 35) + 1) / 100;
 
       }
-      context.globalAlpha = (this.attackTime % 50) / 100;
+      context.globalAlpha = (this.ticsNextAttack % 50) / 100;
       context.drawImage(images.smoke, (this.x - 0.25) * 50, (this.y - this.smoke1Y) * 50, 10, 10);
-      context.globalAlpha = (this.attackTime % 40) / 100;
+      context.globalAlpha = (this.ticsNextAttack % 40) / 100;
       context.drawImage(images.smoke, (this.x - 0.0) * 50, (this.y - this.smoke2Y) * 50, 10, 10);
       context.globalAlpha = 1;
     }
@@ -195,7 +197,7 @@ export default class Ship {
       this.mode = {
         type: 'IDLE',
       };
-      return [{}];
+      return [];
     }
 
     return this.performMove();
@@ -208,18 +210,23 @@ export default class Ship {
     const targetPosition = { x: this.mode.target.getX(), y: this.mode.target.getY() };
 
     if (this.getDistanceToTarget(targetPosition) < 2) {
-      const damageDealt = this.attack(this.mode.target);
-      const result = [{ type: 'DealDamage', shipId: this.getId(), enemyShipId: this.mode.target.getId(), damage: damageDealt }];
-  
+      if (this.ticsNextAttack == 0) {
+        this.ticsNextAttack = 100;
+        const damageDealt = this.attack(this.mode.target);
+        const result = [{ type: 'DealDamage', shipId: this.getId(), enemyShipId: this.mode.target.getId(), damage: damageDealt }];
+    
 
-      if (this.mode.target.getHealth() <= 0) {
-        this.map.removeShip(this.mode.target);
-        this.mode = {
-          type: 'IDLE',
-        };
+        if (this.mode.target.getHealth() <= 0) {
+          this.map.removeShip(this.mode.target);
+          this.mode = {
+            type: 'IDLE',
+          };
+        }
+
+        return result;
+      } else {
+        return [];
       }
-      
-      return result;
     }
 
     this.mode.moves = this.performAStar(targetPosition);
@@ -245,6 +252,10 @@ export default class Ship {
    * Update the ship and get the corresponding update messages.
    */
   getUpdateMessages() {
+    if (this.ticsNextAttack > 0) {
+      this.ticsNextAttack -= 1;
+    }
+
     const result = [];
 
     switch (this.mode.type) {
