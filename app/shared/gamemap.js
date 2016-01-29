@@ -24,8 +24,14 @@ export default class GameMap {
 
     this.grid = {};
 
-    this.addShip(new Ship(this, 0, 4, new Stats()));
-    this.addShip(new Ship(this, 4, 4, new Stats()));
+    var stats1 = new Stats();
+    stats1.applyItemEffect("galleon");
+    stats1.applyItemEffect("roundshot");
+    var stats2 = new Stats();
+    stats2.applyItemEffect("frigate");
+    stats2.applyItemEffect("grapeshot");
+    this.addShip(new Ship(this, 0, 4, stats1));
+    this.addShip(new Ship(this, 4, 4, stats2));
 
     const island1coordinates = [
       [1, 1],
@@ -61,10 +67,16 @@ export default class GameMap {
     return this.ships.get(shipId);
   }
 
+  removeShip(shipId) {
+    this.ships.delete(shipId);
+  }
+
   /**
    * Render both the map and all ships on it.
    */
   render(context, images) {
+    var messages = [];
+
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         context.fillStyle = 'blue';
@@ -80,6 +92,12 @@ export default class GameMap {
 
     for (const ship of this.ships.values()) {
       ship.render(context, images);
+      const shipTarget = ship.getTarget();
+      if (shipTarget != null) {
+        if (ship.clockAttackTime() == 0) {
+          messages.push({ type: 'AttackShip', shipId: ship.getId(), enemyShipId: shipTarget.getId() });
+        }
+      }
     }
 
     for (const mine of this.mines.values()) {
@@ -89,6 +107,8 @@ export default class GameMap {
     for (const shipyard of this.shipyards.values()) {
       shipyard.render(context, images);
     }
+
+    return messages;
   }
 
   getItem(x, y) {

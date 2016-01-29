@@ -80,6 +80,7 @@ class Main {
       'SetPosition': this.game._setPositionHandler.bind(this.game),
       'SetResources': this.game._setResourcesHandler.bind(this.game),
       'UpdateTimeLeftToBuild': this.game._updateTimeLeftToBuildHandler.bind(this.game),
+      'DealDamage': this.game._dealDamageHandler.bind(this.game),
     };
   }
 
@@ -139,7 +140,7 @@ class Main {
     this.update(time);
 
     if (this.mode === 'game') {
-      this.game.render();
+      this.game.render(this.sendMessage.bind(this));
     } else if (this.mode === 'shipbuilder') {
       this.shipbuilder.render();
     }
@@ -245,6 +246,12 @@ class Game {
           const targetLocation = { x: mouseX, y: mouseY };
           sendMessage({ type: 'MoveShip', shipId: this.selectedItem.getId(), targetLocation });
         }
+      } else if (this.selectedItem instanceof Ship && item instanceof Ship && this.selectedItem.getId() != item.getId()) {
+        if (this.selectedItem.getTarget() == null) {
+          this.selectedItem.targetShip(item);
+        } else if (this.selectedItem.getTarget().getId() != item.getId) {
+          this.selectedItem.targetShip(item);
+        }
       } else {
         // TODO: Add logic for attacking stuff.
         if (this.selectedItem instanceof Shipyard && this.guiSelected === false) {
@@ -302,10 +309,19 @@ class Game {
     this.map.getBuilding(id, object).timeLeftToBuild = timeLeftToBuild;
   }
 
+  _dealDamageHandler({ shipId, enemyShipId, damage }) {
+    this.map.getShip(enemyShipId).dealDamage(damage);
+
+    if (this.map.getShip(enemyShipId).getHealth() <= 0) {
+      this.map.getShip(shipId).targetShip(null);
+      this.map.removeShip(enemyShipId);
+    }
+  }
+
   /**
    * Render the game. Also performs updates if necessary.
    */
-  render() {
+  render(sendMessage) {
     this.context.clearRect(0, 0, this.width, this.height);
 
     this.context.save();
@@ -315,7 +331,10 @@ class Game {
     this.context.translate(-this.x, -this.y);
 
     // Render the map and everything on it.
-    this.map.render(this.context, this.images);
+    var messages = this.map.render(this.context, this.images);
+    for (const message of messages) {
+      sendMessage(message);
+    }
 
     this.context.restore();
 

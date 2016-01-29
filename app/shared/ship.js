@@ -15,10 +15,28 @@ export default class Ship {
     this.type = 'ship';
     this.isSelected = false;
     this.stats = stats;
+    this.enemyTarget = null;
+    this.attackTime = 0;
+
+    this.smoke1Y = 0;
+    this.smoke2Y = 0;
   }
 
   render(context, images) {
     context.drawImage(images.ship, (this.x - 0.5) * 50, (this.y - 0.5) * 50, 50, 50);
+
+    if (this.enemyTarget != null) {
+      if (this.attackTime % 50 == 0) {
+        this.smoke1Y = Math.floor((Math.random() * 35) + 1) / 100;
+        this.smoke2Y = Math.floor((Math.random() * 35) + 1) / 100;
+
+      }
+      context.globalAlpha = (this.attackTime % 50) / 100;
+      context.drawImage(images.smoke, (this.x - 0.25) * 50, (this.y - this.smoke1Y) * 50, 10, 10);
+      context.globalAlpha = (this.attackTime % 40) / 100;
+      context.drawImage(images.smoke, (this.x - 0.0) * 50, (this.y - this.smoke2Y) * 50, 10, 10);
+      context.globalAlpha = 1;
+    }
 
     if (this.isSelected) {
       context.strokeStyle = 'cyan';
@@ -144,6 +162,40 @@ export default class Ship {
 
   getId() {
     return this.id;
+  }
+
+  getHealth() {
+    return this.stats.getHealth();
+  }
+
+  attack(enemyShip) {
+    this.enemyTarget = enemyShip;
+    if (enemyShip != null) {
+      return enemyShip.dealDamage(this.stats.getDamage());
+    } else {
+      return 0;
+    }
+  }
+
+  dealDamage(damage) {
+    return this.stats.dealDamage(damage);
+  }
+
+  targetShip(enemyShip) {
+    this.enemyTarget = enemyShip;
+    this.attackTime = 100;
+  }
+
+  getTarget() {
+    return this.enemyTarget;
+  }
+
+  clockAttackTime() {
+    this.attackTime -= 1;
+    if (this.attackTime < 0) {
+      this.attackTime = 100;
+    }
+    return this.attackTime;
   }
 
 }

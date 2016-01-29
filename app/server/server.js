@@ -97,10 +97,25 @@ function makeShipHandler(makeShipMessage) {
   }
 }
 
+function attackShipHandler(attackShipMessage) {
+  const { shipId, enemyShipId } = attackShipMessage;
+
+  const ship = map.getShip(shipId);
+  const enemyShip = map.getShip(enemyShipId);
+
+  const damageDealt = ship.attack(enemyShip);
+  pendingUpdates.push({ type: 'DealDamage', shipId: shipId, enemyShipId: enemyShipId, damage: damageDealt });
+
+  if (enemyShip.getHealth() <= 0) {
+    map.removeShip(enemyShipId);
+  }
+}
+
 const messageHandlers = {
   'MoveShip': moveShipHandler,
   'MakeBuilding': makeBuildingHandler,
   'MakeShip': makeShipHandler,
+  'AttackShip': attackShipHandler,
 };
 
 wss.on('connection', function connection(socket) {

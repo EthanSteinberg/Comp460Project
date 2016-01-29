@@ -192,6 +192,11 @@ export default class Stats {
     }
   }
 
+  dealDamage(damage) {
+    this.health -= damage;
+    return damage;
+  }
+
   getHealth() {
     return this.health;
   }
