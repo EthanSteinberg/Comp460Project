@@ -244,18 +244,19 @@ class Game {
         } else if (this.selectedItem instanceof Ship) {
           // Try to move to that location.
           const targetLocation = { x: mouseX, y: mouseY };
+          // Move to an empty place
           sendMessage({ type: 'MoveShip', shipId: this.selectedItem.getId(), targetLocation });
-        }
-      } else if (this.selectedItem instanceof Ship && item instanceof Ship && this.selectedItem.getId() != item.getId()) {
-        if (this.selectedItem.getTarget() == null) {
-          this.selectedItem.targetShip(item);
-        } else if (this.selectedItem.getTarget().getId() != item.getId) {
-          this.selectedItem.targetShip(item);
+
         }
       } else {
         // TODO: Add logic for attacking stuff.
         if (this.selectedItem instanceof Shipyard && this.guiSelected === false) {
           this.gui.removeShipyardDisplay();
+        }
+
+        if (item instanceof Ship) {
+          // Trying to attack a ship
+          sendMessage({ type: 'AttackShip', id: this.selectedItem.getId(), targetId: item.getId() });
         }
       }
     } else {
@@ -313,7 +314,6 @@ class Game {
     this.map.getShip(enemyShipId).dealDamage(damage);
 
     if (this.map.getShip(enemyShipId).getHealth() <= 0) {
-      this.map.getShip(shipId).targetShip(null);
       this.map.removeShip(enemyShipId);
     }
   }

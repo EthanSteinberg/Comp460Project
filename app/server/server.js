@@ -1,5 +1,4 @@
 import GameMap from '../shared/gamemap';
-import astar from '../shared/astar';
 import buildingConstants from '../shared/buildingconstants';
 
 const http = require('http');
@@ -52,24 +51,7 @@ function moveShipHandler(moveShipMessage) {
 
   const ship = map.getShip(shipId);
 
-  // TODO: Instead of rounding the start position, pick a better one.
-  const startPosition = { x: Math.round(ship.getX()), y: Math.round(ship.getY()) };
-  const endPosition = { x: Math.round(targetLocation.x), y: Math.round(targetLocation.y) };
-
-  const isEmpty = ({ x: tempX, y: tempY }) => {
-    return map.getItem(tempX, tempY) == null && !map.isIsland(tempX, tempY);
-  };
-  const isValid = ({ x: tempX, y: tempY }) => {
-    return tempX >= 0 && tempX < map.width && tempY >= 0 && tempY < map.height;
-  };
-  const moves = astar(startPosition, endPosition, isEmpty, isValid);
-
-  if (moves == null) {
-    console.log('no such path');
-  } else {
-    moves[moves.length - 1] = targetLocation;
-    ship.setMoves(moves);
-  }
+  ship.moveTo(targetLocation);
 }
 
 function makeBuildingHandler(makeBuildingMessage) {
@@ -94,21 +76,17 @@ function makeShipHandler(makeShipMessage) {
   const { islandID, x, y, shipstats } = makeShipMessage;
   if (map.isNextToIsland(islandID, x, y)) {
     map.addBuilding('ship', x, y, islandID, shipstats);
+    pendingUpdates.push(
+      { type: 'SetPosition', object: 'ship', position: { x, y }, islandID: 0, stats: shipstats }
+    );
   }
 }
 
-function attackShipHandler(attackShipMessage) {
-  const { shipId, enemyShipId } = attackShipMessage;
+function attackShipHandler({ id, targetId }) {
+  const sourceShip = map.getShip(id);
+  const targetShip = map.getShip(targetId);
 
-  const ship = map.getShip(shipId);
-  const enemyShip = map.getShip(enemyShipId);
-
-  const damageDealt = ship.attack(enemyShip);
-  pendingUpdates.push({ type: 'DealDamage', shipId: shipId, enemyShipId: enemyShipId, damage: damageDealt });
-
-  if (enemyShip.getHealth() <= 0) {
-    map.removeShip(enemyShipId);
-  }
+  sourceShip.attackTarget(targetShip);
 }
 
 const messageHandlers = {

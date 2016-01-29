@@ -92,12 +92,6 @@ export default class GameMap {
 
     for (const ship of this.ships.values()) {
       ship.render(context, images);
-      const shipTarget = ship.getTarget();
-      if (shipTarget != null) {
-        if (ship.clockAttackTime() == 0) {
-          messages.push({ type: 'AttackShip', shipId: ship.getId(), enemyShipId: shipTarget.getId() });
-        }
-      }
     }
 
     for (const mine of this.mines.values()) {
