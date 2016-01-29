@@ -1,5 +1,4 @@
 import GameMap from '../shared/gamemap';
-import astar from '../shared/astar';
 import buildingConstants from '../shared/buildingconstants';
 
 const http = require('http');
@@ -52,25 +51,7 @@ function moveShipHandler(moveShipMessage) {
 
   const ship = map.getShip(shipId);
 
-  // TODO: Instead of rounding the start position, pick a better one.
-  const startPosition = { x: Math.round(ship.getX()), y: Math.round(ship.getY()) };
-  const endPosition = { x: Math.round(targetLocation.x), y: Math.round(targetLocation.y) };
-
-  const isEmpty = ({ x: tempX, y: tempY }) => {
-    return !map.isIsland(tempX, tempY);
-  };
-  const isValid = ({ x: tempX, y: tempY }) => {
-    return tempX >= 0 && tempX < map.width && tempY >= 0 && tempY < map.height;
-  };
-  const moves = astar(startPosition, endPosition, isEmpty, isValid);
-  console.log(moves);
-
-  if (moves == null) {
-    console.log('no such path');
-  } else {
-    moves[moves.length - 1] = targetLocation;
-    ship.setMoves(moves);
-  }
+  ship.moveTo(targetLocation);
 }
 
 function makeBuildingHandler(makeBuildingMessage) {
@@ -105,7 +86,7 @@ function attackShipHandler({ id, targetId }) {
   const sourceShip = map.getShip(id);
   const targetShip = map.getShip(targetId);
 
-  sourceShip.setTarget(targetShip);
+  sourceShip.attackTarget(targetShip);
 }
 
 const messageHandlers = {

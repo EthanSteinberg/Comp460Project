@@ -1,5 +1,7 @@
 const shipMoveSpeed = 0.05;
 
+import astar from '../shared/astar';
+
 /**
  * A ship entity.
  */
@@ -16,22 +18,30 @@ export default class Ship {
     this.isSelected = false;
     this.stats = stats;
 
+    this.lastDx = 0;
+    this.lastDy = -1;
+
     this.mode = {
       type: 'IDLE',
     };
   }
 
   render(context, images) {
-    context.drawImage(images.ship, (this.x - 0.5) * 50, (this.y - 0.5) * 50, 50, 50);
+    context.save();
+    context.translate(this.x * 50, this.y * 50);
+
+    const angle = Math.atan2(this.lastDy, this.lastDx) + Math.PI / 2;
+
+    context.rotate(angle);
+    context.drawImage(images.ship, (-0.5) * 50, (-0.5) * 50, 50, 50);
+    context.restore();
+
 
     if (this.isSelected) {
       context.strokeStyle = 'cyan';
-      context.strokeRect(
-        (this.x - 0.5) * 50,
-        (this.y - 0.5) * 50,
-        50,
-        50
-      );
+      context.beginPath();
+      context.arc(this.x * 50, this.y * 50, 25, 0, Math.PI * 2, true);
+      context.stroke();
     }
   }
 
@@ -52,17 +62,52 @@ export default class Ship {
   }
 
   setPosition(x, y) {
+    this.lastDx = x - this.x;
+    this.lastDy = y - this.y;
+
     this.x = x;
     this.y = y;
   }
 
-  setMoves(moves) {
+  moveTo(targetLocation) {
+    const moves = this.performAStar(targetLocation);
+
+    if (moves != null) {
+      this.mode = {
+        type: 'MOVING',
+        moves: moves,
+        moveIndex: 0,
+      };
+    }
+  }
+
+  attackTarget(otherShip) {
     this.mode = {
-      type: 'MOVING',
-      moves: moves,
-      ticksTillNextMove: 0,
-      moveIndex: 1,
+      type: 'ATTACKING',
+      target: otherShip,
     };
+  }
+
+  performAStar(targetLocation) {
+    const startPosition = { x: Math.round(this.getX()), y: Math.round(this.getY()) };
+    const endPosition = { x: Math.round(targetLocation.x), y: Math.round(targetLocation.y) };
+
+    const isEmpty = ({ x: tempX, y: tempY }) => {
+      return !this.map.isIsland(tempX, tempY);
+    };
+    const isValid = ({ x: tempX, y: tempY }) => {
+      return tempX >= 0 && tempX < this.map.width && tempY >= 0 && tempY < this.map.height;
+    };
+    const moves = astar(startPosition, endPosition, isEmpty, isValid);
+
+    if (moves == null) {
+      console.log('no such path');
+      return null;
+    }
+
+    moves.splice(0, 1); // Remove the first item
+    moves[moves.length - 1] = targetLocation;
+    return moves;
   }
 
   canMove(move) {
@@ -77,6 +122,8 @@ export default class Ship {
       if (distanceSquared < 1) {
         return false;
       }
+
+      // TODO: Need to check surrounding island borders
     }
     return true;
   }
@@ -85,6 +132,7 @@ export default class Ship {
     if (!this.canMove(move)) {
       return [];
     }
+
     this.setPosition(move.x, move.y);
     return [{ type: 'SetShipPosition', shipId: this.id, position: move }];
   }
@@ -104,6 +152,23 @@ export default class Ship {
   }
 
   /**
+   * Perform a move using this.mode.moveIndex and this.mode.moves.
+   * Returns the move update
+   */
+  performMove() {
+    const currentMove = this.mode.moves[this.mode.moveIndex];
+
+    const scale = Math.min(shipMoveSpeed, this.getDistanceToTarget());
+
+    const move = {
+      x: this.x + (currentMove.x - this.x) / this.getDistanceToTarget() * scale,
+      y: this.y + (currentMove.y - this.y) / this.getDistanceToTarget() * scale,
+    };
+
+    return this.tryMove(move);
+  }
+
+  /**
    * Move the ship and perform the corresponding updates.
    */
   getMoveMessages() {
@@ -118,48 +183,31 @@ export default class Ship {
       return [{}];
     }
 
-    const currentMove = this.mode.moves[this.mode.moveIndex];
-
-    const scale = Math.min(shipMoveSpeed, this.getDistanceToTarget());
-
-    const move = {
-      x: this.x + (currentMove.x - this.x) / this.getDistanceToTarget() * scale,
-      y: this.y + (currentMove.y - this.y) / this.getDistanceToTarget() * scale,
-    };
-
-    return this.tryMove(move);
+    return this.performMove();
   }
 
   /**
    * Try to attack if in range, or move into range otherwise
    */
   getAttackMessages() {
-    this.ticksTillNextMove += 1;
-    if (this.ticksTillNextMove === 20) {
-      this.ticksTillNextMove = 0;
-
-      this.moveIndex += 1;
-
-      if (this.moveIndex === this.moves.length - 1) {
-        this.moving = false;
-        const lastMove = this.moves[this.moves.length - 1];
-
-        return this.tryMove(lastMove);
-      }
+    const targetPosition = { x: this.mode.target.getX(), y: this.mode.target.getY() };
+    this.mode.moves = this.performAStar(targetPosition);
+    if (this.mode.moves == null) {
+      // No such path
+      return [{}];
     }
 
-    const currentMove = this.moves[this.moveIndex];
-    const nextMove = this.moves[this.moveIndex + 1];
+    this.mode.moveIndex = 0;
 
-    const nextMoveFactor = this.ticksTillNextMove / 20.0;
-    const currentMoveFactor = 1 - nextMoveFactor;
+    if (this.closeEnoughToWayPoint()) {
+      this.mode.moveIndex += 1;
+    }
 
-    const interpolatedPosition = {
-      x: currentMove.x * currentMoveFactor + nextMove.x * nextMoveFactor,
-      y: currentMove.y * currentMoveFactor + nextMove.y * nextMoveFactor,
-    };
+    if (this.mode.moveIndex === this.mode.moves.length) {
+      return [{}];
+    }
 
-    return this.tryMove(interpolatedPosition);
+    return this.performMove();
   }
 
   /**
