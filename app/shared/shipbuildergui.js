@@ -45,10 +45,10 @@ export default class ShipbuilderGui {
     this.addTemplateButton(new Template('template', 50, 300, 50, 50, 3));
     this.addTemplateButton(new Customize('customize', 700, 200, 110, 50));
     this.addTemplateButton(new Overwrite('overwrite', 700, 300, 110, 50));
-    this.addTemplateButton(new Gunslot('gunslot', this.width/2 - 100, this.height/2-75, 50, 50, 1)); //upper left
-    this.addTemplateButton(new Gunslot('gunslot', this.width/2 + 50, this.height/2-75, 50, 50, 2)); //uppper right
-    this.addTemplateButton(new Gunslot('gunslot', this.width/2 - 100, this.height/2+75, 50, 50, 3)); //bottom left
-    this.addTemplateButton(new Gunslot('gunslot', this.width/2 + 50, this.height/2+75, 50, 50, 4)); //bottom right
+    this.addTemplateButton(new Gunslot('gunslot', 400, 175, 50, 50, 1)); //upper left
+    this.addTemplateButton(new Gunslot('gunslot', 550, 175, 50, 50, 2)); //uppper right
+    this.addTemplateButton(new Gunslot('gunslot', 400, 325, 50, 50, 3)); //bottom left
+    this.addTemplateButton(new Gunslot('gunslot', 550, 325, 50, 50, 4)); //bottom right
     this.addTemplateButton(new Exit('exit', 900, 5, 25, 25));
 
     this.showTemplateElements(false);
@@ -58,10 +58,10 @@ export default class ShipbuilderGui {
     this.addHullButton(new Galleon('galleon', 550, 100, 50, 50));
     this.addHullButton(new Select('select', 700, 300, 80, 50));
 
-    this.addButton(new Gunslot('gunslot', this.width/2 - 100, this.height/2-75, 50, 50, 1)); //upper left
-    this.addButton(new Gunslot('gunslot', this.width/2 + 50, this.height/2-75, 50, 50, 2)); //uppper right
-    this.addButton(new Gunslot('gunslot', this.width/2 - 100, this.height/2+75, 50, 50, 3)); //bottom left
-    this.addButton(new Gunslot('gunslot', this.width/2 + 50, this.height/2+75, 50, 50, 4)); //bottom right
+    this.addButton(new Gunslot('gunslot', 400, 175, 50, 50, 1)); //upper left
+    this.addButton(new Gunslot('gunslot', 550, 175, 50, 50, 2)); //uppper right
+    this.addButton(new Gunslot('gunslot', 400, 325, 50, 50, 3)); //bottom left
+    this.addButton(new Gunslot('gunslot', 550, 325, 50, 50, 4)); //bottom right
 
     this.addButton(new Roundshot('roundshot', 700, 50, 50, 50));
     this.addButton(new Chainshot('chainshot', 760, 50, 50, 50));
@@ -111,7 +111,7 @@ export default class ShipbuilderGui {
 
     context.font = '25px Courier New';
     context.fillStyle = 'black';
-    context.fillText('SELECT A SHIP TO CUSTOMIZE', this.width/2-175, 25);
+    context.fillText('SELECT A SHIP TO CUSTOMIZE', 325, 25);
 
     //Numbers for templates
     context.font = '20px Courier New';
@@ -126,7 +126,7 @@ export default class ShipbuilderGui {
     context.fillText('Create a new template', 700, 350);
     context.fillText('in the selected save slot.', 700, 370);
 
-    context.drawImage(images.shipskeleton, this.width/2 - 100, this.height/2 - 200, 200, 400);
+    context.drawImage(images.shipskeleton, 400, 50, 200, 400);
     this.statsdisplay.render(context, images);
     this.infodisplay.render(context, images);    
 
@@ -141,7 +141,7 @@ export default class ShipbuilderGui {
 
     context.font = '25px Courier New';
     context.fillStyle = 'black';
-    context.fillText('SELECT A HULL', this.width/2-175, 25);
+    context.fillText('SELECT A HULL', 325, 25);
 
     this.statsdisplay.render(context, images);
     this.infodisplay.render(context, images);    
@@ -157,7 +157,7 @@ export default class ShipbuilderGui {
 
     context.font = '25px Courier New';
     context.fillStyle = 'black';
-    context.fillText('', this.width/2-100, 25);
+    context.fillText('', 400, 25);
 
     context.font = '20px Courier New';
     context.fillText('Drag and drop components', 50, 50);
@@ -179,7 +179,7 @@ export default class ShipbuilderGui {
     this.statsdisplay.render(context, images);
     this.infodisplay.render(context, images);
 
-    context.drawImage(images.shipskeleton, this.width/2 - 100, this.height/2 - 200, 200, 400);
+    context.drawImage(images.shipskeleton, 400, 50, 200, 400);
 
     for (const button of this.buttons.values()) {
       button.render(context, images);

@@ -296,15 +296,16 @@ export default class Ship {
   }
 
   getHealth() {
-    return this.stats.getHealth();
+    return this.stats.health;
   }
 
   attack(enemyShip) {
-    return enemyShip.dealDamage(this.stats.getDamage());
+    return enemyShip.dealDamage(this.stats.damage);
   }
 
   dealDamage(damage) {
-    return this.stats.dealDamage(damage);
+    this.stats.health -= damage;
+    return damage;
   }
 
 }

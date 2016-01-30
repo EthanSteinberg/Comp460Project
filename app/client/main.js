@@ -26,9 +26,13 @@ class Main {
     this.shipbuilder = new Shipbuilder(images);
 
     this.canvas = document.getElementById('canvas');
-    this.width = this.canvas.width;
-    this.height = this.canvas.height;
     this.context = this.canvas.getContext('2d');
+
+    this.context.canvas.width  = window.innerWidth;
+    this.context.canvas.height = window.innerHeight;
+
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
 
     this.pressedKeys = new Set();
 
@@ -161,9 +165,13 @@ class Game {
     this.y = 0;
 
     this.canvas = document.getElementById('canvas');
-    this.width = this.canvas.width;
-    this.height = this.canvas.height;
     this.context = this.canvas.getContext('2d');
+
+    this.context.canvas.width  = window.innerWidth;
+    this.context.canvas.height = window.innerHeight;
+
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
   }
 
   mousedown(event, sendMessage, stats) {
