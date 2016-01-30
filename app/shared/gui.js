@@ -105,8 +105,8 @@ export default class Gui {
         this.statsdisplay.render(context, images);
       } else if (selectedTemplate != null) {
         context.font = '20px Courier New';
-        context.fillText('No template in', (this.x+5)*50, (this.y+5)*50);
-        context.fillText('this save slot.', (this.x+5)*50, (this.y+5)*50);
+        context.fillText('No template in', (this.x+3)*50, (this.y+4)*50);
+        context.fillText('this save slot.', (this.x+3)*50, (this.y+5)*50);
       }
 
     }
