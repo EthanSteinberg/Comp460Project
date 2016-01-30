@@ -7,6 +7,8 @@ import Stats from './stats';
 export const MAP_WIDTH = 8;
 export const MAP_HEIGHT = 8;
 
+const SCALE = 4;
+
 /**
  * A map of the game containing islands and all current ships.
  */
@@ -23,6 +25,8 @@ export default class GameMap {
     this.shipyards = new Map();
 
     this.grid = {};
+
+    this.mode = 'strategic';
 
     var stats1 = new Stats();
     stats1.applyItemEffect("galleon");
@@ -45,6 +49,14 @@ export default class GameMap {
     this.height = MAP_HEIGHT;
 
     this.coins = 100; // Start with 100 coin.
+  }
+
+  setMode(mode) {
+    this.mode = mode;
+  }
+
+  getMode() {
+    return this.mode;
   }
 
   setCoins(coins) {
@@ -75,6 +87,10 @@ export default class GameMap {
    * Render both the map and all ships on it.
    */
   render(context, images) {
+    if (this.mode == 'tactical') {
+      context.scale(SCALE,SCALE);
+    }
+
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         context.fillStyle = 'blue';

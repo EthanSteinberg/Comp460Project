@@ -56,7 +56,9 @@ export default class Ship {
       context.globalAlpha = (this.animateStage % 50) / 100;
       context.drawImage(images.smoke, -0.25 * 50, (-this.smoke1Y) * 50, 10, 10);
       context.globalAlpha = (this.animateStage % 40) / 100;
-      context.drawImage(images.smoke, 0* 50, (-this.smoke2Y) * 50, 10, 10);
+      context.rotate(3.1415926536);
+      context.drawImage(images.smoke, -0.22 * 50, (-this.smoke2Y) * 50, 10, 10);
+      context.rotate(-3.1415926536)
       context.globalAlpha = 1;
 
       this.animateStage += 1;

@@ -19,7 +19,8 @@ export default class Gui {
     this.buttons = [
       new Button('mine', 1+this.x, 1), 
       new Button('shipyard', 1+this.x, 3),
-      new Button('shipbuilder',1+this.x, 6)
+      new Button('shipbuilder',1+this.x, 6),
+      new Button('strategic',1+this.x, 8),
     ];
     this.statsdisplay = new StatsDisplay("statsdisplay", (this.x+3)*50, (this.y+3)*50, 50, 50);
 
@@ -39,7 +40,6 @@ export default class Gui {
     for (const button of this.buttons) {
       this.grid[button.getX() + ',' + button.getY()] = button;
     }
-    console.log(this.grid);
   }
 
   /**

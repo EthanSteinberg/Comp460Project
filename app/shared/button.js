@@ -38,6 +38,22 @@ export default class Button {
         context.fillText('SHIP', this.x * 50 + 15, this.y * 50 + 10);
         context.fillText('BUILDER', this.x * 50 + 5, this.y * 50 + 20);
         break;
+      case 'tactical':
+        context.fillStyle = 'red';
+        context.fillRect(this.x * 50, this.y * 50, 50, 50);
+        context.font = '10px Arial';
+        context.fillStyle = 'black';
+        context.fillText('STRATEGIC', this.x * 50, this.y * 50 + 10);
+        context.fillText('VIEW', this.x * 50 + 5, this.y * 50 + 20);
+        break;
+      case 'strategic':
+        context.fillStyle = 'red';
+        context.fillRect(this.x * 50, this.y * 50, 50, 50);
+        context.font = '10px Arial';
+        context.fillStyle = 'black';
+        context.fillText('TACTICAL', this.x * 50, this.y * 50 + 10);
+        context.fillText('VIEW', this.x * 50 + 5, this.y * 50 + 20);
+        break; 
       default:
         console.error('Trying to render unknown button');
     }
@@ -89,5 +105,9 @@ export default class Button {
 
   getType() {
     return this.type;
+  }
+
+  setType(type) {
+    this.type = type;
   }
 }

@@ -9,6 +9,7 @@ const MILLISECONDS_PER_LOGIC_UPDATE = 5;
 const MILLISECONDS_PER_RENDER_UPDATE = 15;
 
 const SHIPBUILDMODE = true;
+const SCALE = 4;
 
 /**
  * The central game object for most of the logic.
@@ -185,7 +186,7 @@ class Game {
     } else if (event.button === 0) {
       const { rawX, rawY } = this.getRawMouseCords(event);
 
-      if (rawX > 400) {
+      if (rawX > this.width - (8*50)) {
         return this.processGuiMouseClick(rawX, rawY);
       } else {
         this.processMapMouseClick(rawX, rawY, sendMessage);
@@ -214,6 +215,12 @@ class Game {
     if (item != null) {
       if (item.getType() === 'shipbuilder') {
         return 'shipbuilder';
+      } else if (item.getType() === 'strategic') {
+        this.map.setMode('tactical');
+        item.setType('tactical');
+      } else if (item.getType() === 'tactical') {
+        this.map.setMode('strategic');
+        item.setType('strategic');
       }
       this.guiSelected = true;
       this.setSelectedItem(item);
@@ -227,8 +234,12 @@ class Game {
     const y = rawY + this.y - 25;
 
     // The mouse coordinates in grid coordinatess.
-    const mouseX = x / 50;
-    const mouseY = y / 50;
+    var mouseX = x / (50);
+    var mouseY = y / (50);
+    if (this.map.getMode() == 'tactical') {
+      mouseX = x / (50*SCALE);
+      mouseY = y / (50*SCALE);
+    }
 
     const mouseRoundedX = Math.round(mouseX);
     const mouseRoundedY = Math.round(mouseY);
@@ -262,7 +273,7 @@ class Game {
           this.gui.removeShipyardDisplay();
         }
 
-        if (item instanceof Ship) {
+        if (item instanceof Ship && this.selectedItem instanceof Ship) {
           // Trying to attack a ship
           sendMessage({ type: 'AttackShip', id: this.selectedItem.getId(), targetId: item.getId() });
         }
