@@ -75,7 +75,6 @@ export default class GameMap {
    * Render both the map and all ships on it.
    */
   render(context, images) {
-
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         context.fillStyle = 'blue';
@@ -100,8 +99,6 @@ export default class GameMap {
     for (const shipyard of this.shipyards.values()) {
       shipyard.render(context, images);
     }
-
-    return messages;
   }
 
   getItem(x, y) {

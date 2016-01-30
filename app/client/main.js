@@ -140,7 +140,7 @@ class Main {
     this.update(time);
 
     if (this.mode === 'game') {
-      this.game.render(this.sendMessage.bind(this));
+      this.game.render();
     } else if (this.mode === 'shipbuilder') {
       this.shipbuilder.render();
     }
@@ -323,7 +323,7 @@ class Game {
   /**
    * Render the game. Also performs updates if necessary.
    */
-  render(sendMessage) {
+  render() {
     this.context.clearRect(0, 0, this.width, this.height);
 
     this.context.save();
@@ -333,10 +333,7 @@ class Game {
     this.context.translate(-this.x, -this.y);
 
     // Render the map and everything on it.
-    var messages = this.map.render(this.context, this.images);
-    for (const message of messages) {
-      sendMessage(message);
-    }
+    this.map.render(this.context, this.images);
 
     this.context.restore();
 
