@@ -313,6 +313,8 @@ class Game {
   _dealDamageHandler({ shipId, enemyShipId, damage }) {
     this.map.getShip(enemyShipId).dealDamage(damage);
 
+    this.map.getShip(shipId).startAnimating();
+
     if (this.map.getShip(enemyShipId).getHealth() <= 0) {
       this.map.removeShip(enemyShipId);
     }

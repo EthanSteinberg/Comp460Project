@@ -75,7 +75,6 @@ export default class GameMap {
    * Render both the map and all ships on it.
    */
   render(context, images) {
-    var messages = [];
 
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {

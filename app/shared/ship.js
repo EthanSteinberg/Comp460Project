@@ -20,6 +20,9 @@ export default class Ship {
 
     this.ticsNextAttack = 0;
 
+    this.animateStage = 0;
+    this.isAnimating = false;
+
     this.smoke1Y = 0;
     this.smoke2Y = 0;
     this.lastDx = 0;
@@ -38,21 +41,28 @@ export default class Ship {
 
     context.rotate(angle);
     context.drawImage(images.ship, (-0.5) * 50, (-0.5) * 50, 50, 50);
-    context.restore();
+    
 
+    if (this.isAnimating) {
+      if (this.animateStage == 100) {
+        this.animateStage = 0;
+      }
 
-    if (this.enemyTarget != null) {
-      if (this.ticsNextAttack % 50 == 0) {
+      if (this.animateStage % 50 == 0) {
         this.smoke1Y = Math.floor((Math.random() * 35) + 1) / 100;
         this.smoke2Y = Math.floor((Math.random() * 35) + 1) / 100;
 
       }
-      context.globalAlpha = (this.ticsNextAttack % 50) / 100;
-      context.drawImage(images.smoke, (this.x - 0.25) * 50, (this.y - this.smoke1Y) * 50, 10, 10);
-      context.globalAlpha = (this.ticsNextAttack % 40) / 100;
-      context.drawImage(images.smoke, (this.x - 0.0) * 50, (this.y - this.smoke2Y) * 50, 10, 10);
+      context.globalAlpha = (this.animateStage % 50) / 100;
+      context.drawImage(images.smoke, -0.25 * 50, (-this.smoke1Y) * 50, 10, 10);
+      context.globalAlpha = (this.animateStage % 40) / 100;
+      context.drawImage(images.smoke, 0* 50, (-this.smoke2Y) * 50, 10, 10);
       context.globalAlpha = 1;
+
+      this.animateStage += 1;
     }
+
+    context.restore();
 
     if (this.isSelected) {
       context.strokeStyle = 'cyan';
@@ -60,6 +70,10 @@ export default class Ship {
       context.arc(this.x * 50, this.y * 50, 25, 0, Math.PI * 2, true);
       context.stroke();
     }
+  }
+
+  startAnimating() {
+    this.isAnimating = true;
   }
 
   getX() {
