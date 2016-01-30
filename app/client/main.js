@@ -157,13 +157,6 @@ class Game {
    * Takes as input the images object as produced by images.js
    */
   constructor(images) {
-    this.images = images;
-    this.map = new GameMap();
-    this.gui = new Gui();
-
-    this.x = 0;
-    this.y = 0;
-
     this.canvas = document.getElementById('canvas');
     this.context = this.canvas.getContext('2d');
 
@@ -172,6 +165,13 @@ class Game {
 
     this.width = window.innerWidth;
     this.height = window.innerHeight;
+
+    this.images = images;
+    this.map = new GameMap();
+    this.gui = new Gui(this.width, this.height);
+
+    this.x = 0;
+    this.y = 0;
   }
 
   mousedown(event, sendMessage, stats) {

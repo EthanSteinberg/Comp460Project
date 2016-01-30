@@ -1,6 +1,4 @@
 import Button from './button';
-import { MAP_WIDTH } from './gamemap';
-import { MAP_HEIGHT } from './gamemap';
 import StatsDisplay from './guibuttons/statsdisplay';
 import Stats from './stats';
 import buildingConstants from './buildingconstants';
@@ -11,40 +9,45 @@ import buildingConstants from './buildingconstants';
  */
 export default class Gui {
 
-  constructor() {
+  constructor(canvasWidth, canvasHeight) {
+    this.width = 8;
+    this.height = Math.round(canvasHeight/50);
+
+    this.x = Math.round(canvasWidth/50) - this.width;
+    this.y = 0;
+
     this.buttons = [
-      new Button('mine', 1+MAP_WIDTH, 1), 
-      new Button('shipyard', 1+MAP_WIDTH, 3),
-      new Button('shipbuilder',1+MAP_WIDTH, 6)
+      new Button('mine', 1+this.x, 1), 
+      new Button('shipyard', 1+this.x, 3),
+      new Button('shipbuilder',1+this.x, 6)
     ];
-    this.statsdisplay = new StatsDisplay("statsdisplay", 570, 150, 50, 50);
+    this.statsdisplay = new StatsDisplay("statsdisplay", (this.x+3)*50, (this.y+3)*50, 50, 50);
 
     this.templates = [];
 
     this.grid = {};
 
-    this._initGrid();
-
-    this.width = 8;
-    this.height = 8;
     this.displayStats = false;
 
     this.stats = null;
     this.templateStats = new Map();
+
+    this._initGrid();
   }
 
   _initGrid() {
     for (const button of this.buttons) {
       this.grid[button.getX() + ',' + button.getY()] = button;
     }
+    console.log(this.grid);
   }
 
   /**
    * Render the gui
    */
   render(context, images, map, hoverCoords) {
-    for (let x = MAP_WIDTH; x < this.width + MAP_WIDTH; x++) {
-      for (let y = 0; y < this.height; y++) {
+    for (let x = this.x; x < this.width + this.x; x++) {
+      for (let y = this.y; y < this.height; y++) {
         context.fillStyle = 'gray';
         context.fillRect(x * 50, y * 50, 50, 50);
       }
@@ -79,13 +82,13 @@ export default class Gui {
     context.fillStyle = 'black';
     context.textBaseline = 'top';
     context.font = '24px sans-serif';
-    context.fillText(Math.floor(map.getCoins()).toString(), 435, 6);
+    context.fillText(Math.floor(map.getCoins()).toString(), (this.x*50) + 30, (this.y*50) + 5);
 
     const width = context.measureText('100').width;
 
     context.strokeStyle = 'black';
-    context.strokeRect(400, 1, width + 40, 35);
-    context.drawImage(images.money, 405, 6, 25, 25);
+    context.strokeRect(this.x*50, this.y*50, width + 40, 35);
+    context.drawImage(images.money, (this.x*50), (this.y*50) + 5, 25, 25);
 
     if (this.displayStats) {
       var selectedTemplate;
@@ -102,8 +105,8 @@ export default class Gui {
         this.statsdisplay.render(context, images);
       } else if (selectedTemplate != null) {
         context.font = '20px Courier New';
-        context.fillText('No template in', 600, 170);
-        context.fillText('this save slot.', 600, 190);
+        context.fillText('No template in', (this.x+5)*50, (this.y+5)*50);
+        context.fillText('this save slot.', (this.x+5)*50, (this.y+5)*50);
       }
 
     }
@@ -151,9 +154,9 @@ export default class Gui {
   displayShipyard() {
     console.log("displayShipyard")
     this.displayStats = true;
-    this.templates.push(new Button('shiptemplate', MAP_WIDTH, 5, 1));
-    this.templates.push(new Button('shiptemplate', MAP_WIDTH+1, 5, 2));
-    this.templates.push(new Button('shiptemplate', MAP_WIDTH+2, 5, 3));
+    this.templates.push(new Button('shiptemplate', this.x, 5, 1));
+    this.templates.push(new Button('shiptemplate', this.x+1, 5, 2));
+    this.templates.push(new Button('shiptemplate', this.x+2, 5, 3));
 
     for (const template of this.templates) {
       this.grid[template.getX() + ',' + template.getY()] = template;
