@@ -169,6 +169,7 @@ class Game {
 
     this.images = images;
     this.map = new GameMap();
+    this.miniMap = this.map;
     this.gui = new Gui(this.width, this.height);
 
     this.x = 0;
@@ -359,7 +360,7 @@ class Game {
     this.context.translate(-this.x, -this.y);
 
     // Render the map and everything on it.
-    this.map.render(this.context, this.images);
+    this.map.render(this.context, this.images, "map");
 
     this.context.restore();
 
@@ -368,6 +369,12 @@ class Game {
     } else {
       this.gui.render(this.context, this.images, this.map, null);
     }
+
+    this.context.translate(this.width - 100, 0);
+    this.context.scale(.25, .25);
+    this.miniMap.render(this.context, this.images, "miniMap");
+    this.context.scale(4, 4);
+    this.context.translate(-this.width + 100, 0);
   }
 
   keydown(event, pressedKeys) {

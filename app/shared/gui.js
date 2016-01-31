@@ -152,7 +152,6 @@ export default class Gui {
   }
 
   displayShipyard() {
-    console.log("displayShipyard")
     this.displayStats = true;
     this.templates.push(new Button('shiptemplate', this.x, 5, 1));
     this.templates.push(new Button('shiptemplate', this.x+1, 5, 2));
@@ -164,7 +163,6 @@ export default class Gui {
   }
 
   removeShipyardDisplay() {
-    console.log("removeShipyardDisplay")
     this.displayStats = false;
 
     while(this.templates.length > 0) {

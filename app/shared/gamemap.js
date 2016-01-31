@@ -86,8 +86,8 @@ export default class GameMap {
   /**
    * Render both the map and all ships on it.
    */
-  render(context, images) {
-    if (this.mode == 'tactical') {
+  render(context, images, mapMode) {
+    if (this.mode == 'tactical' && mapMode == 'map') {
       context.translate(-50*SCALE, -50*SCALE);
       context.scale(SCALE,SCALE);
     } 
