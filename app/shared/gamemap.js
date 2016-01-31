@@ -86,12 +86,28 @@ export default class GameMap {
   /**
    * Render both the map and all ships on it.
    */
-  render(context, images, mapMode) {
-    if (this.mode == 'tactical' && mapMode == 'map') {
+  render(context, images) {
+    if (this.mode == 'tactical') {
       context.translate(-50*SCALE, -50*SCALE);
       context.scale(SCALE,SCALE);
-    } 
+      this.renderMap(context, images);
+    } else {
+      this.renderMap(context, images);
+    }
+  }
 
+  renderMiniMap(context, images, x, y, width, height) {
+    this.renderMap(context, images);
+
+    if (this.mode == 'tactical') {
+      context.strokeStyle = 'Fuchsia';
+      context.globalAlpha = .25;
+      context.fillRect((x/SCALE)+50, (y/SCALE)+50, width/SCALE - 100, height/SCALE);
+      context.globalAlpha = 1.0;
+    }
+  }
+
+  renderMap(context, images) {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         context.fillStyle = 'blue';

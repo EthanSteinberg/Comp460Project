@@ -360,7 +360,7 @@ class Game {
     this.context.translate(-this.x, -this.y);
 
     // Render the map and everything on it.
-    this.map.render(this.context, this.images, "map");
+    this.map.render(this.context, this.images);
 
     this.context.restore();
 
@@ -372,7 +372,7 @@ class Game {
 
     this.context.translate(this.width - 100, 0);
     this.context.scale(.25, .25);
-    this.miniMap.render(this.context, this.images, "miniMap");
+    this.miniMap.renderMiniMap(this.context, this.images, this.x, this.y, this.width, this.height);
     this.context.scale(4, 4);
     this.context.translate(-this.width + 100, 0);
   }
