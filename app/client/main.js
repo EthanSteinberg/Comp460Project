@@ -211,19 +211,25 @@ class Game {
 
   processGuiMouseClick(rawX, rawY) {
     // In the gui
-    const item = this.gui.getItem(Math.floor(rawX / 50), Math.floor(rawY / 50));
+    var item = this.gui.getItem(Math.floor(rawX / 50), Math.floor(rawY / 50));
     if (item != null) {
       if (item.getType() === 'shipbuilder') {
         return 'shipbuilder';
-      } else if (item.getType() === 'strategic') {
+      } 
+      this.guiSelected = true;
+      this.setSelectedItem(item);
+
+      if (item.getType() === 'strategic') {
         this.map.setMode('tactical');
         item.setType('tactical');
+        this.guiSelected = false;
+        this.setSelectedItem(null);
       } else if (item.getType() === 'tactical') {
         this.map.setMode('strategic');
         item.setType('strategic');
+       this.guiSelected = false;
+        this.setSelectedItem(null);
       }
-      this.guiSelected = true;
-      this.setSelectedItem(item);
     }
 
     return 'game';
@@ -237,8 +243,9 @@ class Game {
     var mouseX = x / (50);
     var mouseY = y / (50);
     if (this.map.getMode() == 'tactical') {
-      mouseX = x / (50*SCALE);
-      mouseY = y / (50*SCALE);
+      mouseX = (x + 50*SCALE) / (50*SCALE) ;
+      mouseY = (y + 50*SCALE) / (50*SCALE) ;
+      console.log(mouseX, mouseY)
     }
 
     const mouseRoundedX = Math.round(mouseX);
