@@ -43,16 +43,16 @@ export default class Button {
         context.fillRect(this.x * 50, this.y * 50, 50, 50);
         context.font = '10px Arial';
         context.fillStyle = 'black';
-        context.fillText('STRATEGIC', this.x * 50, this.y * 50 + 10);
-        context.fillText('VIEW', this.x * 50 + 5, this.y * 50 + 20);
+        context.fillText('ZOOM', this.x * 50 + 10, this.y * 50 + 10);
+        context.fillText('OUT', this.x * 50 + 15, this.y * 50 + 20);
         break;
       case 'strategic':
         context.fillStyle = 'red';
         context.fillRect(this.x * 50, this.y * 50, 50, 50);
         context.font = '10px Arial';
         context.fillStyle = 'black';
-        context.fillText('TACTICAL', this.x * 50, this.y * 50 + 10);
-        context.fillText('VIEW', this.x * 50 + 5, this.y * 50 + 20);
+        context.fillText('ZOOM', this.x * 50 + 10, this.y * 50 + 10);
+        context.fillText('IN', this.x * 50 + 20, this.y * 50 + 20);
         break; 
       default:
         console.error('Trying to render unknown button');
