@@ -3,6 +3,7 @@ import Mine from './mine';
 import Shipyard from './shipyard';
 import Island from './island';
 import Stats from './stats';
+import MiniView from './miniview';
 
 export const MAP_WIDTH = 8;
 export const MAP_HEIGHT = 8;
@@ -15,6 +16,8 @@ const SCALE = 4;
 export default class GameMap {
 
   constructor() {
+    this.miniview = new MiniView("miniview");
+
     this.islands = new Map();
 
     this.ships = new Map();
@@ -100,10 +103,7 @@ export default class GameMap {
     this.renderMap(context, images);
 
     if (this.mode == 'tactical') {
-      context.strokeStyle = 'Fuchsia';
-      context.globalAlpha = .25;
-      context.fillRect((x/SCALE)+50, (y/SCALE)+50, width/SCALE - 100, height/SCALE);
-      context.globalAlpha = 1.0;
+      this.miniview.render(context, images, x, y, width, height, SCALE);
     }
   }
 
@@ -148,6 +148,10 @@ export default class GameMap {
     }
 
     return null;
+  }
+
+  setView(mouseX, mouseY) {
+    return this.miniview.setView(mouseX, mouseY);
   }
 
   isIsland(x, y) {

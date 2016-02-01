@@ -22,18 +22,18 @@ class Main {
   constructor(images) {
     this.mode = 'game';
 
-    this.images = images;
-    this.game = new Game(images);
-    this.shipbuilder = new Shipbuilder(images);
-
     this.canvas = document.getElementById('canvas');
     this.context = this.canvas.getContext('2d');
 
-    this.context.canvas.width  = window.innerWidth;
-    this.context.canvas.height = window.innerHeight;
+    this.canvas.width  = 1200;
+    this.canvas.height = 500;
 
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
+    this.width = this.canvas.width;
+    this.height = this.canvas.height;
+
+    this.images = images;
+    this.game = new Game(images);
+    this.shipbuilder = new Shipbuilder(images);
 
     this.pressedKeys = new Set();
 
@@ -161,11 +161,8 @@ class Game {
     this.canvas = document.getElementById('canvas');
     this.context = this.canvas.getContext('2d');
 
-    this.context.canvas.width  = window.innerWidth;
-    this.context.canvas.height = window.innerHeight;
-
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
+    this.width = this.canvas.width;
+    this.height = this.canvas.height;
 
     this.images = images;
     this.map = new GameMap();
@@ -231,6 +228,13 @@ class Game {
        this.guiSelected = false;
         this.setSelectedItem(null);
       }
+    }
+
+    // In the miniMap
+    var view = this.miniMap.setView(rawX, rawY);
+    if (view != null) {
+      this.x = view.x;
+      this.y = view.y;
     }
 
     return 'game';
@@ -370,11 +374,11 @@ class Game {
       this.gui.render(this.context, this.images, this.map, null);
     }
 
-    this.context.translate(this.width - 100, 0);
+    this.context.translate(this.width - 175, 25);
     this.context.scale(.25, .25);
     this.miniMap.renderMiniMap(this.context, this.images, this.x, this.y, this.width, this.height);
     this.context.scale(4, 4);
-    this.context.translate(-this.width + 100, 0);
+    this.context.translate(-this.width + 175, -25);
   }
 
   keydown(event, pressedKeys) {
