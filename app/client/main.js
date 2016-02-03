@@ -318,15 +318,13 @@ class Game {
         }
         this.map.setMode('tactical');
         item.setType('tactical');
-        this.guiSelected = false;
-        this.setSelectedItem(olditem);
+        this.updateSelectionState({ ...this.selectionState, gui: null });        
       } else if (item.getType() === 'tactical') {
         this.x = 0;
         this.y = 0;
         this.map.setMode('strategic');
         item.setType('strategic');
-        this.guiSelected = false;
-        this.setSelectedItem(olditem);
+        this.updateSelectionState({ ...this.selectionState, gui: null });        
       }
     }
 
@@ -350,8 +348,8 @@ class Game {
     let mouseX = x / (50);
     let mouseY = y / (50);
     if (this.map.getMode() === 'tactical') {
-      mouseX = (x + 50 * SCALE) / (50 * SCALE) + 1;
-      mouseY = (y + 50 * SCALE) / (50 * SCALE) + 1;
+      mouseX = (x + 50 * SCALE) / (50 * SCALE) - 1;
+      mouseY = (y + 50 * SCALE) / (50 * SCALE) - 1;
       console.log(mouseX, mouseY);
     }
 
