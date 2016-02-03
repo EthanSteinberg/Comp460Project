@@ -29,14 +29,14 @@ MakeShip {
 	islandID: the island the ship will be made on
 	x: x position of the building location
 	y: y position of the building location
-	shipstats: the stats of the ship
+	template: the template of the ship
 }
 
 SetPosition: {
 	object: the object type
 	position: the position of the object
 	islandID: the id of the island the object is associated with
-	stats: the stats of the object
+	template: the template of the object
 }
 
 SetResources: {

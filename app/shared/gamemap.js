@@ -2,7 +2,6 @@ import Ship from './ship';
 import Mine from './mine';
 import Shipyard from './shipyard';
 import Island from './island';
-import Stats from './stats';
 import MiniView from './miniview';
 
 export const MAP_WIDTH = 8;
@@ -16,7 +15,7 @@ const SCALE = 4;
 export default class GameMap {
 
   constructor() {
-    this.miniview = new MiniView("miniview");
+    this.miniview = new MiniView('miniview');
 
     this.islands = new Map();
 
@@ -31,14 +30,13 @@ export default class GameMap {
 
     this.mode = 'strategic';
 
-    var stats1 = new Stats();
-    stats1.applyItemEffect("galleon");
-    stats1.applyItemEffect("roundshot");
-    var stats2 = new Stats();
-    stats2.applyItemEffect("frigate");
-    stats2.applyItemEffect("grapeshot");
-    this.addShip(new Ship(this, 0, 4, stats1));
-    this.addShip(new Ship(this, 4, 4, stats2));
+    const template = {
+      hull: 'gunboat',
+      hardpoints: ['roundshot'],
+    };
+
+    this.addShip(new Ship(this, 0, 4, template));
+    this.addShip(new Ship(this, 4, 4, template));
 
     const island1coordinates = [
       [1, 1],
@@ -134,7 +132,13 @@ export default class GameMap {
     }
   }
 
-  getItem(x, y) {
+  /**
+   * Get an item on the map at a given x y position.
+   * If forAttack is provided, it gets items for attacking.
+   * In particular, this allows you to target ship hardpoints while you
+   * cannot select hardpoints yourself.
+   */
+  getItem(x, y, forAttack = false) {
     if (this.grid[Math.round(x) + ',' + Math.round(y)] != null) {
       return this.grid[Math.round(x) + ',' + Math.round(y)];
     }
@@ -143,6 +147,9 @@ export default class GameMap {
       const distanceSquared = (ship.getX() - x) * (ship.getX() - x) + (ship.getY() - y) * (ship.getY() - y);
       const distance = Math.sqrt(distanceSquared);
       if (distance <= 0.5) {
+        if (forAttack && ship.getHardpoint(x, y) != null) {
+          return ship.getHardpoint(x, y);
+        }
         return ship;
       }
     }
@@ -177,7 +184,7 @@ export default class GameMap {
     return -1;
   }
 
-  addBuilding(type, x, y, islandID, stats) {
+  addBuilding(type, x, y, islandID, template) {
     switch (type) {
       case 'mine':
         const mine = new Mine(this, x, y);
@@ -190,7 +197,7 @@ export default class GameMap {
         this.grid[shipyard.getX() + ',' + shipyard.getY()] = shipyard;
         break;
       case 'ship':
-        this.addShip(new Ship(this, x, y, stats));
+        this.addShip(new Ship(this, x, y, template));
         break;
       default:
         console.error('Unexpected building type: ', type);

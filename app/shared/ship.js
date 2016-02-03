@@ -1,6 +1,18 @@
 const shipMoveSpeed = 0.05;
 
 import astar from '../shared/astar';
+import { getStats } from './template';
+import Gun from './gun';
+
+const gun1Position = {
+  x: 0,
+  y: -15.75 / 50,
+};
+
+const gun2Position = {
+  x: 0,
+  y: 13.25 / 50,
+};
 
 /**
  * A ship entity.
@@ -9,56 +21,65 @@ let nextId = 0;
 
 export default class Ship {
 
-  constructor(map, x, y, stats) {
+  constructor(map, x, y, template) {
+    // Both
     this.map = map;
     this.x = x;
     this.y = y;
     this.id = nextId++;
     this.type = 'ship';
-    this.isSelected = false;
-    this.stats = stats;
+    this.template = template;
 
+    this.stats = getStats(this.template);
+
+    // Server side
     this.ticsNextAttack = 0;
 
+    this.mode = {
+      type: 'IDLE',
+    };
+
+    // Client side
     this.animateStage = 0;
     this.isAnimating = false;
 
+    this.isSelected = false;
     this.smoke1Y = 0;
     this.smoke2Y = 0;
     this.lastDx = 0;
     this.lastDy = -1;
 
-    this.mode = {
-      type: 'IDLE',
-    };
+    this.hardpoints = [new Gun(this, gun1Position, 0), new Gun(this, gun2Position, 1)];
+  }
+
+  getOrientation() {
+    return Math.atan2(this.lastDy, this.lastDx) + Math.PI / 2;
   }
 
   render(context, images) {
     context.save();
     context.translate(this.x * 50, this.y * 50);
 
-    const angle = Math.atan2(this.lastDy, this.lastDx) + Math.PI / 2;
+    const angle = this.getOrientation();
 
     context.rotate(angle);
     context.drawImage(images.ship, (-0.5) * 50, (-0.5) * 50, 50, 50);
-    
 
     if (this.isAnimating) {
-      if (this.animateStage == 100) {
+      if (this.animateStage === 100) {
         this.animateStage = 0;
       }
 
-      if (this.animateStage % 50 == 0) {
+      if (this.animateStage % 50 === 0) {
         this.smoke1Y = Math.floor((Math.random() * 35) + 1) / 100;
         this.smoke2Y = Math.floor((Math.random() * 35) + 1) / 100;
-
       }
       context.globalAlpha = (this.animateStage % 50) / 100;
       context.drawImage(images.smoke, -0.25 * 50, (-this.smoke1Y) * 50, 10, 10);
       context.globalAlpha = (this.animateStage % 40) / 100;
-      context.rotate(3.1415926536);
+      context.rotate(Math.PI);
       context.drawImage(images.smoke, -0.22 * 50, (-this.smoke2Y) * 50, 10, 10);
-      context.rotate(-3.1415926536)
+      context.rotate(-Math.PI);
       context.globalAlpha = 1;
 
       this.animateStage += 1;
@@ -66,12 +87,49 @@ export default class Ship {
 
     context.restore();
 
+    context.fillStyle = 'red';
+    context.fillRect(this.x * 50 - 20, this.y * 50 + 30, 40, 5);
+
+    const healthpercent = this.stats.health / getStats(this.template).health;
+
+    context.fillStyle = 'green';
+    context.fillRect(this.x * 50 - 20, this.y * 50 + 30, 40 * healthpercent, 5);
+
+    context.strokeStyle = 'black';
+    context.strokeRect(this.x * 50 - 20, this.y * 50 + 30, 40, 5);
+
     if (this.isSelected) {
       context.strokeStyle = 'cyan';
       context.beginPath();
       context.arc(this.x * 50, this.y * 50, 25, 0, Math.PI * 2, true);
       context.stroke();
     }
+
+    if (this.attackShown != null) {
+      const enemyShip = this.map.getShip(this.attackShown);
+
+      context.strokeStyle = 'red';
+      context.beginPath();
+      context.moveTo(this.getX() * 50, this.getY() * 50);
+      context.lineTo(enemyShip.getX() * 50, enemyShip.getY() * 50);
+      context.stroke();
+    }
+
+    for (const hardpoint of this.hardpoints) {
+      hardpoint.render(context, images);
+    }
+  }
+
+  getHardpoint(x, y) {
+    const position = { x, y };
+
+    for (const hardpoint of this.hardpoints) {
+      if (this.getDistance(position, hardpoint.getPosition()) <= hardpoint.radius) {
+        return hardpoint;
+      }
+    }
+
+    return null;
   }
 
   startAnimating() {
@@ -84,6 +142,10 @@ export default class Ship {
 
   getY() {
     return this.y;
+  }
+
+  getTemplate() {
+    return this.template;
   }
 
   getStats() {
@@ -177,11 +239,13 @@ export default class Ship {
     return this.getDistanceToTarget(this.mode.moves[this.mode.moveIndex]) <= 0.01;
   }
 
-  getDistanceToTarget(target) {
-    const { x, y } = target;
-
-    const distance = Math.sqrt((this.x - x) * (this.x - x) + (this.y - y) * (this.y - y));
+  getDistance(a, b) {
+    const distance = Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
     return distance;
+  }
+
+  getDistanceToTarget(target) {
+    return this.getDistance({ x: this.x, y: this.y }, target);
   }
 
   /**
@@ -226,11 +290,10 @@ export default class Ship {
     const targetPosition = { x: this.mode.target.getX(), y: this.mode.target.getY() };
 
     if (this.getDistanceToTarget(targetPosition) < 2) {
-      if (this.ticsNextAttack == 0) {
-        this.ticsNextAttack = 100;
+      if (this.ticsNextAttack === 0) {
+        this.ticsNextAttack = 10;
         const damageDealt = this.attack(this.mode.target);
         const result = [{ type: 'DealDamage', shipId: this.getId(), enemyShipId: this.mode.target.getId(), damage: damageDealt }];
-    
 
         if (this.mode.target.getHealth() <= 0) {
           this.map.removeShip(this.mode.target);
@@ -240,15 +303,15 @@ export default class Ship {
         }
 
         return result;
-      } else {
-        return [];
       }
+
+      return [];
     }
 
     this.mode.moves = this.performAStar(targetPosition);
     if (this.mode.moves == null) {
       // No such path
-      return [{}];
+      return [];
     }
 
     this.mode.moveIndex = 0;
@@ -258,7 +321,7 @@ export default class Ship {
     }
 
     if (this.mode.moveIndex === this.mode.moves.length) {
-      return [{}];
+      return [];
     }
 
     return this.performMove();

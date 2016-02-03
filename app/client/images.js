@@ -17,6 +17,7 @@ const sources = {
   info: 'info.png',
   exit: 'exit.png',
   smoke: 'smoke.png',
+  cannon: 'badCannon.png',
 };
 
 /**

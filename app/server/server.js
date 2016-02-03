@@ -73,11 +73,11 @@ function makeBuildingHandler(makeBuildingMessage) {
 }
 
 function makeShipHandler(makeShipMessage) {
-  const { islandID, x, y, shipstats } = makeShipMessage;
+  const { islandID, x, y, template } = makeShipMessage;
   if (map.isNextToIsland(islandID, x, y)) {
-    map.addBuilding('ship', x, y, islandID, shipstats);
+    map.addBuilding('ship', x, y, islandID, template);
     pendingUpdates.push(
-      { type: 'SetPosition', object: 'ship', position: { x, y }, islandID: 0, stats: shipstats }
+      { type: 'SetPosition', object: 'ship', position: { x, y }, islandID: 0, template }
     );
   }
 }
