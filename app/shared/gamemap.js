@@ -91,7 +91,6 @@ export default class GameMap {
    */
   render(context, images) {
     if (this.mode == 'tactical') {
-      context.translate(-50*SCALE - 250, -50*SCALE - 250);
       context.scale(SCALE,SCALE);
       this.renderMap(context, images);
     } else {

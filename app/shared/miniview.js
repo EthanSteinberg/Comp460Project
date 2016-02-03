@@ -11,7 +11,7 @@ export default class MiniView extends GuiButton {
 
     context.strokeStyle = 'Fuchsia';
     context.globalAlpha = .25;
-    context.fillRect((this.x/this.SCALE)+100, (this.y/this.SCALE)+100, 
+    context.fillRect((this.x/this.SCALE), (this.y/this.SCALE), 
       this.width/this.SCALE - 100, this.height/this.SCALE);
     context.globalAlpha = 1.0; 
   }
@@ -22,10 +22,8 @@ export default class MiniView extends GuiButton {
 
     if (newX > -25 && newX < mapWidth) {
       if (newY > -25 && newY < mapHeight) {
-        console.log(this.x, this.y)
-        this.x = newX;
-        this.y = newY;
-        console.log(this.x, this.y)
+        this.x = newX*2 - 50;
+        this.y = newY*3 - 50;
         return {x: this.x, y: this.y}
       }
     }

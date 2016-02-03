@@ -210,6 +210,7 @@ class Game {
   processGuiMouseClick(rawX, rawY) {
     // In the gui
     var item = this.gui.getItem(Math.floor(rawX / 50), Math.floor(rawY / 50));
+    var olditem = this.selectedItem;
     if (item != null) {
       if (item.getType() === 'shipbuilder') {
         return 'shipbuilder';
@@ -218,24 +219,37 @@ class Game {
       this.setSelectedItem(item);
 
       if (item.getType() === 'strategic') {
+        if (olditem instanceof Ship) {
+          this.x = olditem.getX()*50*SCALE - this.width/2 + 200;
+          this.y = olditem.getY()*50*SCALE - this.height/2;
+          console.log(this.x, this.y)
+        } else {
+          this.x += this.width/2;
+          this.y += this.height/2
+        }
+
         this.map.setMode('tactical');
         item.setType('tactical');
         this.guiSelected = false;
-        this.setSelectedItem(null);
+        this.setSelectedItem(olditem);
       } else if (item.getType() === 'tactical') {
+        this.x = 0;
+        this.y = 0;
         this.map.setMode('strategic');
         item.setType('strategic');
-       this.guiSelected = false;
-        this.setSelectedItem(null);
+        this.guiSelected = false;
+        this.setSelectedItem(olditem);
       }
     }
 
-    // In the miniMap
-    // var view = this.miniMap.setView(rawX, rawY);
-    // if (view != null) {
-    //   this.x = view.x;
-    //   this.y = view.y;
-    // }
+    if (this.map.mode == 'tactical') {
+      // Minimap selection logic
+      var view = this.miniMap.setView(rawX, rawY);
+      if (view != null) {
+        this.x = view.x;
+        this.y = view.y;
+      }
+    }
 
     return 'game';
   }
