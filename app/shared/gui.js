@@ -43,7 +43,16 @@ export default class Gui {
     if (newMap == null) {
       this.unitButtons = null;
     } else if (newMap instanceof Ship) {
+      const template = newMap.getTemplate();
+
       this.unitButtons = [];
+
+      for (let i = 0; i < template.hardpoints.length; i++) {
+        const hardpoint = template.hardpoints[i];
+        if (hardpoint != null) {
+          this.unitButtons.push(new Button(hardpoint, this.x + i, 7, i));
+        }
+      }
     } else if (newMap instanceof Shipyard) {
       this.unitButtons = [
         new Button('shiptemplate', this.x, 7, 0),

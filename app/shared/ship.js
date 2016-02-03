@@ -40,16 +40,17 @@ export default class Ship {
     };
 
     // Client side
-    this.animateStage = 0;
-    this.isAnimating = false;
 
     this.isSelected = false;
-    this.smoke1Y = 0;
-    this.smoke2Y = 0;
+
     this.lastDx = 0;
     this.lastDy = -1;
 
     this.hardpoints = [new Gun(this, gun1Position, 0), new Gun(this, gun2Position, 1)];
+  }
+
+  getPosition() {
+    return { x: this.x, y: this.y };
   }
 
   getOrientation() {
@@ -64,27 +65,6 @@ export default class Ship {
 
     context.rotate(angle);
     context.drawImage(images.ship, (-0.5) * 50, (-0.5) * 50, 50, 50);
-
-    if (this.isAnimating) {
-      if (this.animateStage === 100) {
-        this.animateStage = 0;
-      }
-
-      if (this.animateStage % 50 === 0) {
-        this.smoke1Y = Math.floor((Math.random() * 35) + 1) / 100;
-        this.smoke2Y = Math.floor((Math.random() * 35) + 1) / 100;
-      }
-      context.globalAlpha = (this.animateStage % 50) / 100;
-      context.drawImage(images.smoke, -0.25 * 50, (-this.smoke1Y) * 50, 10, 10);
-      context.globalAlpha = (this.animateStage % 40) / 100;
-      context.rotate(Math.PI);
-      context.drawImage(images.smoke, -0.22 * 50, (-this.smoke2Y) * 50, 10, 10);
-      context.rotate(-Math.PI);
-      context.globalAlpha = 1;
-
-      this.animateStage += 1;
-    }
-
     context.restore();
 
     context.fillStyle = 'red';
@@ -120,6 +100,10 @@ export default class Ship {
     }
   }
 
+  getHardpointById(hardPointId) {
+    return this.hardpoints[hardPointId];
+  }
+
   getHardpoint(x, y) {
     const position = { x, y };
 
@@ -130,10 +114,6 @@ export default class Ship {
     }
 
     return null;
-  }
-
-  startAnimating() {
-    this.isAnimating = true;
   }
 
   getX() {
@@ -287,19 +267,24 @@ export default class Ship {
    * Try to attack if in range, or move into range otherwise
    */
   getAttackMessages() {
+    if (this.mode.target.getHealth() <= 0) {
+      this.mode = {
+        type: 'IDLE',
+      };
+
+      return [];
+    }
+
     const targetPosition = { x: this.mode.target.getX(), y: this.mode.target.getY() };
 
     if (this.getDistanceToTarget(targetPosition) < 2) {
       if (this.ticsNextAttack === 0) {
         this.ticsNextAttack = 10;
         const damageDealt = this.attack(this.mode.target);
-        const result = [{ type: 'DealDamage', shipId: this.getId(), enemyShipId: this.mode.target.getId(), damage: damageDealt }];
+        const result = [{ type: 'DealDamage', enemyShipId: this.mode.target.getId(), damage: damageDealt }];
 
         if (this.mode.target.getHealth() <= 0) {
           this.map.removeShip(this.mode.target);
-          this.mode = {
-            type: 'IDLE',
-          };
         }
 
         return result;

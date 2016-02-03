@@ -21,10 +21,54 @@ const map = new GameMap();
 
 const playerSockets = [];
 
+let nextProjectileId = 0;
+const projectiles = new Map();
+
 let pendingUpdates = [];
 
+function updateProjectiles() {
+  const result = [];
+
+  for (const [id, { position, targetId }] of projectiles) {
+    const ship = map.getShip(targetId);
+    if (ship == null) {
+      result.push({ type: 'RemoveProjectile', id });
+      projectiles.delete(id);
+      continue;
+    }
+
+    const targetPosition = ship.getPosition();
+
+    const dx = targetPosition.x - position.x;
+    const dy = targetPosition.y - position.y;
+
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist < 0.01) {
+      result.push({ type: 'RemoveProjectile', id });
+      projectiles.delete(id);
+
+      const damageDealt = ship.dealDamage(50);
+      result.push({ type: 'DealDamage', enemyShipId: targetId, damage: damageDealt });
+
+      if (ship.getHealth() <= 0) {
+        map.removeShip(targetId);
+      }
+    } else {
+      const movement = Math.min(dist, 0.1);
+
+      position.x += dx / dist * movement;
+      position.y += dy / dist * movement;
+
+      result.push({ type: 'SetProjectilePosition', id, position });
+    }
+  }
+
+  return result;
+}
+
 function updateGameState() {
-  const updateMessages = pendingUpdates.concat(map.getUpdateMessages());
+  const updateMessages = pendingUpdates.concat(map.getUpdateMessages()).concat(updateProjectiles());
 
   // Clear the pending updates list.
   pendingUpdates = [];
@@ -89,11 +133,25 @@ function attackShipHandler({ id, targetId }) {
   sourceShip.attackTarget(targetShip);
 }
 
+
+function fireShotHandler({ id, targetId, hardpointId }) {
+  const hardpoint = map.getShip(id).getHardpointById(hardpointId);
+  const projectileId = nextProjectileId;
+  const position = hardpoint.getPosition();
+
+  nextProjectileId += 1;
+
+  projectiles.set(projectileId, { position, targetId });
+
+  pendingUpdates.push({ type: 'AddProjectile', id: projectileId, position });
+}
+
 const messageHandlers = {
   'MoveShip': moveShipHandler,
   'MakeBuilding': makeBuildingHandler,
   'MakeShip': makeShipHandler,
   'AttackShip': attackShipHandler,
+  'FireShot': fireShotHandler,
 };
 
 wss.on('connection', function connection(socket) {

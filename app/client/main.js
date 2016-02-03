@@ -97,6 +97,9 @@ class Main {
       'DealDamage': this.game._dealDamageHandler.bind(this.game),
       'StartShowingAttack': this.game._startShowingAttack.bind(this.game),
       'StopShowingAttack': this.game._stopShowingAttack.bind(this.game),
+      'AddProjectile': this.game._addProjectile.bind(this.game),
+      'SetProjectilePosition': this.game._setProjectilePosition.bind(this.game),
+      'RemoveProjectile': this.game._removeProjectile.bind(this.game),
     };
   }
 
@@ -181,6 +184,8 @@ class Game {
       gui: null,
       map: null,
     };
+
+    this.projectiles = new Map();
 
     this.images = images;
     this.map = new GameMap();
@@ -362,9 +367,11 @@ class Game {
       if (this.selectionState.gui.getType() === 'shiptemplate') {
         const template = templates[this.selectionState.gui.getTemplateNum()];
         sendMessage({ type: 'MakeShip', islandID: this.selectionState.map.getIslandID(), x: mouseRoundedX, y: mouseRoundedY, template });
-      } else {
+      } else if (this.selectionState.gui.getType() === 'mine' || this.selectionState.gui.getType() === 'shipyard') {
         const buildingType = this.selectionState.gui.getType();
         sendMessage({ type: 'MakeBuilding', building: buildingType, x: mouseRoundedX, y: mouseRoundedY });
+      } else if (this.selectionState.gui.getType() === 'roundshot' && item instanceof Ship) {
+        sendMessage({ type: 'FireShot', id: this.selectionState.map.getId(), hardpointId: this.selectionState.gui.getTemplateNum(), targetId: item.getId() });
       }
     } else if (item != null) {
       // Select
@@ -375,8 +382,19 @@ class Game {
     }
   }
 
+  _removeProjectile({ id }) {
+    this.projectiles.delete(id);
+  }
+
+  _addProjectile({ id, position }) {
+    this.projectiles.set(id, position);
+  }
+
+  _setProjectilePosition({ id, position }) {
+    this.projectiles.set(id, position);
+  }
+
   _startShowingAttack({ id, targetId }) {
-    console.log('sure');
     this.map.getShip(id).showAttack(targetId);
   }
 
@@ -402,10 +420,8 @@ class Game {
     this.map.getBuilding(id, object).timeLeftToBuild = timeLeftToBuild;
   }
 
-  _dealDamageHandler({ shipId, enemyShipId, damage }) {
+  _dealDamageHandler({ enemyShipId, damage }) {
     this.map.getShip(enemyShipId).dealDamage(damage);
-
-    this.map.getShip(shipId).startAnimating();
 
     if (this.map.getShip(enemyShipId).getHealth() <= 0) {
       this.map.removeShip(enemyShipId);
@@ -426,6 +442,11 @@ class Game {
 
     // Render the map and everything on it.
     this.map.render(this.context, this.images);
+
+    for (const position of this.projectiles.values()) {
+      const radius = 10;
+      this.context.drawImage(this.images.roundshot, position.x * 50 - radius / 2, position.y * 50 - radius / 2, radius, radius);
+    }
 
     this.context.restore();
 

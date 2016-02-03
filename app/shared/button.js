@@ -53,7 +53,12 @@ export default class Button {
         context.fillStyle = 'black';
         context.fillText('ZOOM', this.x * 50 + 10, this.y * 50 + 10);
         context.fillText('IN', this.x * 50 + 20, this.y * 50 + 20);
-        break; 
+        break;
+
+      case 'roundshot':
+        context.drawImage(images.roundshot, this.x * 50, this.y * 50, 50, 50);
+        break;
+
       default:
         console.error('Trying to render unknown button');
     }

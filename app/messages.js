@@ -54,4 +54,24 @@ AttackShip: {
 	id: the ship to attack with,
 	targetId: the ship to attack
 }
+
+FireShot: {
+	id: The ship to attack with,
+	hardpointId: The index of the hardpoint
+	targetId: the ship to attack
+}
+
+AddProjectile: {
+	id: The id of the projectile
+	position: The starting position
+}
+
+SetProjectilePosition: {
+	id: The id of the projectile,
+	position: The new position
+}
+
+RemoveProjectile: {
+	id: The id of the projectile
+}
 */
