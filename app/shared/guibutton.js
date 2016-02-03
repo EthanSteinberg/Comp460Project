@@ -66,23 +66,19 @@ export default class GuiButton {
     this.rendertype = type;
   }
 
-  emptyslot(mouseX, mouseY) {
+  isOver(mouseX, mouseY) {
     if (mouseX > this.x && mouseX < this.x + this.width) {
       if (mouseY > this.y && mouseY < this.y + this.height) {
-        var oldtype = this.rendertype;
-        this.rendertype = this.type;
-        return oldtype;
+        return true;
       }
     }
-    return null;
+    return false;
   }
 
   select(mouseX, mouseY) {
-    if (mouseX > this.x && mouseX < this.x + this.width) {
-      if (mouseY > this.y && mouseY < this.y + this.height) {
-        this.selected = true;
-        return this.id;
-      }
+    if (this.isOver(mouseX, mouseY)) {
+      this.selected = true;
+      return this.id;
     }
 
     this.selected = false;
