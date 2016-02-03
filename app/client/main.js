@@ -248,8 +248,8 @@ class Game {
     var mouseX = x / (50);
     var mouseY = y / (50);
     if (this.map.getMode() == 'tactical') {
-      mouseX = (x + 25*SCALE) / (50*SCALE) ;
-      mouseY = (y + 25*SCALE) / (50*SCALE) ;
+      mouseX = (x + 50*SCALE) / (50*SCALE) +1;
+      mouseY = (y + 50*SCALE) / (50*SCALE) +1;
       console.log(mouseX, mouseY)
     }
 
