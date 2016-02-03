@@ -231,11 +231,11 @@ class Game {
     }
 
     // In the miniMap
-    var view = this.miniMap.setView(rawX, rawY);
-    if (view != null) {
-      this.x = view.x;
-      this.y = view.y;
-    }
+    // var view = this.miniMap.setView(rawX, rawY);
+    // if (view != null) {
+    //   this.x = view.x;
+    //   this.y = view.y;
+    // }
 
     return 'game';
   }
@@ -248,8 +248,8 @@ class Game {
     var mouseX = x / (50);
     var mouseY = y / (50);
     if (this.map.getMode() == 'tactical') {
-      mouseX = (x + 50*SCALE) / (50*SCALE) ;
-      mouseY = (y + 50*SCALE) / (50*SCALE) ;
+      mouseX = (x + 25*SCALE) / (50*SCALE) ;
+      mouseY = (y + 25*SCALE) / (50*SCALE) ;
       console.log(mouseX, mouseY)
     }
 

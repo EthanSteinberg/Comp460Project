@@ -91,7 +91,7 @@ export default class GameMap {
    */
   render(context, images) {
     if (this.mode == 'tactical') {
-      context.translate(-50*SCALE, -50*SCALE);
+      context.translate(-50*SCALE - 250, -50*SCALE - 250);
       context.scale(SCALE,SCALE);
       this.renderMap(context, images);
     } else {
@@ -151,7 +151,7 @@ export default class GameMap {
   }
 
   setView(mouseX, mouseY) {
-    return this.miniview.setView(mouseX, mouseY);
+    return this.miniview.setView(mouseX, mouseY, MAP_WIDTH*50, MAP_HEIGHT*50);
   }
 
   isIsland(x, y) {

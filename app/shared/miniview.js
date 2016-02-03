@@ -11,22 +11,21 @@ export default class MiniView extends GuiButton {
 
     context.strokeStyle = 'Fuchsia';
     context.globalAlpha = .25;
-    context.fillRect((this.x/this.SCALE)+50, (this.y/this.SCALE)+50, 
+    context.fillRect((this.x/this.SCALE)+100, (this.y/this.SCALE)+100, 
       this.width/this.SCALE - 100, this.height/this.SCALE);
     context.globalAlpha = 1.0; 
   }
 
-  setView(mouseX, mouseY) {
-    var newX = (mouseX*.25 + (this.width - 175))
-    var newY = (mouseY*.25 + (25))
+  setView(mouseX, mouseY, mapWidth, mapHeight) {
+    var newX = (mouseX - (this.width - 175))*this.SCALE
+    var newY = (mouseY - 25)*this.SCALE
 
-    console.log(newX, newY);
-    console.log(this.x, this.y);
-
-    if (newX > (this.x/this.SCALE)+50 && newX < this.width/this.SCALE - 100) {
-      if (newY > (this.y/this.SCALE)+50 && newY < this.height/this.SCALE) {
+    if (newX > -25 && newX < mapWidth) {
+      if (newY > -25 && newY < mapHeight) {
+        console.log(this.x, this.y)
         this.x = newX;
         this.y = newY;
+        console.log(this.x, this.y)
         return {x: this.x, y: this.y}
       }
     }
