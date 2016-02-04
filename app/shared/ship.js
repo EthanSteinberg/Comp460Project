@@ -114,6 +114,10 @@ export default class Ship {
     return this.hardpoints[hardPointId];
   }
 
+  getHardpoints() {
+    return this.hardpoints;
+  }
+
   getHardpoint(x, y) {
     const position = { x, y };
 

@@ -267,7 +267,6 @@ class Game {
       mouseY = (y + 50 * SCALE) / (50 * SCALE);
     }
 
-    console.log('foo');
     const item = this.map.getItem(mouseX, mouseY);
 
     if (item == null) {
@@ -280,7 +279,7 @@ class Game {
     } else {
       if (item instanceof Ship && this.selectionState.map instanceof Ship) {
         // Trying to attack a ship
-        if (item.getId() != this.selectionState.map.getId()) {
+        if (item.getId() !== this.selectionState.map.getId()) {
           sendMessage({ type: 'AttackShip', id: this.selectionState.map.getId(), targetId: item.getId() });
         }
       }
@@ -371,7 +370,11 @@ class Game {
         const buildingType = this.selectionState.gui.getType();
         sendMessage({ type: 'MakeBuilding', building: buildingType, x: mouseRoundedX, y: mouseRoundedY });
       } else if (this.selectionState.gui.getType() === 'roundshot' && item instanceof Ship) {
-        sendMessage({ type: 'FireShot', id: this.selectionState.map.getId(), hardpointId: this.selectionState.gui.getTemplateNum(), targetId: item.getId() });
+        const hardpoint = this.selectionState.map.getHardpointById(this.selectionState.gui.getTemplateNum());
+
+        if (hardpoint.getTimeTillFire() === 0) {
+          sendMessage({ type: 'FireShot', id: this.selectionState.map.getId(), hardpointId: this.selectionState.gui.getTemplateNum(), targetId: item.getId() });
+        }
       }
     } else if (item != null) {
       // Select
@@ -384,7 +387,6 @@ class Game {
 
   _setWeaponCooldown({ shipId, hardpointId, timeTillNextFire }) {
     const hardpoint = this.map.getShip(shipId).getHardpointById(hardpointId);
-    console.log(shipId, hardpointId, hardpoint);
     hardpoint.setTimeTillNextFire(timeTillNextFire);
   }
 

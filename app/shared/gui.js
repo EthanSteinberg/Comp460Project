@@ -102,6 +102,33 @@ export default class Gui {
 
     if (this.selectionState.map instanceof Ship) {
       statsDisplay((this.x + 3.5) * 50, (this.y + 6.25) * 50, this.selectionState.map.getStats(), context, images);
+      this.selectionState.map.getHardpoints().forEach((hardpoint, i) => {
+        if (hardpoint != null && hardpoint.getTimeTillFire() !== 0) {
+          context.save();
+          context.rect((this.x + i) * 50, 7 * 50, 50, 50);
+          context.clip();
+
+          const angle = (100 - hardpoint.getTimeTillFire()) / 100 * Math.PI * 2;
+
+          context.globalCompositeOperation = 'multiply';
+          context.fillStyle = 'rgba(0,0,0,.5)';
+          context.beginPath();
+          context.arc((this.x + i) * 50 + 25, 7 * 50 + 25, 50, 0, angle, true);
+          context.lineTo((this.x + i) * 50 + 25, 7 * 50 + 25);
+          context.fill();
+          context.globalCompositeOperation = 'source-over';
+
+          context.strokeStyle = 'white';
+          context.beginPath();
+          context.moveTo((this.x + i) * 50 + 25, 7 * 50 + 25);
+          context.lineTo((this.x + i) * 50 + 25 + 50, 7 * 50 + 25);
+          context.arc((this.x + i) * 50 + 25, 7 * 50 + 25, 50, 0, angle, true);
+          context.lineTo((this.x + i) * 50 + 25, 7 * 50 + 25);
+          context.stroke();
+
+          context.restore();
+        }
+      });
     } else if (this.selectionState.map instanceof Shipyard) {
       if (this.selectionState.gui != null && this.selectionState.gui.getType() === 'shiptemplate') {
         const template = this.templates[this.selectionState.gui.getTemplateNum()];
