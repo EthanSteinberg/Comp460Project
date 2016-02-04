@@ -1,6 +1,15 @@
+import { hardpoints } from './template';
+
 export default class Gun {
-  constructor(ship, offset, id) {
+  constructor(ship, offset, id, gunType) {
     this.type = 'gun';
+    this.gunType = gunType;
+
+    this.stats = {
+      health: hardpoints[this.gunType].health,
+      timeTillNextFire: 0,
+    };
+
     this.ship = ship;
     this.offset = offset;
     this.id = id;
@@ -18,6 +27,19 @@ export default class Gun {
     const { x, y } = this.getPosition();
 
     context.drawImage(images.cannon, x * 50 - 15 / 4, y * 50 - 25 / 4, 10, 10);
+
+    context.fillStyle = 'red';
+    context.fillRect(x * 50 - 10, y * 50 + 5, 20, 5);
+
+    const healthpercent = this.stats.health / hardpoints[this.gunType].health;
+
+    context.fillStyle = 'green';
+    context.fillRect(x * 50 - 10, y * 50 + 5, 20 * healthpercent, 5);
+
+    context.strokeStyle = 'black';
+    context.strokeRect(x * 50 - 10, y * 50 + 5, 20, 5);
+
+
     if (this.isSelected) {
       context.strokeStyle = 'cyan';
       context.beginPath();
@@ -26,11 +48,37 @@ export default class Gun {
     }
   }
 
+  getTimeTillFire() {
+    return this.stats.timeTillNextFire;
+  }
+
+  getHealth() {
+    return this.stats.health;
+  }
+
   getType() {
     return this.type;
   }
 
   getId() {
     return this.id;
+  }
+
+  fire() {
+    this.stats.timeTillNextFire = 100;
+    return [{ type: 'SetWeaponCooldown', shipId: this.ship.getId(), hardpointId: this.id, timeTillNextFire: this.stats.timeTillNextFire }];
+  }
+
+  setTimeTillNextFire(timeTillNextFire) {
+    this.stats.timeTillNextFire = timeTillNextFire;
+  }
+
+  getUpdateMessages() {
+    if (this.stats.timeTillNextFire !== 0) {
+      this.stats.timeTillNextFire -= 1;
+      return [{ type: 'SetWeaponCooldown', shipId: this.ship.getId(), hardpointId: this.id, timeTillNextFire: this.stats.timeTillNextFire }];
+    }
+
+    return [];
   }
 }

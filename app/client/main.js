@@ -100,6 +100,7 @@ class Main {
       'AddProjectile': this.game._addProjectile.bind(this.game),
       'SetProjectilePosition': this.game._setProjectilePosition.bind(this.game),
       'RemoveProjectile': this.game._removeProjectile.bind(this.game),
+      'SetWeaponCooldown': this.game._setWeaponCooldown.bind(this.game),
     };
   }
 
@@ -379,6 +380,12 @@ class Game {
       // Deselect
       this.updateSelectionState({ ...this.selectionState, map: null });
     }
+  }
+
+  _setWeaponCooldown({ shipId, hardpointId, timeTillNextFire }) {
+    const hardpoint = this.map.getShip(shipId).getHardpointById(hardpointId);
+    console.log(shipId, hardpointId, hardpoint);
+    hardpoint.setTimeTillNextFire(timeTillNextFire);
   }
 
   _removeProjectile({ id }) {

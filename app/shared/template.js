@@ -11,7 +11,7 @@ const roundshot = {
   wcost: 10,
   ccost: 10,
   tcost: 10,
-}
+};
 
 const chainshot = {
   health: 100,
@@ -21,7 +21,7 @@ const chainshot = {
   wcost: 25,
   ccost: 10,
   tcost: 10,
-}
+};
 
 const grapeshot = {
   health: 100,
@@ -31,7 +31,7 @@ const grapeshot = {
   wcost: 50,
   ccost: 50,
   tcost: 20,
-}
+};
 
 const shell = {
   health: 100,
@@ -41,7 +41,7 @@ const shell = {
   wcost: 50,
   ccost: 100,
   tcost: 20,
-}
+};
 
 const gunboat = {
   health: 100,

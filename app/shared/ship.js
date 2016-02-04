@@ -1,7 +1,7 @@
 const shipMoveSpeed = 0.05;
 
 import astar from '../shared/astar';
-import { getStats } from './template';
+import { hulls } from './template';
 import Gun from './gun';
 
 const gun1Position = {
@@ -13,6 +13,11 @@ const gun2Position = {
   x: 0,
   y: 13.25 / 50,
 };
+
+const gunPositions = [
+  gun1Position,
+  gun2Position,
+];
 
 /**
  * A ship entity.
@@ -30,11 +35,21 @@ export default class Ship {
     this.type = 'ship';
     this.template = template;
 
-    this.stats = getStats(this.template);
+    this.stats = JSON.parse(JSON.stringify(hulls[this.template.hull]));
+
+    this.hardpoints = this.template.hardpoints.map((hardpoint, index) => {
+      if (hardpoint == null) {
+        return null;
+      }
+
+      return new Gun(this, gunPositions[index], index, hardpoint);
+    });
+
+    this.lastDx = 0;
+    this.lastDy = -1;
+
 
     // Server side
-    this.ticsNextAttack = 0;
-
     this.mode = {
       type: 'IDLE',
     };
@@ -42,11 +57,6 @@ export default class Ship {
     // Client side
 
     this.isSelected = false;
-
-    this.lastDx = 0;
-    this.lastDy = -1;
-
-    this.hardpoints = [new Gun(this, gun1Position, 0), new Gun(this, gun2Position, 1)];
   }
 
   getPosition() {
@@ -70,7 +80,7 @@ export default class Ship {
     context.fillStyle = 'red';
     context.fillRect(this.x * 50 - 20, this.y * 50 + 30, 40, 5);
 
-    const healthpercent = this.stats.health / getStats(this.template).health;
+    const healthpercent = this.stats.health / hulls[this.template.hull].health;
 
     context.fillStyle = 'green';
     context.fillRect(this.x * 50 - 20, this.y * 50 + 30, 40 * healthpercent, 5);
@@ -249,6 +259,13 @@ export default class Ship {
    * Move the ship and perform the corresponding updates.
    */
   getMoveMessages() {
+    if (this.mode.moveIndex === this.mode.moves.length) {
+      this.mode = {
+        type: 'IDLE',
+      };
+      return [];
+    }
+
     if (this.closeEnoughToWayPoint()) {
       this.mode.moveIndex += 1;
     }
@@ -321,6 +338,12 @@ export default class Ship {
     }
 
     const result = [];
+
+    for (const hardpoint of this.hardpoints) {
+      if (hardpoint != null) {
+        result.push(...hardpoint.getUpdateMessages());
+      }
+    }
 
     switch (this.mode.type) {
       case 'MOVING':

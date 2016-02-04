@@ -144,6 +144,7 @@ function fireShotHandler({ id, targetId, hardpointId }) {
   projectiles.set(projectileId, { position, targetId });
 
   pendingUpdates.push({ type: 'AddProjectile', id: projectileId, position });
+  pendingUpdates.push(...hardpoint.fire());
 }
 
 const messageHandlers = {

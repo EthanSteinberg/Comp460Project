@@ -74,4 +74,10 @@ SetProjectilePosition: {
 RemoveProjectile: {
 	id: The id of the projectile
 }
+
+SetWeaponCooldown: {
+	shipId: The id of the ship to fiddle with the cooldown,
+	hardpointId: The index of the hardpoint,
+	timeTillNextFire: How many ticks remaining in the cooldown
+}
 */
