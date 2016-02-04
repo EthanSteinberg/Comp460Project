@@ -21,19 +21,16 @@ const map = new GameMap();
 
 const playerSockets = [];
 
-let nextProjectileId = 0;
-const projectiles = new Map();
-
 let pendingUpdates = [];
 
 function updateProjectiles() {
   const result = [];
 
-  for (const [id, { position, targetId }] of projectiles) {
+  for (const [id, { position, targetId }] of map.getProjectiles()) {
     const ship = map.getShip(targetId);
     if (ship == null) {
       result.push({ type: 'RemoveProjectile', id });
-      projectiles.delete(id);
+      this.map.getProjectiles().delete(id);
       continue;
     }
 
@@ -46,7 +43,7 @@ function updateProjectiles() {
 
     if (dist < 0.01) {
       result.push({ type: 'RemoveProjectile', id });
-      projectiles.delete(id);
+      map.getProjectiles().delete(id);
 
       const damageDealt = ship.dealDamage(50);
       result.push({ type: 'DealDamage', enemyShipId: targetId, damage: damageDealt });
@@ -136,15 +133,13 @@ function attackShipHandler({ id, targetId }) {
 
 function fireShotHandler({ id, targetId, hardpointId }) {
   const hardpoint = map.getShip(id).getHardpointById(hardpointId);
-  const projectileId = nextProjectileId;
-  const position = hardpoint.getPosition();
 
-  nextProjectileId += 1;
+  if (hardpoint.getTimeTillFire() !== 0) {
+    // Don't fire if still waiting.
+    return;
+  }
 
-  projectiles.set(projectileId, { position, targetId });
-
-  pendingUpdates.push({ type: 'AddProjectile', id: projectileId, position });
-  pendingUpdates.push(...hardpoint.fire());
+  pendingUpdates.push(...hardpoint.fire(targetId));
 }
 
 const messageHandlers = {

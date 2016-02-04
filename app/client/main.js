@@ -371,10 +371,7 @@ class Game {
         sendMessage({ type: 'MakeBuilding', building: buildingType, x: mouseRoundedX, y: mouseRoundedY });
       } else if (this.selectionState.gui.getType() === 'roundshot' && item instanceof Ship) {
         const hardpoint = this.selectionState.map.getHardpointById(this.selectionState.gui.getTemplateNum());
-
-        if (hardpoint.getTimeTillFire() === 0) {
-          sendMessage({ type: 'FireShot', id: this.selectionState.map.getId(), hardpointId: this.selectionState.gui.getTemplateNum(), targetId: item.getId() });
-        }
+        sendMessage({ type: 'FireShot', id: this.selectionState.map.getId(), hardpointId: this.selectionState.gui.getTemplateNum(), targetId: item.getId() });
       }
     } else if (item != null) {
       // Select

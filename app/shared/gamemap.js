@@ -21,8 +21,6 @@ export default class GameMap {
 
     this.ships = new Map();
 
-    this.buttons = [];
-
     this.mines = new Map();
     this.shipyards = new Map();
 
@@ -50,6 +48,19 @@ export default class GameMap {
     this.height = MAP_HEIGHT;
 
     this.coins = 100; // Start with 100 coin.
+
+    this.projectiles = new Map();
+    this.nextProjectileId = 0;
+  }
+
+  getNextProjectileId() {
+    const result = this.nextProjectileId;
+    this.nextProjectileId += 1;
+    return result;
+  }
+
+  getProjectiles() {
+    return this.projectiles;
   }
 
   setMode(mode) {

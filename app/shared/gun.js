@@ -1,9 +1,10 @@
 import { hardpoints } from './template';
 
 export default class Gun {
-  constructor(ship, offset, id, gunType) {
+  constructor(ship, offset, id, gunType, map) {
     this.type = 'gun';
     this.gunType = gunType;
+    this.map = map;
 
     this.stats = {
       health: hardpoints[this.gunType].health,
@@ -64,9 +65,17 @@ export default class Gun {
     return this.id;
   }
 
-  fire() {
+  fire(targetId) {
+    const projectileId = this.map.getNextProjectileId();
+    const position = this.getPosition();
+
+    this.map.getProjectiles().set(projectileId, { position, targetId });
+
     this.stats.timeTillNextFire = 100;
-    return [{ type: 'SetWeaponCooldown', shipId: this.ship.getId(), hardpointId: this.id, timeTillNextFire: this.stats.timeTillNextFire }];
+    return [
+      { type: 'SetWeaponCooldown', shipId: this.ship.getId(), hardpointId: this.id, timeTillNextFire: this.stats.timeTillNextFire },
+      { type: 'AddProjectile', id: projectileId, position },
+    ];
   }
 
   setTimeTillNextFire(timeTillNextFire) {

@@ -42,7 +42,7 @@ export default class Ship {
         return null;
       }
 
-      return new Gun(this, gunPositions[index], index, hardpoint);
+      return new Gun(this, gunPositions[index], index, hardpoint, this.map);
     });
 
     this.lastDx = 0;
@@ -299,19 +299,13 @@ export default class Ship {
     const targetPosition = { x: this.mode.target.getX(), y: this.mode.target.getY() };
 
     if (this.getDistanceToTarget(targetPosition) < 2) {
-      if (this.ticsNextAttack === 0) {
-        this.ticsNextAttack = 10;
-        const damageDealt = this.attack(this.mode.target);
-        const result = [{ type: 'DealDamage', enemyShipId: this.mode.target.getId(), damage: damageDealt }];
-
-        if (this.mode.target.getHealth() <= 0) {
-          this.map.removeShip(this.mode.target);
+      const result = [];
+      for (const hardpoint of this.hardpoints) {
+        if (hardpoint != null && hardpoint.getTimeTillFire() === 0) {
+          result.push(...hardpoint.fire(this.mode.target.getId()));
         }
-
-        return result;
       }
-
-      return [];
+      return result;
     }
 
     this.mode.moves = this.performAStar(targetPosition);
