@@ -11,7 +11,7 @@ const MILLISECONDS_PER_LOGIC_UPDATE = 5;
 const MILLISECONDS_PER_RENDER_UPDATE = 15;
 
 const SHIPBUILDMODE = true;
-const SCALE = 4;
+const SCALE = 3;
 
 
 const templates = [defaultTemplate(), defaultTemplate(), defaultTemplate()];
@@ -279,7 +279,9 @@ class Game {
     } else {
       if (item instanceof Ship && this.selectionState.map instanceof Ship) {
         // Trying to attack a ship
-        sendMessage({ type: 'AttackShip', id: this.selectionState.map.getId(), targetId: item.getId() });
+        if (item.getId() != this.selectionState.map.getId()) {
+          sendMessage({ type: 'AttackShip', id: this.selectionState.map.getId(), targetId: item.getId() });
+        }
       }
     }
   }
@@ -300,7 +302,6 @@ class Game {
   processGuiLeftMouseClick(rawX, rawY) {
     // In the gui
     var item = this.gui.getItem(Math.floor(rawX / 50), Math.floor(rawY / 50));
-    var olditem = this.selectedItem;
     if (item != null) {
       if (item.getType() === 'shipbuilder') {
         return 'shipbuilder';
@@ -308,9 +309,9 @@ class Game {
       this.updateSelectionState({ ...this.selectionState, gui: item });
 
       if (item.getType() === 'strategic') {
-        if (olditem instanceof Ship) {
-          this.x = olditem.getX()*50*SCALE - this.width/2 + 200;
-          this.y = olditem.getY()*50*SCALE - this.height/2;
+        if (this.selectionState.map.getType() == 'ship') {
+          this.x = this.selectionState.map.getX()*50*SCALE - this.width/2 + 100;
+          this.y = this.selectionState.map.getY()*50*SCALE - this.height/2;
           console.log(this.x, this.y)
         } else {
           this.x += this.width/2;

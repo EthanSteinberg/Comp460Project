@@ -7,7 +7,7 @@ import MiniView from './miniview';
 export const MAP_WIDTH = 8;
 export const MAP_HEIGHT = 8;
 
-const SCALE = 4;
+const SCALE = 3;
 
 /**
  * A map of the game containing islands and all current ships.
