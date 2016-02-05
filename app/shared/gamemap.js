@@ -38,11 +38,12 @@ export default class GameMap {
 
     const island1coordinates = [
       [1, 1],
-      [1, 2],
-      [2, 1],
-      [2, 2],
     ];
     this.addIsland(new Island(this, island1coordinates));
+    const island2coordinates = [
+      [6, 6],
+    ];
+    this.addIsland(new Island(this, island2coordinates));
 
     this.width = MAP_WIDTH;
     this.height = MAP_HEIGHT;

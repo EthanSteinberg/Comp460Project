@@ -19,7 +19,7 @@ export default class Gui {
 
     this.buttons = [
       new Button('mine', 1 + this.x, 1),
-      new Button('shipyard', 1 + this.x, 3),
+      new Button('shipyard', this.x, 1),
       new Button('shipbuilder', 1 + this.x, 4),
       new Button('strategic', 2 + this.x, 4),
     ];

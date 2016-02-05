@@ -309,7 +309,7 @@ class Game {
       this.updateSelectionState({ ...this.selectionState, gui: item });
 
       if (item.getType() === 'strategic') {
-        if (this.selectionState.map.getType() == 'ship') {
+        if (this.selectionState.map != null && this.selectionState.map.getType() == 'ship') {
           this.x = this.selectionState.map.getX()*50*SCALE - this.width/2 + 100;
           this.y = this.selectionState.map.getY()*50*SCALE - this.height/2;
           console.log(this.x, this.y)

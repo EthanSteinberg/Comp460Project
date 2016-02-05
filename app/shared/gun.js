@@ -27,7 +27,7 @@ export default class Gun {
   render(context, images) {
     const { x, y } = this.getPosition();
 
-    context.drawImage(images.cannon, x * 50 - 15 / 4, y * 50 - 25 / 4, 10, 10);
+    context.drawImage(images.cannon, x * 50 - 20 / 4, y * 50 - 25 / 4, 10, 10);
 
     context.fillStyle = 'red';
     context.fillRect(x * 50 - 10, y * 50 + 5, 20, 5);
