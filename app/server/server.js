@@ -37,7 +37,9 @@ function serializeMapEntities() {
 let lastEntityState = serializeMapEntities();
 
 function updateGameState() {
-  const updateMessages = pendingUpdates.concat(map.getUpdateMessages());
+  const updateMessages = pendingUpdates;
+
+  map.processUpdate();
 
   const currentEntityState = serializeMapEntities();
 
@@ -84,31 +86,22 @@ function moveShipHandler({ shipId, targetLocation }) {
   Ships.moveTo(ship, map, targetLocation);
 }
 
-function makeBuildingHandler(makeBuildingMessage) {
-  const { building, x, y } = makeBuildingMessage;
+function makeBuildingHandler({ building, x, y }) {
   const islandID = map.getIsland(x, y);
   if (islandID !== -1) {
     const buildingStats = buildingConstants[building];
-    if (buildingStats.coinCost > map.getCoins()) {
+    if (buildingStats.coinCost > map.getEntity('0').coins) {
       console.error('Trying to build a buildng you cant afford');
       return;
     }
-    map.setCoins(map.getCoins() - buildingStats.coinCost);
+    map.getEntity('0').coins -= buildingStats.coinCost;
     map.addBuilding(building, x, y, islandID);
-
-    const position = { x, y };
-    pendingUpdates.push({ type: 'SetPosition', object: building, position, islandID });
-    pendingUpdates.push({ type: 'SetResources', coin: map.getCoins() });
   }
 }
 
-function makeShipHandler(makeShipMessage) {
-  const { islandID, x, y, template } = makeShipMessage;
+function makeShipHandler({ islandID, x, y, template }) {
   if (map.isNextToIsland(islandID, x, y)) {
-    map.addBuilding('ship', x, y, islandID, template);
-    pendingUpdates.push(
-      { type: 'SetPosition', object: 'ship', position: { x, y }, islandID: 0, template }
-    );
+    Ships.createShipAndHardpoints(map, x, y, template);
   }
 }
 

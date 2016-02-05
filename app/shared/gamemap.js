@@ -1,7 +1,7 @@
 import * as Ships from './ship';
 import * as Projectiles from './projectile';
-import Mine from './mine';
-import Shipyard from './shipyard';
+import * as Mines from './mine';
+import * as Shipyards from './shipyard';
 import Island from './island';
 import MiniView from './miniview';
 
@@ -19,15 +19,15 @@ export default class GameMap {
     this.miniview = new MiniView('miniview');
 
     this.entities = new Map();
-    if (typeof window !== 'undefined') { window.entities = this.entities; }
-    this.nextEntityId = 0;
+    this.nextEntityId = 1;
+
+    this.entities.set('0', {
+      id: '0',
+      type: 'playerstate',
+      coins: 100,
+    });
 
     this.islands = new Map();
-
-    this.mines = new Map();
-    this.shipyards = new Map();
-
-    this.grid = {};
 
     this.mode = 'strategic';
 
@@ -50,10 +50,6 @@ export default class GameMap {
 
     this.width = MAP_WIDTH;
     this.height = MAP_HEIGHT;
-
-    this.coins = 100; // Start with 100 coin.
-
-    this.hardpoints = new Map();
   }
 
   addEntity(entity) {
@@ -76,14 +72,6 @@ export default class GameMap {
     return '' + id;
   }
 
-  addHardpoint(hardpoint) {
-    this.hardpoints.set(hardpoint.getId(), hardpoint);
-  }
-
-  getHardpoint(hardpointId) {
-    return this.hardpoints.get(hardpointId);
-  }
-
   setMode(mode) {
     this.mode = mode;
   }
@@ -92,16 +80,7 @@ export default class GameMap {
     return this.mode;
   }
 
-  setCoins(coins) {
-    this.coins = coins;
-  }
-
-  getCoins() {
-    return this.coins;
-  }
-
   addIsland(island) {
-    this.entities.set(island.getId(), island);
     this.islands.set(island.getId(), island);
   }
 
@@ -140,20 +119,17 @@ export default class GameMap {
     }
 
     for (const entity of this.entities.values()) {
+      const isSelected = selectionState.map === entity.id;
+
       if (entity.type === 'ship') {
-        const isSelected = selectionState.map === entity.id;
         Ships.render(entity, this, context, images, isSelected);
       } else if (entity.type === 'projectile') {
-        Projectiles.render(entity, this, context, images);
+        Projectiles.render(entity, this, context, images, isSelected);
+      } else if (entity.type === 'shipyard') {
+        Shipyards.render(entity, this, context, images, isSelected);
+      } else if (entity.type === 'mine') {
+        Mines.render(entity, this, context, images, isSelected);
       }
-    }
-
-    for (const mine of this.mines.values()) {
-      mine.render(context, images);
-    }
-
-    for (const shipyard of this.shipyards.values()) {
-      shipyard.render(context, images);
     }
   }
 
@@ -164,15 +140,15 @@ export default class GameMap {
    * cannot select hardpoints yourself.
    */
   getItem(x, y) {
-    if (this.grid[Math.round(x) + ',' + Math.round(y)] != null) {
-      return this.grid[Math.round(x) + ',' + Math.round(y)];
-    }
-
     for (const entity of this.entities.values()) {
       if (entity.type === 'ship') {
         const distanceSquared = (entity.x - x) * (entity.x - x) + (entity.y - y) * (entity.y - y);
         const distance = Math.sqrt(distanceSquared);
         if (distance <= 0.5) {
+          return entity;
+        }
+      } else if (entity.type === 'shipyard' || entity.type === 'mine') {
+        if (Math.round(x) === entity.x && Math.round(y) === entity.y) {
           return entity;
         }
       }
@@ -208,22 +184,13 @@ export default class GameMap {
     return -1;
   }
 
-  addBuilding(type, x, y, islandID, template) {
+  addBuilding(type, x, y, islandID) {
     switch (type) {
       case 'mine':
-        const mine = new Mine(this, x, y);
-        this.entities.set(mine.getId(), mine);
-        this.mines.set(mine.getId(), mine);
-        this.grid[mine.getX() + ',' + mine.getY()] = mine;
+        Mines.createMine(this, x, y);
         break;
       case 'shipyard':
-        const shipyard = new Shipyard(this, x, y, islandID);
-        this.entities.set(shipyard.getId(), shipyard);
-        this.shipyards.set(shipyard.getId(), shipyard);
-        this.grid[shipyard.getX() + ',' + shipyard.getY()] = shipyard;
-        break;
-      case 'ship':
-        this.addShip(new Ship(this, x, y, template));
+        Shipyards.createShipyard(this, x, y, islandID);
         break;
       default:
         console.error('Unexpected building type: ', type);
@@ -234,37 +201,20 @@ export default class GameMap {
     return [...this.entities.values()].filter(a => a.type === 'ship');
   }
 
-  getBuilding(id, type) {
-    switch (type) {
-      case 'shipyard':
-        return this.shipyards.get(id);
-      case 'mine':
-        return this.mines.get(id);
-      default:
-        console.error('Unexpected building type: ', type);
-    }
-  }
-
   /**
    * Update the map and get the corresponding update messages.
    */
-  getUpdateMessages() {
-    const result = [];
-
+  processUpdate() {
     for (const entity of this.entities.values()) {
       if (entity.type === 'ship') {
         Ships.processUpdate(entity, this);
       } else if (entity.type === 'projectile') {
         Projectiles.processUpdate(entity, this);
+      } else if (entity.type === 'shipyard') {
+        Shipyards.processUpdate(entity, this);
+      } else if (entity.type === 'mine') {
+        Mines.processUpdate(entity, this);
       }
     }
-
-    for (const mine of this.mines.values()) {
-      result.push(...mine.getUpdateMessages());
-    }
-    for (const shipyard of this.shipyards.values()) {
-      result.push(...shipyard.getUpdateMessages());
-    }
-    return result;
   }
 }

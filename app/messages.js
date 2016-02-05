@@ -27,24 +27,6 @@ MakeShip {
 	template: the template of the ship
 }
 
-SetPosition: {
-	object: the object type
-	position: the position of the object
-	islandID: the id of the island the object is associated with
-	template: the template of the object
-}
-
-SetResources: {
-	coin: the amount of coin you have
-}
-
-
-UpdateTimeLeftToBuildHandler: {
-	id: The building id,
-	timeLeftToBuild: the number of ticks left to build,
-	object: The building type
-}
-
 AttackShip: {
 	id: the ship to attack with,
 	targetId: the ship to attack

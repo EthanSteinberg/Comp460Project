@@ -78,8 +78,10 @@ export function render(ship, map, context, images, isSelected) {
   }
 
   for (const hardpointId of ship.hardpoints) {
-    const hardpoint = map.getEntity(hardpointId);
-    Hardpoints.render(hardpoint, map, context, images);
+    if (hardpointId != null) {
+      const hardpoint = map.getEntity(hardpointId);
+      Hardpoints.render(hardpoint, map, context, images);
+    }
   }
 }
 

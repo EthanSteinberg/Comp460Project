@@ -1,7 +1,6 @@
 import Button from './button';
 import { statsDisplay } from './guibuttons/statsdisplay';
 import buildingConstants from './buildingconstants';
-import Shipyard from './shipyard';
 import { getStats } from './template';
 
 /**
@@ -54,7 +53,7 @@ export default class Gui {
           this.unitButtons.push(new Button(hardpoint, this.x + i, 7, newMap.hardpoints[i]));
         }
       }
-    } else if (newMap instanceof Shipyard) {
+    } else if (newMap.type === 'shipyard') {
       this.unitButtons = [
         new Button('shiptemplate', this.x, 7, 0),
         new Button('shiptemplate', this.x + 1, 7, 1),
@@ -88,7 +87,7 @@ export default class Gui {
       this.drawUnitGuiBox(context, images);
     }
 
-    const moneyText = Math.floor(map.getCoins()).toString();
+    const moneyText = Math.floor(map.getEntity('0').coins).toString();
 
     context.fillStyle = 'black';
     context.textBaseline = 'top';
@@ -105,40 +104,42 @@ export default class Gui {
       button.render(context, images, this.selectionState.gui === button);
     }
 
-    if (this.getSelectedMap() != null && this.getSelectedMap().type === 'ship') {
-      statsDisplay((this.x + 3.5) * 50, (this.y + 6.25) * 50, this.getSelectedMap().stats, context, images);
-      this.getSelectedMap().hardpoints.forEach((hardpointId, i) => {
-        const hardpoint = map.getEntity(hardpointId);
-        if (hardpoint != null && hardpoint.timeTillNextFire !== 0) {
-          context.save();
-          context.rect((this.x + i) * 50, 7 * 50, 50, 50);
-          context.clip();
+    if (this.getSelectedMap() != null) {
+      if (this.getSelectedMap().type === 'ship') {
+        statsDisplay((this.x + 3.5) * 50, (this.y + 6.25) * 50, this.getSelectedMap().stats, context, images);
+        this.getSelectedMap().hardpoints.forEach((hardpointId, i) => {
+          const hardpoint = map.getEntity(hardpointId);
+          if (hardpoint != null && hardpoint.timeTillNextFire !== 0) {
+            context.save();
+            context.rect((this.x + i) * 50, 7 * 50, 50, 50);
+            context.clip();
 
-          const angle = (100 - hardpoint.timeTillNextFire) / 100 * Math.PI * 2;
+            const angle = (100 - hardpoint.timeTillNextFire) / 100 * Math.PI * 2;
 
-          context.globalCompositeOperation = 'multiply';
-          context.fillStyle = 'rgba(0,0,0,.5)';
-          context.beginPath();
-          context.arc((this.x + i) * 50 + 25, 7 * 50 + 25, 50, 0, angle, true);
-          context.lineTo((this.x + i) * 50 + 25, 7 * 50 + 25);
-          context.fill();
-          context.globalCompositeOperation = 'source-over';
+            context.globalCompositeOperation = 'multiply';
+            context.fillStyle = 'rgba(0,0,0,.5)';
+            context.beginPath();
+            context.arc((this.x + i) * 50 + 25, 7 * 50 + 25, 50, 0, angle, true);
+            context.lineTo((this.x + i) * 50 + 25, 7 * 50 + 25);
+            context.fill();
+            context.globalCompositeOperation = 'source-over';
 
-          context.strokeStyle = 'white';
-          context.beginPath();
-          context.moveTo((this.x + i) * 50 + 25, 7 * 50 + 25);
-          context.lineTo((this.x + i) * 50 + 25 + 50, 7 * 50 + 25);
-          context.arc((this.x + i) * 50 + 25, 7 * 50 + 25, 50, 0, angle, true);
-          context.lineTo((this.x + i) * 50 + 25, 7 * 50 + 25);
-          context.stroke();
+            context.strokeStyle = 'white';
+            context.beginPath();
+            context.moveTo((this.x + i) * 50 + 25, 7 * 50 + 25);
+            context.lineTo((this.x + i) * 50 + 25 + 50, 7 * 50 + 25);
+            context.arc((this.x + i) * 50 + 25, 7 * 50 + 25, 50, 0, angle, true);
+            context.lineTo((this.x + i) * 50 + 25, 7 * 50 + 25);
+            context.stroke();
 
-          context.restore();
+            context.restore();
+          }
+        });
+      } else if (this.getSelectedMap().type === 'shipyard') {
+        if (this.selectionState.gui != null && this.selectionState.gui.getType() === 'shiptemplate') {
+          const template = this.templates[this.selectionState.gui.getTemplateNum()];
+          statsDisplay((this.x + 3.5) * 50, (this.y + 6.25) * 50, getStats(template), context, images);
         }
-      });
-    } else if (this.selectionState.map instanceof Shipyard) {
-      if (this.selectionState.gui != null && this.selectionState.gui.getType() === 'shiptemplate') {
-        const template = this.templates[this.selectionState.gui.getTemplateNum()];
-        statsDisplay((this.x + 3.5) * 50, (this.y + 6.25) * 50, getStats(template), context, images);
       }
     }
 
