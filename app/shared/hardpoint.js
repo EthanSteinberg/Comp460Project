@@ -53,7 +53,7 @@ export function render(hardpoint, map, context, images) {
   context.strokeRect(x * 50 - 10, y * 50 + 5, 20, 5);
 }
 
-function getPosition(hardpoint, map) {
+export function getPosition(hardpoint, map) {
   const ship = map.getEntity(hardpoint.shipId);
 
   const x = ship.x + Math.cos(Ships.getOrientation(ship)) * hardpoint.offset.x - Math.sin(Ships.getOrientation(ship)) * hardpoint.offset.y;
@@ -63,7 +63,7 @@ function getPosition(hardpoint, map) {
 
 export function fire(hardpoint, map, target) {
   const position = getPosition(hardpoint, map);
-  
+
   Projectiles.createProjectile(map, position, target);
 
   hardpoint.timeTillNextFire = 100;

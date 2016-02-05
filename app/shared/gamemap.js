@@ -2,6 +2,7 @@ import * as Ships from './ship';
 import * as Projectiles from './projectile';
 import * as Mines from './mine';
 import * as Shipyards from './shipyard';
+import * as Hardpoints from './hardpoint';
 import Island from './island';
 import MiniView from './miniview';
 
@@ -74,6 +75,10 @@ export default class GameMap {
   }
 
   getNextEntityId() {
+    if (typeof windows !== 'undefined') {
+      console.error('You are trying to create something on the client. Do not do that.');
+    }
+
     const id = this.nextEntityId++;
     return '' + id;
   }
@@ -155,6 +160,21 @@ export default class GameMap {
         }
       } else if (entity.type === 'shipyard' || entity.type === 'mine') {
         if (Math.round(x) === entity.x && Math.round(y) === entity.y) {
+          return entity;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  getHardpointItem(x, y) {
+    for (const entity of this.entities.values()) {
+      if (entity.type === 'hardpoint') {
+        const position = Hardpoints.getPosition(entity, this);
+        const distanceSquared = (position.x - x) * (position.x - x) + (position.y - y) * (position.y - y);
+        const distance = Math.sqrt(distanceSquared);
+        if (distance <= entity.radius) {
           return entity;
         }
       }

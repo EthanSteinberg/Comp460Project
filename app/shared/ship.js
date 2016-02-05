@@ -25,7 +25,7 @@ export function createShipAndHardpoints(map, x, y, template) {
     id: shipId,
     type: 'ship',
     template: template,
-    stats: JSON.parse(JSON.stringify(hulls[template.hull])),
+    health: JSON.parse(JSON.stringify(hulls[template.hull])).health,
     hardpoints,
 
     lastDx: 0,
@@ -62,7 +62,7 @@ export function render(ship, map, context, images, isSelected) {
   context.fillStyle = 'red';
   context.fillRect(ship.x * 50 - 20, ship.y * 50 + 30, 40, 5);
 
-  const healthpercent = ship.stats.health / hulls[ship.template.hull].health;
+  const healthpercent = ship.health / hulls[ship.template.hull].health;
 
   context.fillStyle = 'green';
   context.fillRect(ship.x * 50 - 20, ship.y * 50 + 30, 40 * healthpercent, 5);
@@ -78,8 +78,8 @@ export function render(ship, map, context, images, isSelected) {
   }
 
   for (const hardpointId of ship.hardpoints) {
-    if (hardpointId != null) {
-      const hardpoint = map.getEntity(hardpointId);
+    const hardpoint = map.getEntity(hardpointId);
+    if (hardpoint != null) {
       Hardpoints.render(hardpoint, map, context, images);
     }
   }
@@ -244,13 +244,43 @@ function processAttack(ship, map) {
     }
   }
 
-  ship.mode.moves = performAStar(ship, map, targetPosition);
+  // Try all posible sides if the main way doesn't work.
+
+  const right = { x: targetPosition.x + 1, y: targetPosition.y };
+  const left = { x: targetPosition.x - 1, y: targetPosition.y };
+
+  const up = { x: targetPosition.x, y: targetPosition.y - 1 };
+  const down = { x: targetPosition.x, y: targetPosition.y + 1 };
+
+  const posibilities = [
+    targetPosition,
+    right,
+    left,
+    up,
+    down,
+  ];
+
+  let bestOne = null;
+
+  for (const possib of posibilities) {
+    const moves = performAStar(ship, map, possib);
+    if (bestOne == null || bestOne.length > moves.length) {
+      bestOne = moves;
+    }
+  }
+
+  ship.mode.moves = bestOne;
+
   if (ship.mode.moves == null) {
     // No such path
     return;
   }
 
   ship.mode.moveIndex = 0;
+
+  if (ship.mode.moveIndex === ship.mode.moves.length) {
+    return;
+  }
 
   if (closeEnoughToWayPoint(ship)) {
     ship.mode.moveIndex += 1;
@@ -268,7 +298,8 @@ function processAttack(ship, map) {
  */
 export function processUpdate(ship, map) {
   for (const hardpointId of ship.hardpoints) {
-    if (hardpointId != null) {
+    const hardpoint = map.getEntity(hardpointId);
+    if (hardpoint != null) {
       Hardpoints.processUpdate(map.getEntity(hardpointId), map);
     }
   }
@@ -290,14 +321,10 @@ export function processUpdate(ship, map) {
   }
 }
 
+export function getPosition(ship) {
+  return { x: ship.x, y: ship.y };
+}
+
 export function getHealth(ship) {
-  return ship.stats.health;
-}
-
-function attack(ship, enemyShip) {
-  return dealDamage(enemyShip, ship.stats.damage);
-}
-
-export function dealDamage(ship, damage) {
-  ship.stats.health -= damage;
+  return ship.health;
 }

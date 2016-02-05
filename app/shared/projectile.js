@@ -1,4 +1,5 @@
 import * as Ships from './ship';
+import Types from './types';
 
 export function createProjectile(map, position, target) {
   const projectile = {
@@ -14,13 +15,13 @@ export function createProjectile(map, position, target) {
 }
 
 export function processUpdate(projectile, map) {
-  const ship = map.getEntity(projectile.targetId);
-  if (ship == null) {
+  const target = map.getEntity(projectile.targetId);
+  if (target == null) {
     map.removeEntity(projectile);
     return;
   }
 
-  const targetPosition = Ships.getPosition(ship);
+  const targetPosition = Types[target.type].getPosition(target, map);
 
   const dx = targetPosition.x - projectile.position.x;
   const dy = targetPosition.y - projectile.position.y;
@@ -30,9 +31,9 @@ export function processUpdate(projectile, map) {
   if (dist < 0.01) {
     map.removeEntity(projectile.id);
 
-    Ships.dealDamage(ship, 50);
+    target.health -= 50;
 
-    if (Ships.getHealth(ship) <= 0) {
+    if (target.health <= 0) {
       map.removeEntity(projectile.targetId);
     }
   } else {

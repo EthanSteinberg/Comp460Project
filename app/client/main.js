@@ -247,7 +247,7 @@ class Game {
       mouseY = (y + 50 * SCALE) / (50 * SCALE);
     }
 
-    const item = this.map.getItem(mouseX, mouseY);
+    let item = this.map.getItem(mouseX, mouseY);
 
     if (item == null) {
       if (this.getSelectedMap().type === 'ship') {
@@ -257,11 +257,12 @@ class Game {
         sendMessage({ type: 'MoveShip', shipId: this.getSelectedMap().id, targetLocation });
       }
     } else {
-      if (item.type === 'ship' && this.getSelectedMap().type === 'ship') {
-        // Trying to attack a ship
-        if (item.id !== this.getSelectedMap().id) {
-          sendMessage({ type: 'AttackShip', id: this.getSelectedMap().id, targetId: item.id });
+      if ((item.type === 'ship' || item.type === 'shipyard') && this.getSelectedMap().type === 'ship' && item.id !== this.getSelectedMap().id) {
+        // Trying to attack something
+        if (item.type === 'ship') {
+          item = this.map.getHardpointItem(mouseX, mouseY) || item;
         }
+        sendMessage({ type: 'AttackShip', id: this.getSelectedMap().id, targetId: item.id });
       }
     }
   }
@@ -339,7 +340,7 @@ class Game {
     const mouseRoundedX = Math.round(mouseX);
     const mouseRoundedY = Math.round(mouseY);
 
-    const item = this.map.getItem(mouseX, mouseY);
+    let item = this.map.getItem(mouseX, mouseY);
 
     if (this.selectionState.gui != null) {
       // The gui stuff always has priority.
@@ -351,7 +352,11 @@ class Game {
       } else if (this.selectionState.gui.getType() === 'mine' || this.selectionState.gui.getType() === 'shipyard') {
         const buildingType = this.selectionState.gui.getType();
         sendMessage({ type: 'MakeBuilding', building: buildingType, x: mouseRoundedX, y: mouseRoundedY });
-      } else if (this.selectionState.gui.getType() === 'roundshot' && item.type === 'ship') {
+      } else if (this.selectionState.gui.getType() === 'roundshot' && item != null && (item.type === 'ship' || item.type === 'shipyard')) {
+        if (item.type === 'ship') {
+          item = this.map.getHardpointItem(mouseX, mouseY) || item;
+        }
+
         sendMessage({ type: 'FireShot', id: this.selectionState.gui.getTemplateNum(), targetId: item.id });
       }
     } else if (item != null) {

@@ -106,7 +106,6 @@ export default class Gui {
 
     if (this.getSelectedMap() != null) {
       if (this.getSelectedMap().type === 'ship') {
-        statsDisplay((this.x + 3.5) * 50, (this.y + 6.25) * 50, this.getSelectedMap().stats, context, images);
         this.getSelectedMap().hardpoints.forEach((hardpointId, i) => {
           const hardpoint = map.getEntity(hardpointId);
           if (hardpoint != null && hardpoint.timeTillNextFire !== 0) {
