@@ -4,6 +4,7 @@
     "rules": {
         "no-console": 0,
         "no-param-reassign": [2, { "props": false }],
-        "eqeqeq": [2, "allow-null"]
+        "eqeqeq": [2, "allow-null"],
+        "no-use-before-define": [2, "nofunc"]
     }
 }

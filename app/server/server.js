@@ -1,6 +1,8 @@
 import GameMap from '../shared/gamemap';
 import buildingConstants from '../shared/buildingconstants';
 
+import * as Ships from '../shared/ship';
+
 const http = require('http');
 const ws = require('ws');
 const path = require('path');
@@ -64,8 +66,29 @@ function updateProjectiles() {
   return result;
 }
 
+function serializeMapEntities() {
+  const result = [];
+  for (const [key, entity] of map.entities) {
+    result[key] = JSON.stringify(entity);
+  }
+  return result;
+}
+
+let lastEntityState = serializeMapEntities();
+
 function updateGameState() {
   const updateMessages = pendingUpdates.concat(map.getUpdateMessages()).concat(updateProjectiles());
+
+  const currentEntityState = serializeMapEntities();
+
+  // TODO: Need a faster way to scan for changes
+  for (const id of Object.keys(currentEntityState)) {
+    if (lastEntityState[id] !== currentEntityState[id]) {
+      updateMessages.push({ type: 'UpdateEntity', id, data: JSON.parse(currentEntityState[id]) });
+    }
+  }
+
+  lastEntityState = currentEntityState;
 
   // Clear the pending updates list.
   pendingUpdates = [];
@@ -86,13 +109,11 @@ app.get('/', (req, res) => {
 app.use('/dist', express.static('dist'));
 app.use('/static', express.static('static'));
 
-function moveShipHandler(moveShipMessage) {
+function moveShipHandler({ shipId, targetLocation }) {
   // Move the ship
-  const { shipId, targetLocation } = moveShipMessage;
+  const ship = map.getEntity(shipId);
 
-  const ship = map.getShip(shipId);
-
-  ship.moveTo(targetLocation);
+  Ships.moveTo(ship, map, targetLocation);
 }
 
 function makeBuildingHandler(makeBuildingMessage) {
@@ -131,8 +152,8 @@ function attackShipHandler({ id, targetId }) {
 }
 
 
-function fireShotHandler({ id, targetId, hardpointId }) {
-  const hardpoint = map.getShip(id).getHardpointById(hardpointId);
+function fireShotHandler({ targetId, hardpointId }) {
+  const hardpoint = map.getHardpointById(hardpointId);
 
   if (hardpoint.getTimeTillFire() !== 0) {
     // Don't fire if still waiting.

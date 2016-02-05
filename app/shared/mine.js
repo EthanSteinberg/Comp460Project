@@ -1,7 +1,6 @@
 /**
  * A mine entity.
  */
-let nextId = 0;
 
 export default class Mine {
 
@@ -9,7 +8,7 @@ export default class Mine {
     this.map = map;
     this.x = x;
     this.y = y;
-    this.id = nextId++;
+    this.id = map.getNextEntityId();
     this.set = true;
     this.type = 'mine';
     this.islandID = islandID;

@@ -2,7 +2,6 @@ import Button from './button';
 import { statsDisplay } from './guibuttons/statsdisplay';
 import buildingConstants from './buildingconstants';
 import Shipyard from './shipyard';
-import Ship from './ship';
 import { getStats } from './template';
 
 /**
@@ -42,8 +41,8 @@ export default class Gui {
 
     if (newMap == null) {
       this.unitButtons = null;
-    } else if (newMap instanceof Ship) {
-      const template = newMap.getTemplate();
+    } else if (newMap.type === 'ship') {
+      const template = newMap.template;
 
       this.unitButtons = [];
 
@@ -100,15 +99,16 @@ export default class Gui {
       button.render(context, images);
     }
 
-    if (this.selectionState.map instanceof Ship) {
-      statsDisplay((this.x + 3.5) * 50, (this.y + 6.25) * 50, this.selectionState.map.getStats(), context, images);
-      this.selectionState.map.getHardpoints().forEach((hardpoint, i) => {
-        if (hardpoint != null && hardpoint.getTimeTillFire() !== 0) {
+    if (this.selectionState.map != null && this.selectionState.map.type === 'ship') {
+      statsDisplay((this.x + 3.5) * 50, (this.y + 6.25) * 50, this.selectionState.map.stats, context, images);
+      this.selectionState.map.hardpoints.forEach((hardpointId, i) => {
+        const hardpoint = map.getEntity(hardpointId);
+        if (hardpoint != null && hardpoint.timeTillFire !== 0) {
           context.save();
           context.rect((this.x + i) * 50, 7 * 50, 50, 50);
           context.clip();
 
-          const angle = (100 - hardpoint.getTimeTillFire()) / 100 * Math.PI * 2;
+          const angle = (100 - hardpoint.timeTillFire) / 100 * Math.PI * 2;
 
           context.globalCompositeOperation = 'multiply';
           context.fillStyle = 'rgba(0,0,0,.5)';

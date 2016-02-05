@@ -1,4 +1,4 @@
-import Ship from './ship';
+import * as Ships from './ship';
 import Mine from './mine';
 import Shipyard from './shipyard';
 import Island from './island';
@@ -17,9 +17,10 @@ export default class GameMap {
   constructor() {
     this.miniview = new MiniView('miniview');
 
-    this.islands = new Map();
+    this.entities = new Map();
+    this.nextEntityId = 0;
 
-    this.ships = new Map();
+    this.islands = new Map();
 
     this.mines = new Map();
     this.shipyards = new Map();
@@ -33,8 +34,8 @@ export default class GameMap {
       hardpoints: ['roundshot'],
     };
 
-    this.addShip(new Ship(this, 0, 4, template));
-    this.addShip(new Ship(this, 4, 4, template));
+    Ships.createShipAndHardpoints(this, 0, 4, template);
+    Ships.createShipAndHardpoints(this, 4, 4, template);
 
     const island1coordinates = [
       [1, 1],
@@ -52,6 +53,29 @@ export default class GameMap {
 
     this.projectiles = new Map();
     this.nextProjectileId = 0;
+
+    this.hardpoints = new Map();
+  }
+
+  addEntity(entity) {
+    this.entities.set(entity.id, entity);
+  }
+
+  getEntity(entityId) {
+    return this.entities.get(entityId);
+  }
+
+  getNextEntityId() {
+    const id = this.nextEntityId++;
+    return '' + id;
+  }
+
+  addHardpoint(hardpoint) {
+    this.hardpoints.set(hardpoint.getId(), hardpoint);
+  }
+
+  getHardpoint(hardpointId) {
+    return this.hardpoints.get(hardpointId);
   }
 
   getNextProjectileId() {
@@ -80,43 +104,32 @@ export default class GameMap {
     return this.coins;
   }
 
-  addShip(ship) {
-    this.ships.set(ship.getId(), ship);
-  }
-
   addIsland(island) {
+    this.entities.set(island.getId(), island);
     this.islands.set(island.getId(), island);
-  }
-
-  getShip(shipId) {
-    return this.ships.get(shipId);
-  }
-
-  removeShip(shipId) {
-    this.ships.delete(shipId);
   }
 
   /**
    * Render both the map and all ships on it.
    */
-  render(context, images) {
-    if (this.mode == 'tactical') {
-      context.scale(SCALE,SCALE);
-      this.renderMap(context, images);
+  render(context, images, selectionState) {
+    if (this.mode === 'tactical') {
+      context.scale(SCALE, SCALE);
+      this.renderMap(context, images, selectionState);
     } else {
-      this.renderMap(context, images);
+      this.renderMap(context, images, selectionState);
     }
   }
 
   renderMiniMap(context, images, x, y, width, height) {
-    this.renderMap(context, images);
+    this.renderMap(context, images, { gui: null, map: null });
 
-    if (this.mode == 'tactical') {
+    if (this.mode === 'tactical') {
       this.miniview.render(context, images, x, y, width, height, SCALE);
     }
   }
 
-  renderMap(context, images) {
+  renderMap(context, images, selectionState) {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         context.fillStyle = 'blue';
@@ -130,8 +143,11 @@ export default class GameMap {
       island.render(context);
     }
 
-    for (const ship of this.ships.values()) {
-      ship.render(context, images);
+    for (const entity of this.entities.values()) {
+      if (entity.type === 'ship') {
+        const isSelected = selectionState.map === entity.id;
+        Ships.render(entity, this, context, images, isSelected);
+      }
     }
 
     for (const mine of this.mines.values()) {
@@ -149,19 +165,18 @@ export default class GameMap {
    * In particular, this allows you to target ship hardpoints while you
    * cannot select hardpoints yourself.
    */
-  getItem(x, y, forAttack = false) {
+  getItem(x, y) {
     if (this.grid[Math.round(x) + ',' + Math.round(y)] != null) {
       return this.grid[Math.round(x) + ',' + Math.round(y)];
     }
 
-    for (const ship of this.ships.values()) {
-      const distanceSquared = (ship.getX() - x) * (ship.getX() - x) + (ship.getY() - y) * (ship.getY() - y);
-      const distance = Math.sqrt(distanceSquared);
-      if (distance <= 0.5) {
-        if (forAttack && ship.getHardpoint(x, y) != null) {
-          return ship.getHardpoint(x, y);
+    for (const entity of this.entities.values()) {
+      if (entity.type === 'ship') {
+        const distanceSquared = (entity.x - x) * (entity.x - x) + (entity.y - y) * (entity.y - y);
+        const distance = Math.sqrt(distanceSquared);
+        if (distance <= 0.5) {
+          return entity;
         }
-        return ship;
       }
     }
 
@@ -169,7 +184,7 @@ export default class GameMap {
   }
 
   setView(mouseX, mouseY) {
-    return this.miniview.setView(mouseX, mouseY, MAP_WIDTH*50, MAP_HEIGHT*50);
+    return this.miniview.setView(mouseX, mouseY, MAP_WIDTH * 50, MAP_HEIGHT * 50);
   }
 
   isIsland(x, y) {
@@ -199,11 +214,13 @@ export default class GameMap {
     switch (type) {
       case 'mine':
         const mine = new Mine(this, x, y);
+        this.entities.set(mine.getId(), mine);
         this.mines.set(mine.getId(), mine);
         this.grid[mine.getX() + ',' + mine.getY()] = mine;
         break;
       case 'shipyard':
         const shipyard = new Shipyard(this, x, y, islandID);
+        this.entities.set(shipyard.getId(), shipyard);
         this.shipyards.set(shipyard.getId(), shipyard);
         this.grid[shipyard.getX() + ',' + shipyard.getY()] = shipyard;
         break;
@@ -216,7 +233,7 @@ export default class GameMap {
   }
 
   getShips() {
-    return [...this.ships.values()];
+    return [...this.entities.values()].filter(a => a.type === 'ship');
   }
 
   getBuilding(id, type) {
@@ -235,9 +252,13 @@ export default class GameMap {
    */
   getUpdateMessages() {
     const result = [];
-    for (const ship of this.ships.values()) {
-      result.push(...ship.getUpdateMessages());
+
+    for (const entity of this.entities.values()) {
+      if (entity.type === 'ship') {
+        Ships.processUpdate(entity, this);
+      }
     }
+
     for (const mine of this.mines.values()) {
       result.push(...mine.getUpdateMessages());
     }

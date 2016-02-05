@@ -1,17 +1,16 @@
-import {MAP_WIDTH} from './gamemap';
-import {MAP_HEIGHT} from './gamemap';
+import { MAP_WIDTH } from './gamemap';
+import { MAP_HEIGHT } from './gamemap';
 
 /**
  * An island entity.
  */
-let nextId = 0;
 
 export default class Island {
 
   constructor(map, coordinates) {
     this.map = map;
     this.coordinates = coordinates;
-    this.id = nextId++;
+    this.id = map.getNextEntityId();
 
     this.perimeter = [];
     for (const [iX, iY] of this.coordinates) {

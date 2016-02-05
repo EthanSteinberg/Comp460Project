@@ -1,8 +1,72 @@
 import { hardpoints } from './template';
+import * as Ships from './ship';
 
-export default class Gun {
-  constructor(ship, offset, id, gunType, map) {
-    this.type = 'gun';
+const gun1Position = {
+  x: 0,
+  y: -15.75 / 50,
+};
+
+const gun2Position = {
+  x: 0,
+  y: 13.25 / 50,
+};
+
+const gunPositions = [
+  gun1Position,
+  gun2Position,
+];
+
+export function createHardpoint(map, shipId, index, gunType) {
+  const point = {
+    id: map.getNextEntityId(),
+    type: 'hardpoint',
+    gunType,
+    stats: {
+      health: hardpoints[gunType].health,
+      timeTillNextFire: 0,
+    },
+    shipId,
+    offset: gunPositions[index],
+    index,
+
+    radius: 5.625 / 50,
+
+    isSelected: false,
+  };
+
+  map.addEntity(point);
+
+  return point.id;
+}
+
+export function render(hardpoint, map, context, images) {
+  const { x, y } = getPosition(hardpoint, map);
+
+  context.drawImage(images.cannon, x * 50 - 15 / 4, y * 50 - 25 / 4, 10, 10);
+
+  context.fillStyle = 'red';
+  context.fillRect(x * 50 - 10, y * 50 + 5, 20, 5);
+
+  const healthpercent = hardpoint.stats.health / hardpoints[hardpoint.gunType].health;
+
+  context.fillStyle = 'green';
+  context.fillRect(x * 50 - 10, y * 50 + 5, 20 * healthpercent, 5);
+
+  context.strokeStyle = 'black';
+  context.strokeRect(x * 50 - 10, y * 50 + 5, 20, 5);
+}
+
+function getPosition(hardpoint, map) {
+  const ship = map.getEntity(hardpoint.shipId);
+
+  const x = ship.x + Math.cos(Ships.getOrientation(ship)) * hardpoint.offset.x - Math.sin(Ships.getOrientation(ship)) * hardpoint.offset.y;
+  const y = ship.y + Math.sin(Ships.getOrientation(ship)) * hardpoint.offset.x + Math.cos(Ships.getOrientation(ship)) * hardpoint.offset.y;
+  return { x, y };
+}
+
+export default class Hardpoint {
+  constructor(ship, offset, index, gunType, map) {
+    this.type = 'hardpoint';
     this.gunType = gunType;
     this.map = map;
 
@@ -13,9 +77,13 @@ export default class Gun {
 
     this.ship = ship;
     this.offset = offset;
-    this.id = id;
+    this.id = nextId++;
     this.radius = 5.625 / 50;
     this.isSelected = false;
+
+    this.index = index;
+
+    this.map.addHardpoint(this);
   }
 
   getPosition() {
@@ -63,6 +131,10 @@ export default class Gun {
 
   getId() {
     return this.id;
+  }
+
+  getIndex() {
+    return this.index;
   }
 
   fire(targetId) {

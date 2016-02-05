@@ -57,8 +57,7 @@ AttackShip: {
 
 FireShot: {
 	id: The ship to attack with,
-	hardpointId: The index of the hardpoint
-	targetId: the ship to attack
+	hardpointId: The id of the hardpoint
 }
 
 AddProjectile: {
@@ -76,8 +75,12 @@ RemoveProjectile: {
 }
 
 SetWeaponCooldown: {
-	shipId: The id of the ship to fiddle with the cooldown,
-	hardpointId: The index of the hardpoint,
+	hardpointId: The id of the hardpoint,
 	timeTillNextFire: How many ticks remaining in the cooldown
+}
+
+UpdateEntity: {
+	id: The id of the entity,
+	data: The new data for the entity
 }
 */

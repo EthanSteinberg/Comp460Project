@@ -2,15 +2,13 @@ import GameMap from '../shared/gamemap';
 import Gui from '../shared/gui';
 import ShipbuilderGui from '../shared/shipbuildergui';
 import loadImages from './images';
-import Ship from '../shared/ship';
-import Shipyard from '../shared/shipyard';
+import * as Ships from '../shared/ship';
 
 import { defaultTemplate } from '../shared/template';
 
 const MILLISECONDS_PER_LOGIC_UPDATE = 5;
 const MILLISECONDS_PER_RENDER_UPDATE = 15;
 
-const SHIPBUILDMODE = true;
 const SCALE = 3;
 
 
@@ -95,12 +93,11 @@ class Main {
       'SetResources': this.game._setResourcesHandler.bind(this.game),
       'UpdateTimeLeftToBuild': this.game._updateTimeLeftToBuildHandler.bind(this.game),
       'DealDamage': this.game._dealDamageHandler.bind(this.game),
-      'StartShowingAttack': this.game._startShowingAttack.bind(this.game),
-      'StopShowingAttack': this.game._stopShowingAttack.bind(this.game),
       'AddProjectile': this.game._addProjectile.bind(this.game),
       'SetProjectilePosition': this.game._setProjectilePosition.bind(this.game),
       'RemoveProjectile': this.game._removeProjectile.bind(this.game),
       'SetWeaponCooldown': this.game._setWeaponCooldown.bind(this.game),
+      'UpdateEntity': this.game._updateEntity.bind(this.game),
     };
   }
 
@@ -197,25 +194,14 @@ class Game {
     this.y = 0;
   }
 
-  updateSelectionState(newState) {
-    if (this.selectionState.gui != null) {
-      this.selectionState.gui.isSelected = false;
-    }
-    if (this.selectionState.map != null) {
-      this.selectionState.map.isSelected = false;
-    }
+  _updateEntity({ id, data }) {
+    this.map.entities.set(id, data);
+  }
 
+  updateSelectionState(newState) {
     this.selectionState = newState;
 
     this.gui.setSelectionState(this.selectionState);
-
-    if (this.selectionState.gui != null) {
-      this.selectionState.gui.isSelected = true;
-    }
-
-    if (this.selectionState.map != null) {
-      this.selectionState.map.isSelected = true;
-    }
   }
 
   mousedown(event, sendMessage) {
@@ -270,17 +256,17 @@ class Game {
     const item = this.map.getItem(mouseX, mouseY);
 
     if (item == null) {
-      if (this.selectionState.map instanceof Ship) {
+      if (this.getSelected().map.type === 'ship') {
         // Try to move to that location.
         const targetLocation = { x: mouseX, y: mouseY };
         // Move to an empty place
-        sendMessage({ type: 'MoveShip', shipId: this.selectionState.map.getId(), targetLocation });
+        sendMessage({ type: 'MoveShip', shipId: this.getSelected().map.id, targetLocation });
       }
     } else {
-      if (item instanceof Ship && this.selectionState.map instanceof Ship) {
+      if (item.type === 'ship' && this.getSelected().map.type === 'ship') {
         // Trying to attack a ship
-        if (item.getId() !== this.selectionState.map.getId()) {
-          sendMessage({ type: 'AttackShip', id: this.selectionState.map.getId(), targetId: item.getId() });
+        if (item.id !== this.getSelected().map.id) {
+          sendMessage({ type: 'AttackShip', id: this.getSelected().map.id, targetId: item.id });
         }
       }
     }
@@ -309,23 +295,22 @@ class Game {
       this.updateSelectionState({ ...this.selectionState, gui: item });
 
       if (item.getType() === 'strategic') {
-        if (this.selectionState.map != null && this.selectionState.map.getType() == 'ship') {
-          this.x = this.selectionState.map.getX()*50*SCALE - this.width/2 + 100;
-          this.y = this.selectionState.map.getY()*50*SCALE - this.height/2;
-          console.log(this.x, this.y)
+        if (this.selectionState.map.type === 'ship') {
+          this.x = this.selectionState.map.x * 50 * SCALE - this.width / 2 + 100;
+          this.y = this.selectionState.map.y * 50 * SCALE - this.height / 2;
         } else {
-          this.x += this.width/2;
-          this.y += this.height/2
+          this.x += this.width / 2;
+          this.y += this.height / 2;
         }
         this.map.setMode('tactical');
         item.setType('tactical');
-        this.updateSelectionState({ ...this.selectionState, gui: null });        
+        this.updateSelectionState({ ...this.selectionState, gui: null });
       } else if (item.getType() === 'tactical') {
         this.x = 0;
         this.y = 0;
         this.map.setMode('strategic');
         item.setType('strategic');
-        this.updateSelectionState({ ...this.selectionState, gui: null });        
+        this.updateSelectionState({ ...this.selectionState, gui: null });
       }
     }
 
@@ -341,6 +326,13 @@ class Game {
     return 'game';
   }
 
+  getSelected() {
+    return {
+      gui: this.map.getEntity(this.selectionState.gui),
+      map: this.map.getEntity(this.selectionState.map),
+    };
+  }
+
   processMapLeftMouseClick(rawX, rawY, sendMessage) {
     const x = rawX + this.x - 25;
     const y = rawY + this.y - 25;
@@ -351,7 +343,6 @@ class Game {
     if (this.map.getMode() === 'tactical') {
       mouseX = (x + 50 * SCALE) / (50 * SCALE) - 1;
       mouseY = (y + 50 * SCALE) / (50 * SCALE) - 1;
-      console.log(mouseX, mouseY);
     }
 
     const mouseRoundedX = Math.round(mouseX);
@@ -369,13 +360,13 @@ class Game {
       } else if (this.selectionState.gui.getType() === 'mine' || this.selectionState.gui.getType() === 'shipyard') {
         const buildingType = this.selectionState.gui.getType();
         sendMessage({ type: 'MakeBuilding', building: buildingType, x: mouseRoundedX, y: mouseRoundedY });
-      } else if (this.selectionState.gui.getType() === 'roundshot' && item instanceof Ship) {
+      } else if (this.selectionState.gui.getType() === 'roundshot' && item.type === 'ship') {
         const hardpoint = this.selectionState.map.getHardpointById(this.selectionState.gui.getTemplateNum());
         sendMessage({ type: 'FireShot', id: this.selectionState.map.getId(), hardpointId: this.selectionState.gui.getTemplateNum(), targetId: item.getId() });
       }
     } else if (item != null) {
       // Select
-      this.updateSelectionState({ ...this.selectionState, map: item });
+      this.updateSelectionState({ ...this.selectionState, map: item.id });
     } else {
       // Deselect
       this.updateSelectionState({ ...this.selectionState, map: null });
@@ -397,14 +388,6 @@ class Game {
 
   _setProjectilePosition({ id, position }) {
     this.projectiles.set(id, position);
-  }
-
-  _startShowingAttack({ id, targetId }) {
-    this.map.getShip(id).showAttack(targetId);
-  }
-
-  _stopShowingAttack({ id }) {
-    this.map.getShip(id).stopShowAttack();
   }
 
   _setShipPositionHandler(setShipPositionMessage) {
@@ -446,7 +429,7 @@ class Game {
     this.context.translate(-this.x, -this.y);
 
     // Render the map and everything on it.
-    this.map.render(this.context, this.images);
+    this.map.render(this.context, this.images, this.selectionState);
 
     for (const position of this.projectiles.values()) {
       const radius = 10;
