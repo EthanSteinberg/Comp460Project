@@ -19,10 +19,16 @@ export default class GameMap {
     this.miniview = new MiniView('miniview');
 
     this.entities = new Map();
-    this.nextEntityId = 1;
+    this.nextEntityId = 2;
 
     this.entities.set('0', {
       id: '0',
+      type: 'playerstate',
+      coins: 100,
+    });
+
+    this.entities.set('1', {
+      id: '1',
       type: 'playerstate',
       coins: 100,
     });
