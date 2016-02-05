@@ -92,12 +92,8 @@ class Main {
       'SetPosition': this.game._setPositionHandler.bind(this.game),
       'SetResources': this.game._setResourcesHandler.bind(this.game),
       'UpdateTimeLeftToBuild': this.game._updateTimeLeftToBuildHandler.bind(this.game),
-      'DealDamage': this.game._dealDamageHandler.bind(this.game),
-      'AddProjectile': this.game._addProjectile.bind(this.game),
-      'SetProjectilePosition': this.game._setProjectilePosition.bind(this.game),
-      'RemoveProjectile': this.game._removeProjectile.bind(this.game),
-      'SetWeaponCooldown': this.game._setWeaponCooldown.bind(this.game),
       'UpdateEntity': this.game._updateEntity.bind(this.game),
+      'RemoveEntity': this.game._removeEntity.bind(this.game),
     };
   }
 
@@ -183,19 +179,21 @@ class Game {
       map: null,
     };
 
-    this.projectiles = new Map();
-
     this.images = images;
     this.map = new GameMap();
     this.miniMap = this.map;
-    this.gui = new Gui(this.width, this.height, templates, this.selectionState);
+    this.gui = new Gui(this.width, this.height, templates, this.selectionState, this.map);
 
     this.x = 0;
     this.y = 0;
   }
 
-  _updateEntity({ id, data }) {
-    this.map.entities.set(id, data);
+  _updateEntity({ data }) {
+    this.map.addEntity(data);
+  }
+
+  _removeEntity({ id }) {
+    this.map.removeEntity(id);
   }
 
   updateSelectionState(newState) {
@@ -233,7 +231,7 @@ class Game {
         return 'game';
       }
 
-      if (this.selectionState.map != null) {
+      if (this.getSelectedMap() != null) {
         this.processRightClickOnMap(rawX, rawY, sendMessage);
       }
     }
@@ -256,17 +254,17 @@ class Game {
     const item = this.map.getItem(mouseX, mouseY);
 
     if (item == null) {
-      if (this.getSelected().map.type === 'ship') {
+      if (this.getSelectedMap().type === 'ship') {
         // Try to move to that location.
         const targetLocation = { x: mouseX, y: mouseY };
         // Move to an empty place
-        sendMessage({ type: 'MoveShip', shipId: this.getSelected().map.id, targetLocation });
+        sendMessage({ type: 'MoveShip', shipId: this.getSelectedMap().id, targetLocation });
       }
     } else {
-      if (item.type === 'ship' && this.getSelected().map.type === 'ship') {
+      if (item.type === 'ship' && this.getSelectedMap().type === 'ship') {
         // Trying to attack a ship
-        if (item.id !== this.getSelected().map.id) {
-          sendMessage({ type: 'AttackShip', id: this.getSelected().map.id, targetId: item.id });
+        if (item.id !== this.getSelectedMap().id) {
+          sendMessage({ type: 'AttackShip', id: this.getSelectedMap().id, targetId: item.id });
         }
       }
     }
@@ -287,7 +285,7 @@ class Game {
 
   processGuiLeftMouseClick(rawX, rawY) {
     // In the gui
-    var item = this.gui.getItem(Math.floor(rawX / 50), Math.floor(rawY / 50));
+    const item = this.gui.getItem(Math.floor(rawX / 50), Math.floor(rawY / 50));
     if (item != null) {
       if (item.getType() === 'shipbuilder') {
         return 'shipbuilder';
@@ -295,9 +293,9 @@ class Game {
       this.updateSelectionState({ ...this.selectionState, gui: item });
 
       if (item.getType() === 'strategic') {
-        if (this.selectionState.map.type === 'ship') {
-          this.x = this.selectionState.map.x * 50 * SCALE - this.width / 2 + 100;
-          this.y = this.selectionState.map.y * 50 * SCALE - this.height / 2;
+        if (this.getSelectedMap().type === 'ship') {
+          this.x = this.getSelectedMap().x * 50 * SCALE - this.width / 2 + 100;
+          this.y = this.getSelectedMap().y * 50 * SCALE - this.height / 2;
         } else {
           this.x += this.width / 2;
           this.y += this.height / 2;
@@ -314,9 +312,9 @@ class Game {
       }
     }
 
-    if (this.map.mode == 'tactical') {
+    if (this.map.mode === 'tactical') {
       // Minimap selection logic
-      var view = this.miniMap.setView(rawX, rawY);
+      const view = this.miniMap.setView(rawX, rawY);
       if (view != null) {
         this.x = view.x;
         this.y = view.y;
@@ -326,11 +324,8 @@ class Game {
     return 'game';
   }
 
-  getSelected() {
-    return {
-      gui: this.map.getEntity(this.selectionState.gui),
-      map: this.map.getEntity(this.selectionState.map),
-    };
+  getSelectedMap() {
+    return this.map.getEntity(this.selectionState.map);
   }
 
   processMapLeftMouseClick(rawX, rawY, sendMessage) {
@@ -356,13 +351,12 @@ class Game {
       // If an empty tile on an island is selected then add a building
       if (this.selectionState.gui.getType() === 'shiptemplate') {
         const template = templates[this.selectionState.gui.getTemplateNum()];
-        sendMessage({ type: 'MakeShip', islandID: this.selectionState.map.getIslandID(), x: mouseRoundedX, y: mouseRoundedY, template });
+        sendMessage({ type: 'MakeShip', islandID: this.getSelectedMap().getIslandID(), x: mouseRoundedX, y: mouseRoundedY, template });
       } else if (this.selectionState.gui.getType() === 'mine' || this.selectionState.gui.getType() === 'shipyard') {
         const buildingType = this.selectionState.gui.getType();
         sendMessage({ type: 'MakeBuilding', building: buildingType, x: mouseRoundedX, y: mouseRoundedY });
       } else if (this.selectionState.gui.getType() === 'roundshot' && item.type === 'ship') {
-        const hardpoint = this.selectionState.map.getHardpointById(this.selectionState.gui.getTemplateNum());
-        sendMessage({ type: 'FireShot', id: this.selectionState.map.getId(), hardpointId: this.selectionState.gui.getTemplateNum(), targetId: item.getId() });
+        sendMessage({ type: 'FireShot', id: this.selectionState.gui.getTemplateNum(), targetId: item.id });
       }
     } else if (item != null) {
       // Select
@@ -376,18 +370,6 @@ class Game {
   _setWeaponCooldown({ shipId, hardpointId, timeTillNextFire }) {
     const hardpoint = this.map.getShip(shipId).getHardpointById(hardpointId);
     hardpoint.setTimeTillNextFire(timeTillNextFire);
-  }
-
-  _removeProjectile({ id }) {
-    this.projectiles.delete(id);
-  }
-
-  _addProjectile({ id, position }) {
-    this.projectiles.set(id, position);
-  }
-
-  _setProjectilePosition({ id, position }) {
-    this.projectiles.set(id, position);
   }
 
   _setShipPositionHandler(setShipPositionMessage) {
@@ -430,11 +412,6 @@ class Game {
 
     // Render the map and everything on it.
     this.map.render(this.context, this.images, this.selectionState);
-
-    for (const position of this.projectiles.values()) {
-      const radius = 10;
-      this.context.drawImage(this.images.roundshot, position.x * 50 - radius / 2, position.y * 50 - radius / 2, radius, radius);
-    }
 
     this.context.restore();
 

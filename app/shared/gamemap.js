@@ -1,4 +1,5 @@
 import * as Ships from './ship';
+import * as Projectiles from './projectile';
 import Mine from './mine';
 import Shipyard from './shipyard';
 import Island from './island';
@@ -18,6 +19,7 @@ export default class GameMap {
     this.miniview = new MiniView('miniview');
 
     this.entities = new Map();
+    if (typeof window !== 'undefined') { window.entities = this.entities; }
     this.nextEntityId = 0;
 
     this.islands = new Map();
@@ -51,14 +53,18 @@ export default class GameMap {
 
     this.coins = 100; // Start with 100 coin.
 
-    this.projectiles = new Map();
-    this.nextProjectileId = 0;
-
     this.hardpoints = new Map();
   }
 
   addEntity(entity) {
     this.entities.set(entity.id, entity);
+  }
+
+  removeEntity(entityId) {
+    if (typeof entityId !== 'string') {
+      console.error('Bad entitity id', entityId);
+    }
+    this.entities.delete(entityId);
   }
 
   getEntity(entityId) {
@@ -76,16 +82,6 @@ export default class GameMap {
 
   getHardpoint(hardpointId) {
     return this.hardpoints.get(hardpointId);
-  }
-
-  getNextProjectileId() {
-    const result = this.nextProjectileId;
-    this.nextProjectileId += 1;
-    return result;
-  }
-
-  getProjectiles() {
-    return this.projectiles;
   }
 
   setMode(mode) {
@@ -147,6 +143,8 @@ export default class GameMap {
       if (entity.type === 'ship') {
         const isSelected = selectionState.map === entity.id;
         Ships.render(entity, this, context, images, isSelected);
+      } else if (entity.type === 'projectile') {
+        Projectiles.render(entity, this, context, images);
       }
     }
 
@@ -256,6 +254,8 @@ export default class GameMap {
     for (const entity of this.entities.values()) {
       if (entity.type === 'ship') {
         Ships.processUpdate(entity, this);
+      } else if (entity.type === 'projectile') {
+        Projectiles.processUpdate(entity, this);
       }
     }
 

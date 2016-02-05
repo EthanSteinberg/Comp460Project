@@ -41,7 +41,7 @@ export function createShipAndHardpoints(map, x, y, template) {
   return shipId;
 }
 
-function getPosition(ship) {
+export function getPosition(ship) {
   return { x: ship.x, y: ship.y };
 }
 
@@ -103,7 +103,7 @@ export function moveTo(ship, map, targetLocation) {
   }
 }
 
-function attackTarget(ship, target) {
+export function attackTarget(ship, target) {
   ship.mode = {
     type: 'ATTACKING',
     targetId: target.id,
@@ -221,10 +221,12 @@ function processMove(ship, map) {
 function processAttack(ship, map) {
   const target = map.getEntity(ship.mode.targetId);
 
-  if (getHealth(target) <= 0) {
+  if (target == null) {
+    // Target is gone or dead
     ship.mode = {
       type: 'IDLE',
     };
+    return;
   }
 
   const targetPosition = getPosition(target);
@@ -233,8 +235,8 @@ function processAttack(ship, map) {
     for (const hardpointId of ship.hardpoints) {
       if (hardpointId != null) {
         const hardpoint = map.getEntity(hardpointId);
-        if (Hardpoints.getTimeTillFire(hardpoint) === 0) {
-          Hardpoints.fire(hardpoint, target);
+        if (hardpoint.timeTillNextFire === 0) {
+          Hardpoints.fire(hardpoint, map, target);
         }
       }
     }
@@ -265,7 +267,7 @@ function processAttack(ship, map) {
 export function processUpdate(ship, map) {
   for (const hardpointId of ship.hardpoints) {
     if (hardpointId != null) {
-      // Hardpoints.processUpdate(map.getEntity(hardpointId), map);
+      Hardpoints.processUpdate(map.getEntity(hardpointId), map);
     }
   }
 
@@ -286,7 +288,7 @@ export function processUpdate(ship, map) {
   }
 }
 
-function getHealth(ship) {
+export function getHealth(ship) {
   return ship.stats.health;
 }
 
@@ -294,7 +296,6 @@ function attack(ship, enemyShip) {
   return dealDamage(enemyShip, ship.stats.damage);
 }
 
-function dealDamage(ship, damage) {
+export function dealDamage(ship, damage) {
   ship.stats.health -= damage;
-  return damage;
 }

@@ -56,22 +56,8 @@ AttackShip: {
 }
 
 FireShot: {
-	id: The ship to attack with,
-	hardpointId: The id of the hardpoint
-}
-
-AddProjectile: {
-	id: The id of the projectile
-	position: The starting position
-}
-
-SetProjectilePosition: {
-	id: The id of the projectile,
-	position: The new position
-}
-
-RemoveProjectile: {
-	id: The id of the projectile
+	id: The hardpoint to attack with,
+	targetId: The id of the target
 }
 
 SetWeaponCooldown: {
@@ -80,6 +66,11 @@ SetWeaponCooldown: {
 }
 
 UpdateEntity: {
+	id: The id of the entity,
+	data: The new data for the entity
+}
+
+RemoveEntity: {
 	id: The id of the entity,
 	data: The new data for the entity
 }

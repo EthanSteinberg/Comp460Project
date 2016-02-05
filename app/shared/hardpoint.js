@@ -1,5 +1,6 @@
 import { hardpoints } from './template';
 import * as Ships from './ship';
+import * as Projectiles from './projectile';
 
 const gun1Position = {
   x: 0,
@@ -21,17 +22,13 @@ export function createHardpoint(map, shipId, index, gunType) {
     id: map.getNextEntityId(),
     type: 'hardpoint',
     gunType,
-    stats: {
-      health: hardpoints[gunType].health,
-      timeTillNextFire: 0,
-    },
+    health: hardpoints[gunType].health,
+    timeTillNextFire: 0,
     shipId,
     offset: gunPositions[index],
     index,
 
     radius: 5.625 / 50,
-
-    isSelected: false,
   };
 
   map.addEntity(point);
@@ -42,12 +39,12 @@ export function createHardpoint(map, shipId, index, gunType) {
 export function render(hardpoint, map, context, images) {
   const { x, y } = getPosition(hardpoint, map);
 
-  context.drawImage(images.cannon, x * 50 - 15 / 4, y * 50 - 25 / 4, 10, 10);
+  context.drawImage(images.cannon, x * 50 - 20 / 4, y * 50 - 25 / 4, 10, 10);
 
   context.fillStyle = 'red';
   context.fillRect(x * 50 - 10, y * 50 + 5, 20, 5);
 
-  const healthpercent = hardpoint.stats.health / hardpoints[hardpoint.gunType].health;
+  const healthpercent = hardpoint.health / hardpoints[hardpoint.gunType].health;
 
   context.fillStyle = 'green';
   context.fillRect(x * 50 - 10, y * 50 + 5, 20 * healthpercent, 5);
@@ -64,102 +61,16 @@ function getPosition(hardpoint, map) {
   return { x, y };
 }
 
-export default class Hardpoint {
-  constructor(ship, offset, index, gunType, map) {
-    this.type = 'hardpoint';
-    this.gunType = gunType;
-    this.map = map;
+export function fire(hardpoint, map, target) {
+  const position = getPosition(hardpoint, map);
+  
+  Projectiles.createProjectile(map, position, target);
 
-    this.stats = {
-      health: hardpoints[this.gunType].health,
-      timeTillNextFire: 0,
-    };
+  hardpoint.timeTillNextFire = 100;
+}
 
-    this.ship = ship;
-    this.offset = offset;
-    this.id = nextId++;
-    this.radius = 5.625 / 50;
-    this.isSelected = false;
-
-    this.index = index;
-
-    this.map.addHardpoint(this);
-  }
-
-  getPosition() {
-    const x = this.ship.getX() + Math.cos(this.ship.getOrientation()) * this.offset.x - Math.sin(this.ship.getOrientation()) * this.offset.y;
-    const y = this.ship.getY() + Math.sin(this.ship.getOrientation()) * this.offset.x + Math.cos(this.ship.getOrientation()) * this.offset.y;
-    return { x, y };
-  }
-
-  render(context, images) {
-    const { x, y } = this.getPosition();
-
-    context.drawImage(images.cannon, x * 50 - 20 / 4, y * 50 - 25 / 4, 10, 10);
-
-    context.fillStyle = 'red';
-    context.fillRect(x * 50 - 10, y * 50 + 5, 20, 5);
-
-    const healthpercent = this.stats.health / hardpoints[this.gunType].health;
-
-    context.fillStyle = 'green';
-    context.fillRect(x * 50 - 10, y * 50 + 5, 20 * healthpercent, 5);
-
-    context.strokeStyle = 'black';
-    context.strokeRect(x * 50 - 10, y * 50 + 5, 20, 5);
-
-
-    if (this.isSelected) {
-      context.strokeStyle = 'cyan';
-      context.beginPath();
-      context.arc(this.getPosition().x * 50, this.getPosition().y * 50, this.radius * 50, 0, Math.PI * 2, true);
-      context.stroke();
-    }
-  }
-
-  getTimeTillFire() {
-    return this.stats.timeTillNextFire;
-  }
-
-  getHealth() {
-    return this.stats.health;
-  }
-
-  getType() {
-    return this.type;
-  }
-
-  getId() {
-    return this.id;
-  }
-
-  getIndex() {
-    return this.index;
-  }
-
-  fire(targetId) {
-    const projectileId = this.map.getNextProjectileId();
-    const position = this.getPosition();
-
-    this.map.getProjectiles().set(projectileId, { position, targetId });
-
-    this.stats.timeTillNextFire = 100;
-    return [
-      { type: 'SetWeaponCooldown', shipId: this.ship.getId(), hardpointId: this.id, timeTillNextFire: this.stats.timeTillNextFire },
-      { type: 'AddProjectile', id: projectileId, position },
-    ];
-  }
-
-  setTimeTillNextFire(timeTillNextFire) {
-    this.stats.timeTillNextFire = timeTillNextFire;
-  }
-
-  getUpdateMessages() {
-    if (this.stats.timeTillNextFire !== 0) {
-      this.stats.timeTillNextFire -= 1;
-      return [{ type: 'SetWeaponCooldown', shipId: this.ship.getId(), hardpointId: this.id, timeTillNextFire: this.stats.timeTillNextFire }];
-    }
-
-    return [];
+export function processUpdate(hardpoint) {
+  if (hardpoint.timeTillNextFire !== 0) {
+    hardpoint.timeTillNextFire -= 1;
   }
 }

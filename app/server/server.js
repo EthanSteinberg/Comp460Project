@@ -25,47 +25,6 @@ const playerSockets = [];
 
 let pendingUpdates = [];
 
-function updateProjectiles() {
-  const result = [];
-
-  for (const [id, { position, targetId }] of map.getProjectiles()) {
-    const ship = map.getShip(targetId);
-    if (ship == null) {
-      result.push({ type: 'RemoveProjectile', id });
-      this.map.getProjectiles().delete(id);
-      continue;
-    }
-
-    const targetPosition = ship.getPosition();
-
-    const dx = targetPosition.x - position.x;
-    const dy = targetPosition.y - position.y;
-
-    const dist = Math.sqrt(dx * dx + dy * dy);
-
-    if (dist < 0.01) {
-      result.push({ type: 'RemoveProjectile', id });
-      map.getProjectiles().delete(id);
-
-      const damageDealt = ship.dealDamage(50);
-      result.push({ type: 'DealDamage', enemyShipId: targetId, damage: damageDealt });
-
-      if (ship.getHealth() <= 0) {
-        map.removeShip(targetId);
-      }
-    } else {
-      const movement = Math.min(dist, 0.1);
-
-      position.x += dx / dist * movement;
-      position.y += dy / dist * movement;
-
-      result.push({ type: 'SetProjectilePosition', id, position });
-    }
-  }
-
-  return result;
-}
-
 function serializeMapEntities() {
   const result = [];
   for (const [key, entity] of map.entities) {
@@ -77,14 +36,22 @@ function serializeMapEntities() {
 let lastEntityState = serializeMapEntities();
 
 function updateGameState() {
-  const updateMessages = pendingUpdates.concat(map.getUpdateMessages()).concat(updateProjectiles());
+  const updateMessages = pendingUpdates.concat(map.getUpdateMessages());
 
   const currentEntityState = serializeMapEntities();
 
+  // Scan for changes in entities and add new entities
   // TODO: Need a faster way to scan for changes
   for (const id of Object.keys(currentEntityState)) {
     if (lastEntityState[id] !== currentEntityState[id]) {
       updateMessages.push({ type: 'UpdateEntity', id, data: JSON.parse(currentEntityState[id]) });
+    }
+  }
+
+  // Remove removed things
+  for (const id of Object.keys(lastEntityState)) {
+    if (!(id in currentEntityState)) {
+      updateMessages.push({ type: 'RemoveEntity', id });
     }
   }
 
@@ -145,10 +112,10 @@ function makeShipHandler(makeShipMessage) {
 }
 
 function attackShipHandler({ id, targetId }) {
-  const sourceShip = map.getShip(id);
-  const targetShip = map.getShip(targetId);
+  const sourceShip = map.getEntity(id);
+  const targetShip = map.getEntity(targetId);
 
-  sourceShip.attackTarget(targetShip);
+  Ships.attackTarget(sourceShip, targetShip);
 }
 
 

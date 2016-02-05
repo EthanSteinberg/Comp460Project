@@ -9,7 +9,7 @@ import { getStats } from './template';
  */
 export default class Gui {
 
-  constructor(canvasWidth, canvasHeight, templates, selectionState) {
+  constructor(canvasWidth, canvasHeight, templates, selectionState, map) {
     this.width = 8;
     this.height = 5;
 
@@ -28,12 +28,14 @@ export default class Gui {
     this.unitButtons = null;
 
     this.selectionState = selectionState;
+
+    this.map = map;
   }
 
   updateUnitButtons(newSelectionState) {
-    const oldMap = this.selectionState.map;
+    const oldMap = this.map.getEntity(this.selectionState.map);
 
-    const newMap = newSelectionState.map;
+    const newMap = this.map.getEntity(newSelectionState.map);
 
     if (oldMap === newMap) {
       return;
@@ -65,6 +67,10 @@ export default class Gui {
     this.updateUnitButtons(newSelectionState);
 
     this.selectionState = newSelectionState;
+  }
+
+  getSelectedMap() {
+    return this.map.getEntity(this.selectionState.map);
   }
 
   /**
@@ -99,9 +105,9 @@ export default class Gui {
       button.render(context, images);
     }
 
-    if (this.selectionState.map != null && this.selectionState.map.type === 'ship') {
-      statsDisplay((this.x + 3.5) * 50, (this.y + 6.25) * 50, this.selectionState.map.stats, context, images);
-      this.selectionState.map.hardpoints.forEach((hardpointId, i) => {
+    if (this.getSelectedMap() != null && this.getSelectedMap().type === 'ship') {
+      statsDisplay((this.x + 3.5) * 50, (this.y + 6.25) * 50, this.getSelectedMap().stats, context, images);
+      this.getSelectedMap().hardpoints.forEach((hardpointId, i) => {
         const hardpoint = map.getEntity(hardpointId);
         if (hardpoint != null && hardpoint.timeTillFire !== 0) {
           context.save();
