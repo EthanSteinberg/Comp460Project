@@ -3,6 +3,8 @@ import buildingConstants from '../shared/buildingconstants';
 
 import * as Ships from '../shared/ship';
 import * as Hardpoints from '../shared/hardpoint';
+import Types from '../shared/types';
+import * as Vectors from '../shared/vector';
 
 const http = require('http');
 const ws = require('ws');
@@ -115,9 +117,17 @@ function attackShipHandler({ id, targetId }) {
 
 function fireShotHandler({ targetId, id }) {
   const hardpoint = map.getEntity(id);
+  const ship = map.getEntity(hardpoint.shipId);
 
-  if (hardpoint.timeTillNextFire !== 0) {
-    // Don't fire if still waiting.
+  const target = map.getEntity(targetId);
+
+  const targetPosition = Types[target.type].getPosition(target, map);
+  const position = Ships.getPosition(ship);
+
+  console.log(Vectors.getDistance(position, targetPosition));
+
+  if (hardpoint.timeTillNextFire !== 0 || Vectors.getDistance(position, targetPosition) >= 2) {
+    // Don't fire if still waiting or out of distance.
     return;
   }
 

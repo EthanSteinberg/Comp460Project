@@ -4,6 +4,7 @@ import astar from './astar';
 import { hulls } from './template';
 import * as Hardpoints from './hardpoint';
 import Types from './types';
+import { getDistance } from './vector';
 
 /**
  * A ship entity.
@@ -166,11 +167,6 @@ function closeEnoughToWayPoint(ship) {
   return getDistanceToTarget(ship, ship.mode.moves[ship.mode.moveIndex]) <= 0.01;
 }
 
-function getDistance(a, b) {
-  const distance = Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
-  return distance;
-}
-
 function getDistanceToTarget(ship, target) {
   return getDistance(getPosition(ship), target);
 }
@@ -236,8 +232,8 @@ function processAttack(ship, map) {
 
   if (getDistanceToTarget(ship, targetPosition) < 2) {
     for (const hardpointId of ship.hardpoints) {
-      if (hardpointId != null) {
-        const hardpoint = map.getEntity(hardpointId);
+      const hardpoint = map.getEntity(hardpointId);
+      if (hardpoint != null) {
         if (hardpoint.timeTillNextFire === 0) {
           Hardpoints.fire(hardpoint, map, target);
         }
