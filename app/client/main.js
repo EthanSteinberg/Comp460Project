@@ -287,7 +287,7 @@ class Game {
       if (item.getType() === 'shipbuilder') {
         return 'shipbuilder';
       }
-      this.updateSelectionState({ ...this.selectionState, gui: item });
+      this.updateSelectionState({ ...this.selectionState, gui: { type: item.getType(), templateNum: item.getTemplateNum() } });
 
       if (item.getType() === 'strategic') {
         if (this.getSelectedMap().type === 'ship') {
@@ -346,18 +346,18 @@ class Game {
       // The gui stuff always has priority.
 
       // If an empty tile on an island is selected then add a building
-      if (this.selectionState.gui.getType() === 'shiptemplate') {
-        const template = templates[this.selectionState.gui.getTemplateNum()];
+      if (this.selectionState.gui.type === 'shiptemplate') {
+        const template = templates[this.selectionState.gui.templateNum];
         sendMessage({ type: 'MakeShip', islandID: this.getSelectedMap().islandID, x: mouseRoundedX, y: mouseRoundedY, template });
-      } else if (this.selectionState.gui.getType() === 'mine' || this.selectionState.gui.getType() === 'shipyard') {
-        const buildingType = this.selectionState.gui.getType();
+      } else if (this.selectionState.gui.type === 'mine' || this.selectionState.gui.type === 'shipyard') {
+        const buildingType = this.selectionState.gui.type;
         sendMessage({ type: 'MakeBuilding', building: buildingType, x: mouseRoundedX, y: mouseRoundedY });
-      } else if (this.selectionState.gui.getType() === 'roundshot' && item != null && (item.type === 'ship' || item.type === 'shipyard')) {
+      } else if (this.selectionState.gui.type === 'roundshot' && item != null && (item.type === 'ship' || item.type === 'shipyard')) {
         if (item.type === 'ship') {
           item = this.map.getHardpointItem(mouseX, mouseY) || item;
         }
 
-        sendMessage({ type: 'FireShot', id: this.selectionState.gui.getTemplateNum(), targetId: item.id });
+        sendMessage({ type: 'FireShot', id: this.selectionState.gui.templateNum, targetId: item.id });
       }
     } else if (item != null) {
       // Select

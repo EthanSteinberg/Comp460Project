@@ -24,47 +24,12 @@ export default class Gui {
 
     this.templates = templates;
 
-    this.unitButtons = null;
-
     this.selectionState = selectionState;
 
     this.map = map;
   }
 
-  updateUnitButtons(newSelectionState) {
-    const oldMap = this.map.getEntity(this.selectionState.map);
-
-    const newMap = this.map.getEntity(newSelectionState.map);
-
-    if (oldMap === newMap) {
-      return;
-    }
-
-    if (newMap == null) {
-      this.unitButtons = null;
-    } else if (newMap.type === 'ship') {
-      const template = newMap.template;
-
-      this.unitButtons = [];
-
-      for (let i = 0; i < template.hardpoints.length; i++) {
-        const hardpoint = template.hardpoints[i];
-        if (hardpoint != null) {
-          this.unitButtons.push(new Button(hardpoint, this.x + i, 7, newMap.hardpoints[i]));
-        }
-      }
-    } else if (newMap.type === 'shipyard') {
-      this.unitButtons = [
-        new Button('shiptemplate', this.x, 7, 0),
-        new Button('shiptemplate', this.x + 1, 7, 1),
-        new Button('shiptemplate', this.x + 2, 7, 2),
-      ];
-    }
-  }
-
   setSelectionState(newSelectionState) {
-    this.updateUnitButtons(newSelectionState);
-
     this.selectionState = newSelectionState;
   }
 
@@ -83,7 +48,7 @@ export default class Gui {
       }
     }
 
-    if (this.unitButtons != null) {
+    if (this.getUnitButtons() != null) {
       this.drawUnitGuiBox(context, images);
     }
 
@@ -101,7 +66,9 @@ export default class Gui {
     context.drawImage(images.money, (this.x * 50), (this.y * 50) + 5, 25, 25);
 
     for (const button of this.getButtons()) {
-      button.render(context, images, this.selectionState.gui === button);
+      const isSelected = this.selectionState.gui != null && this.selectionState.gui.type === button.type &&
+        this.selectionState.gui.templateNum === button.templateNum;
+      button.render(context, images, isSelected);
     }
 
     if (this.getSelectedMap() != null) {
@@ -135,8 +102,8 @@ export default class Gui {
           }
         });
       } else if (this.getSelectedMap().type === 'shipyard') {
-        if (this.selectionState.gui != null && this.selectionState.gui.getType() === 'shiptemplate') {
-          const template = this.templates[this.selectionState.gui.getTemplateNum()];
+        if (this.selectionState.gui != null && this.selectionState.gui.type === 'shiptemplate') {
+          const template = this.templates[this.selectionState.gui.templateNum];
           statsDisplay((this.x + 3.5) * 50, (this.y + 6.25) * 50, getStats(template), context, images);
         }
       }
@@ -178,8 +145,30 @@ export default class Gui {
     }
   }
 
+  getUnitButtons() {
+    if (this.getSelectedMap() == null) {
+      return null;
+    } else if (this.getSelectedMap().type === 'ship') {
+      const result = [];
+
+      for (let i = 0; i < this.getSelectedMap().hardpoints.length; i++) {
+        const hardpoint = this.map.getEntity(this.getSelectedMap().hardpoints[i]);
+        if (hardpoint != null) {
+          result.push(new Button(hardpoint.gunType, this.x + i, 7, hardpoint.id));
+        }
+      }
+      return result;
+    } else if (this.getSelectedMap().type === 'shipyard') {
+      return [
+        new Button('shiptemplate', this.x, 7, 0),
+        new Button('shiptemplate', this.x + 1, 7, 1),
+        new Button('shiptemplate', this.x + 2, 7, 2),
+      ];
+    }
+  }
+
   getButtons() {
-    return this.buttons.concat(this.unitButtons || []);
+    return this.buttons.concat(this.getUnitButtons() || []);
   }
 
   getItem(x, y) {

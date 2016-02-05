@@ -1,8 +1,9 @@
 const shipMoveSpeed = 0.05;
 
-import astar from '../shared/astar';
+import astar from './astar';
 import { hulls } from './template';
 import * as Hardpoints from './hardpoint';
+import Types from './types';
 
 /**
  * A ship entity.
@@ -231,7 +232,7 @@ function processAttack(ship, map) {
     return;
   }
 
-  const targetPosition = getPosition(target);
+  const targetPosition = Types[target.type].getPosition(target, map);
 
   if (getDistanceToTarget(ship, targetPosition) < 2) {
     for (const hardpointId of ship.hardpoints) {
@@ -264,7 +265,7 @@ function processAttack(ship, map) {
 
   for (const possib of posibilities) {
     const moves = performAStar(ship, map, possib);
-    if (bestOne == null || bestOne.length > moves.length) {
+    if (moves != null && (bestOne == null || bestOne.length > moves.length)) {
       bestOne = moves;
     }
   }
