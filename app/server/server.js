@@ -2,6 +2,7 @@ import GameMap from '../shared/gamemap';
 import buildingConstants from '../shared/buildingconstants';
 
 import * as Ships from '../shared/ship';
+import * as Hardpoints from '../shared/hardpoint';
 
 const http = require('http');
 const ws = require('ws');
@@ -119,15 +120,15 @@ function attackShipHandler({ id, targetId }) {
 }
 
 
-function fireShotHandler({ targetId, hardpointId }) {
-  const hardpoint = map.getHardpointById(hardpointId);
+function fireShotHandler({ targetId, id }) {
+  const hardpoint = map.getEntity(id);
 
-  if (hardpoint.getTimeTillFire() !== 0) {
+  if (hardpoint.timeTillNextFire !== 0) {
     // Don't fire if still waiting.
     return;
   }
 
-  pendingUpdates.push(...hardpoint.fire(targetId));
+  Hardpoints.fire(hardpoint, map, map.getEntity(targetId));
 }
 
 const messageHandlers = {

@@ -88,7 +88,6 @@ class Main {
     });
 
     this.messageHandlerMap = {
-      'SetShipPosition': this.game._setShipPositionHandler.bind(this.game),
       'SetPosition': this.game._setPositionHandler.bind(this.game),
       'SetResources': this.game._setResourcesHandler.bind(this.game),
       'UpdateTimeLeftToBuild': this.game._updateTimeLeftToBuildHandler.bind(this.game),
@@ -286,6 +285,7 @@ class Game {
   processGuiLeftMouseClick(rawX, rawY) {
     // In the gui
     const item = this.gui.getItem(Math.floor(rawX / 50), Math.floor(rawY / 50));
+    console.log(item);
     if (item != null) {
       if (item.getType() === 'shipbuilder') {
         return 'shipbuilder';
@@ -367,16 +367,6 @@ class Game {
     }
   }
 
-  _setWeaponCooldown({ shipId, hardpointId, timeTillNextFire }) {
-    const hardpoint = this.map.getShip(shipId).getHardpointById(hardpointId);
-    hardpoint.setTimeTillNextFire(timeTillNextFire);
-  }
-
-  _setShipPositionHandler(setShipPositionMessage) {
-    const { shipId, position } = setShipPositionMessage;
-    this.map.getShip(shipId).setPosition(position.x, position.y);
-  }
-
   _setPositionHandler(setPositionMessage) {
     const { object, position, islandID, template } = setPositionMessage;
     this.map.addBuilding(object, position.x, position.y, islandID, template);
@@ -388,14 +378,6 @@ class Game {
 
   _updateTimeLeftToBuildHandler({ id, timeLeftToBuild, object }) {
     this.map.getBuilding(id, object).timeLeftToBuild = timeLeftToBuild;
-  }
-
-  _dealDamageHandler({ enemyShipId, damage }) {
-    this.map.getShip(enemyShipId).dealDamage(damage);
-
-    if (this.map.getShip(enemyShipId).getHealth() <= 0) {
-      this.map.removeShip(enemyShipId);
-    }
   }
 
   /**

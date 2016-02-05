@@ -14,12 +14,11 @@ export default class Button {
     this.type = type;
     this.x = x;
     this.y = y;
-    this.isSelected = false;
 
     this.templateNum = templateNum;
   }
 
-  render(context, images) {
+  render(context, images, isSelected) {
     switch (this.type) {
       case 'mine':
         context.drawImage(images.mine, this.x * 50, this.y * 50, 50, 50);
@@ -63,7 +62,7 @@ export default class Button {
         console.error('Trying to render unknown button');
     }
 
-    if (this.isSelected) {
+    if (isSelected) {
       context.strokeStyle = 'cyan';
       context.strokeRect(
         this.x * 50,

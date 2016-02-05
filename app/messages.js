@@ -14,11 +14,6 @@ MoveShip: {
 	targetLocation: the id of the target to move to
 }
 
-SetShipPosition: {
-	shipId: the id of the ship
-	position: the position of the ship
-}
-
 MakeBuilding: {
 	building: the building type
 	x: x position of the building location
@@ -58,11 +53,6 @@ AttackShip: {
 FireShot: {
 	id: The hardpoint to attack with,
 	targetId: The id of the target
-}
-
-SetWeaponCooldown: {
-	hardpointId: The id of the hardpoint,
-	timeTillNextFire: How many ticks remaining in the cooldown
 }
 
 UpdateEntity: {

@@ -51,7 +51,7 @@ export default class Gui {
       for (let i = 0; i < template.hardpoints.length; i++) {
         const hardpoint = template.hardpoints[i];
         if (hardpoint != null) {
-          this.unitButtons.push(new Button(hardpoint, this.x + i, 7, i));
+          this.unitButtons.push(new Button(hardpoint, this.x + i, 7, newMap.hardpoints[i]));
         }
       }
     } else if (newMap instanceof Shipyard) {
@@ -102,19 +102,19 @@ export default class Gui {
     context.drawImage(images.money, (this.x * 50), (this.y * 50) + 5, 25, 25);
 
     for (const button of this.getButtons()) {
-      button.render(context, images);
+      button.render(context, images, this.selectionState.gui === button);
     }
 
     if (this.getSelectedMap() != null && this.getSelectedMap().type === 'ship') {
       statsDisplay((this.x + 3.5) * 50, (this.y + 6.25) * 50, this.getSelectedMap().stats, context, images);
       this.getSelectedMap().hardpoints.forEach((hardpointId, i) => {
         const hardpoint = map.getEntity(hardpointId);
-        if (hardpoint != null && hardpoint.timeTillFire !== 0) {
+        if (hardpoint != null && hardpoint.timeTillNextFire !== 0) {
           context.save();
           context.rect((this.x + i) * 50, 7 * 50, 50, 50);
           context.clip();
 
-          const angle = (100 - hardpoint.timeTillFire) / 100 * Math.PI * 2;
+          const angle = (100 - hardpoint.timeTillNextFire) / 100 * Math.PI * 2;
 
           context.globalCompositeOperation = 'multiply';
           context.fillStyle = 'rgba(0,0,0,.5)';
