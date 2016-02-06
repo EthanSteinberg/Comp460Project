@@ -4,14 +4,14 @@ import buildingConstants from './buildingconstants';
  * A shipyard entity.
  */
 
-export function createShipyard(map, x, y, islandID) {
+export function createShipyard(map, x, y, islandID, team) {
   const shipyard = {
     map,
     x,
     y,
     islandID,
     health: 100,
-
+    team,
     id: map.getNextEntityId(),
     set: true,
     type: 'shipyard',
@@ -23,6 +23,11 @@ export function createShipyard(map, x, y, islandID) {
 }
 
 export function render(shipyard, map, context, images, isSelected) {
+  (shipyard.team) ? context.fillStyle = 'firebrick': context.fillStyle = 'royalblue';
+  context.beginPath();
+  context.arc(shipyard.x * 50, shipyard.y * 50, 25, 0, Math.PI * 2, true);
+  context.fill();
+
   context.drawImage(images.shipyard, (shipyard.x - 0.5) * 50, (shipyard.y - 0.5) * 50, 50, 50);
 
   context.fillStyle = 'red';

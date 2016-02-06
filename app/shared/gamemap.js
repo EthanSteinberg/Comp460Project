@@ -43,8 +43,8 @@ export default class GameMap {
       hardpoints: ['roundshot'],
     };
 
-    Ships.createShipAndHardpoints(this, 0, 4, template);
-    Ships.createShipAndHardpoints(this, 4, 4, template);
+    Ships.createShipAndHardpoints(this, 0, 4, template, 0);
+    Ships.createShipAndHardpoints(this, 4, 4, template, 1);
 
     const island1coordinates = [
       [1, 1],
@@ -210,13 +210,13 @@ export default class GameMap {
     return -1;
   }
 
-  addBuilding(type, x, y, islandID) {
+  addBuilding(type, x, y, islandID, team) {
     switch (type) {
       case 'mine':
         Mines.createMine(this, x, y);
         break;
       case 'shipyard':
-        Shipyards.createShipyard(this, x, y, islandID);
+        Shipyards.createShipyard(this, x, y, islandID, team);
         break;
       default:
         console.error('Unexpected building type: ', type);

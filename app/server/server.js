@@ -81,33 +81,35 @@ app.get('/', (req, res) => {
 app.use('/dist', express.static('dist'));
 app.use('/static', express.static('static'));
 
-function moveShipHandler({ shipId, targetLocation }) {
+function moveShipHandler({ shipId, targetLocation }, playerTeam) {
   // Move the ship
   const ship = map.getEntity(shipId);
 
-  Ships.moveTo(ship, map, targetLocation);
+  if (ship.team == playerTeam) {
+    Ships.moveTo(ship, map, targetLocation);
+  }
 }
 
-function makeBuildingHandler({ building, x, y }) {
+function makeBuildingHandler({ building, x, y }, playerTeam) {
   const islandID = map.getIsland(x, y);
   if (islandID !== -1) {
     const buildingStats = buildingConstants[building];
-    if (buildingStats.coinCost > map.getEntity('0').coins) {
+    if (buildingStats.coinCost > map.getEntity(playerTeam).coins) {
       console.error('Trying to build a buildng you cant afford');
       return;
     }
-    map.getEntity('0').coins -= buildingStats.coinCost;
-    map.addBuilding(building, x, y, islandID);
+    map.getEntity(playerTeam).coins -= buildingStats.coinCost;
+    map.addBuilding(building, x, y, islandID, playerTeam);
   }
 }
 
-function makeShipHandler({ islandID, x, y, template }) {
+function makeShipHandler({ islandID, x, y, template }, playerTeam) {
   if (map.isNextToIsland(islandID, x, y)) {
-    Ships.createShipAndHardpoints(map, x, y, template);
+    Ships.createShipAndHardpoints(map, x, y, template, playerTeam);
   }
 }
 
-function attackShipHandler({ id, targetId }) {
+function attackShipHandler({ id, targetId }, playerTeam) {
   const sourceShip = map.getEntity(id);
   const targetShip = map.getEntity(targetId);
 
@@ -115,7 +117,7 @@ function attackShipHandler({ id, targetId }) {
 }
 
 
-function fireShotHandler({ targetId, id }) {
+function fireShotHandler({ targetId, id }, playerTeam) {
   const hardpoint = map.getEntity(id);
   const ship = map.getEntity(hardpoint.shipId);
 
@@ -149,7 +151,7 @@ wss.on('connection', function connection(socket) {
     console.error('received: "%s"', message);
     const actualMessage = JSON.parse(message);
     if (actualMessage.type in messageHandlers) {
-      messageHandlers[actualMessage.type](actualMessage);
+      messageHandlers[actualMessage.type](actualMessage, socket.id);
     }
   });
 

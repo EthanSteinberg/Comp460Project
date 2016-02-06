@@ -10,7 +10,7 @@ import { getDistance } from './vector';
  * A ship entity.
  */
 
-export function createShipAndHardpoints(map, x, y, template) {
+export function createShipAndHardpoints(map, x, y, template, team) {
   const shipId = map.getNextEntityId();
 
   const hardpoints = template.hardpoints.map((hardpoint, index) => {
@@ -25,6 +25,7 @@ export function createShipAndHardpoints(map, x, y, template) {
     x,
     y,
     id: shipId,
+    team,
     type: 'ship',
     template: template,
     health: JSON.parse(JSON.stringify(hulls[template.hull])).health,
@@ -56,6 +57,11 @@ export function render(ship, map, context, images, isSelected) {
   context.translate(ship.x * 50, ship.y * 50);
 
   const angle = getOrientation(ship);
+
+  (ship.team) ? context.fillStyle = 'firebrick': context.fillStyle = 'royalblue';
+  context.beginPath();
+  context.arc(0, 0, 25, 0, Math.PI * 2, true);
+  context.fill();
 
   context.rotate(angle);
   context.drawImage(images.ship, (-0.5) * 50, (-0.5) * 50, 50, 50);
