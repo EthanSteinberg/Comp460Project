@@ -11,6 +11,7 @@ export default class Island {
     this.map = map;
     this.coordinates = coordinates;
     this.id = map.getNextEntityId();
+    this.team = null;
 
     this.perimeter = [];
     for (const [iX, iY] of this.coordinates) {

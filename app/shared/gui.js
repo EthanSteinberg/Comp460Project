@@ -65,6 +65,10 @@ export default class Gui {
     context.strokeRect(this.x * 50, this.y * 50, width + 40, 35);
     context.drawImage(images.money, (this.x * 50), (this.y * 50) + 5, 25, 25);
 
+    context.fillText("Team: ", (this.x * 50) + 100, (this.y * 50) + 5);
+    parseInt(this.map.team) ? context.fillStyle = 'firebrick': context.fillStyle = 'royalblue';
+    context.fillRect(this.x * 50 + 175, this.y * 50 + 5, 25, 25);
+
     for (const button of this.getButtons()) {
       const isSelected = this.selectionState.gui != null && this.selectionState.gui.type === button.type &&
         this.selectionState.gui.templateNum === button.templateNum;

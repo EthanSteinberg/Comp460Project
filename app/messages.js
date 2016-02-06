@@ -9,6 +9,10 @@ The basic message wrapper is simply:
 
 The various data types are:
 
+GetTeam {
+	
+}
+
 MoveShip: {
 	shipId: the id of the ship to move
 	targetLocation: the id of the target to move to
@@ -45,5 +49,9 @@ UpdateEntity: {
 RemoveEntity: {
 	id: The id of the entity,
 	data: The new data for the entity
+}
+
+DesignateTeam: {
+	playerTeam: the team the client belongs to
 }
 */

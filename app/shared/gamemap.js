@@ -206,10 +206,14 @@ export default class GameMap {
   getIsland(x, y) {
     for (const island of this.islands.values()) {
       if (island.isIsland(x, y)) {
-        return island.getId();
+        return island;
       }
     }
     return -1;
+  }
+
+  getIslandById(islandID) {
+    return this.islands.get(islandID);
   }
 
   addBuilding(type, x, y, islandID, team) {
@@ -219,6 +223,7 @@ export default class GameMap {
         break;
       case 'shipyard':
         Shipyards.createShipyard(this, x, y, islandID, team);
+        this.getIsland(x, y).team = team;
         break;
       default:
         console.error('Unexpected building type: ', type);

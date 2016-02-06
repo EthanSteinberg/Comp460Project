@@ -97,20 +97,24 @@ function moveShipHandler({ shipId, targetLocation }, playerTeam) {
 }
 
 function makeBuildingHandler({ building, x, y }, playerTeam) {
-  const islandID = map.getIsland(x, y);
-  if (islandID !== -1) {
+  const island = map.getIsland(x, y);
+  if (island !== -1) {
     const buildingStats = buildingConstants[building];
     if (buildingStats.coinCost > map.getEntity(String(playerTeam)).coins) {
       console.error('Trying to build a buildng you cant afford');
       return;
     }
     map.getEntity(String(playerTeam)).coins -= buildingStats.coinCost;
-    map.addBuilding(building, x, y, islandID, playerTeam);
+    map.addBuilding(building, x, y, island.getId(), playerTeam);
   }
 }
 
 function makeShipHandler({ islandID, x, y, template }, playerTeam) {
   if (map.isNextToIsland(islandID, x, y)) {
+    if (map.getIslandById(islandID).team != playerTeam) {
+      console.error('Not allowed to use enemy shipyard');
+      return;
+    }
     Ships.createShipAndHardpoints(map, x, y, template, playerTeam);
   }
 }
@@ -119,6 +123,11 @@ function attackShipHandler({ id, targetId }, playerTeam) {
   const sourceShip = map.getEntity(id);
   const targetShip = map.getEntity(targetId);
 
+  if (sourceShip.team != playerTeam) {
+    console.error("You are not allowed to command enemy ships.");
+    return;
+  }
+
   Ships.attackTarget(sourceShip, targetShip);
 }
 
@@ -126,6 +135,11 @@ function attackShipHandler({ id, targetId }, playerTeam) {
 function fireShotHandler({ targetId, id }, playerTeam) {
   const hardpoint = map.getEntity(id);
   const ship = map.getEntity(hardpoint.shipId);
+
+  if (ship.team != playerTeam) {
+    console.error("You are not allowed to command enemy ships.");
+    return;
+  }
 
   const target = map.getEntity(targetId);
 
