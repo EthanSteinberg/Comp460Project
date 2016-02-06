@@ -67,7 +67,13 @@ function updateGameState() {
 
   for (const updateMessage of updateMessages) {
     for (const playerSocket of playerSockets) {
-      playerSocket.send(JSON.stringify(updateMessage));
+      if (updateMessage.type == 'DesignateTeam') {
+        if (playerSockets.indexOf(playerSocket) == updateMessage.playerTeam) {
+          playerSocket.send(JSON.stringify(updateMessage));
+        }
+      } else {
+        playerSocket.send(JSON.stringify(updateMessage));
+      }
     }
   }
 }
@@ -94,11 +100,11 @@ function makeBuildingHandler({ building, x, y }, playerTeam) {
   const islandID = map.getIsland(x, y);
   if (islandID !== -1) {
     const buildingStats = buildingConstants[building];
-    if (buildingStats.coinCost > map.getEntity(playerTeam).coins) {
+    if (buildingStats.coinCost > map.getEntity(String(playerTeam)).coins) {
       console.error('Trying to build a buildng you cant afford');
       return;
     }
-    map.getEntity(playerTeam).coins -= buildingStats.coinCost;
+    map.getEntity(String(playerTeam)).coins -= buildingStats.coinCost;
     map.addBuilding(building, x, y, islandID, playerTeam);
   }
 }
@@ -136,7 +142,12 @@ function fireShotHandler({ targetId, id }, playerTeam) {
   Hardpoints.fire(hardpoint, map, map.getEntity(targetId));
 }
 
+function getTeamHandler({}, playerTeam) {
+    pendingUpdates.push({ type: 'DesignateTeam', playerTeam });
+}
+
 const messageHandlers = {
+  'GetTeam': getTeamHandler,
   'MoveShip': moveShipHandler,
   'MakeBuilding': makeBuildingHandler,
   'MakeShip': makeShipHandler,
@@ -151,7 +162,7 @@ wss.on('connection', function connection(socket) {
     console.error('received: "%s"', message);
     const actualMessage = JSON.parse(message);
     if (actualMessage.type in messageHandlers) {
-      messageHandlers[actualMessage.type](actualMessage, socket.id);
+      messageHandlers[actualMessage.type](actualMessage, playerSockets.indexOf(socket));
     }
   });
 

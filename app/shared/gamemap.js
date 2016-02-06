@@ -38,6 +38,8 @@ export default class GameMap {
 
     this.mode = 'strategic';
 
+    this.team = '0';
+
     const template = {
       hull: 'gunboat',
       hardpoints: ['roundshot'],

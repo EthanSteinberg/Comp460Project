@@ -52,7 +52,7 @@ export default class Gui {
       this.drawUnitGuiBox(context, images);
     }
 
-    const moneyText = Math.floor(map.getEntity('0').coins).toString();
+    const moneyText = Math.floor(map.getEntity(this.map.team).coins).toString();
 
     context.fillStyle = 'black';
     context.textBaseline = 'top';

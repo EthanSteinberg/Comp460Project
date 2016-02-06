@@ -43,6 +43,8 @@ class Main {
 
     this.pressedKeys = new Set();
 
+    this.teamAssigned = false;
+
     this.actionMap = {
       37: () => this.game.x -= 1,
       38: () => this.game.y -= 1,
@@ -90,6 +92,7 @@ class Main {
     this.messageHandlerMap = {
       'UpdateEntity': this.game._updateEntity.bind(this.game),
       'RemoveEntity': this.game._removeEntity.bind(this.game),
+      'DesignateTeam': this.game._designateTeam.bind(this.game),
     };
   }
 
@@ -109,6 +112,10 @@ class Main {
     this.lastUpdate = performance.now();
 
     this.start = performance.now();
+  }
+
+  assignTeam() {
+    this.sendMessage({ type: 'GetTeam' });
   }
 
   _onMessage(event) {
@@ -146,6 +153,11 @@ class Main {
    * Render the game. Also performs updates if necessary.
    */
   render() {
+    if (this.teamAssigned == false) {
+      this.assignTeam();
+      this.teamAssigned = true;
+    }
+
     const time = performance.now();
 
     this.update(time);
@@ -178,6 +190,7 @@ class Game {
     this.images = images;
     this.map = new GameMap();
     this.miniMap = this.map;
+    this.team = '0';
     this.gui = new Gui(this.width, this.height, templates, this.selectionState, this.map);
 
     this.x = 0;
@@ -190,6 +203,11 @@ class Game {
 
   _removeEntity({ id }) {
     this.map.removeEntity(id);
+  }
+
+  _designateTeam({ playerTeam }) {
+    this.team = String(playerTeam);
+    this.map.team = this.team;
   }
 
   updateSelectionState(newState) {
@@ -344,9 +362,9 @@ class Game {
 
     if (this.selectionState.gui != null) {
       // The gui stuff always has priority.
-
       // If an empty tile on an island is selected then add a building
       if (this.selectionState.gui.type === 'shiptemplate') {
+        this.updateSelectionState({ ...this.selectionState, gui: null });
         const template = templates[this.selectionState.gui.templateNum];
         sendMessage({ type: 'MakeShip', islandID: this.getSelectedMap().islandID, x: mouseRoundedX, y: mouseRoundedY, template });
       } else if (this.selectionState.gui.type === 'mine' || this.selectionState.gui.type === 'shipyard') {
@@ -356,7 +374,6 @@ class Game {
         if (item.type === 'ship') {
           item = this.map.getHardpointItem(mouseX, mouseY) || item;
         }
-
         sendMessage({ type: 'FireShot', id: this.selectionState.gui.templateNum, targetId: item.id });
       }
     } else if (item != null) {
