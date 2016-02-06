@@ -52,6 +52,10 @@ export function render(shipyard, map, context, images, isSelected) {
   }
 }
 
+export function getPosition(shipyard) {
+  return { x: shipyard.x, y: shipyard.y };
+}
+
 export function processUpdate(shipyard, map) {
   // Do nothing for now
 }
