@@ -57,9 +57,18 @@ export default class Button {
       case 'roundshot':
         context.drawImage(images.roundshot, this.x * 50, this.y * 50, 50, 50);
         break;
+      case 'grapeshot':
+        context.drawImage(images.grapeshot, this.x * 50, this.y * 50, 50, 50);
+        break;
+      case 'chainshot':
+        context.drawImage(images.roundshot, this.x * 50, this.y * 50, 50, 50);
+        break;
+      case 'shell':
+        context.drawImage(images.roundshot, this.x * 50, this.y * 50, 50, 50);
+        break;
 
       default:
-        console.error('Trying to render unknown button');
+        console.error('Trying to render unknown button: ',  this.type);
     }
 
     if (isSelected) {

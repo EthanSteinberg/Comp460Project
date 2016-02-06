@@ -44,10 +44,8 @@ export default class ShipbuilderGui {
     this.addTemplateButton(new Template('template', 50, 300, 50, 50, 2));
     this.addTemplateButton(new Customize('customize', 700, 200, 110, 50));
     this.addTemplateButton(new Overwrite('overwrite', 700, 300, 110, 50));
-    this.addTemplateButton(new Gunslot('gunslot', 400, 175, 50, 50, 0)); // upper left
-    this.addTemplateButton(new Gunslot('gunslot', 550, 175, 50, 50, 1)); // uppper right
-    this.addTemplateButton(new Gunslot('gunslot', 400, 325, 50, 50, 2)); // bottom left
-    this.addTemplateButton(new Gunslot('gunslot', 550, 325, 50, 50, 3)); // bottom right
+    this.addTemplateButton(new Gunslot('gunslot', 475, 175, 50, 50, 0)); // upper
+    this.addTemplateButton(new Gunslot('gunslot', 475, 325, 50, 50, 1)); // bottom
     this.addTemplateButton(new Exit('exit', 900, 5, 25, 25));
 
     this.addHullButton(new Gunboat('gunboat', 250, 100, 50, 50));
@@ -55,10 +53,8 @@ export default class ShipbuilderGui {
     this.addHullButton(new Galleon('galleon', 550, 100, 50, 50));
     this.addHullButton(new Select('select', 700, 300, 80, 50));
 
-    this.addButton(new Gunslot('gunslot', 400, 175, 50, 50, 0)); // upper left
-    this.addButton(new Gunslot('gunslot', 550, 175, 50, 50, 1)); // uppper right
-    this.addButton(new Gunslot('gunslot', 400, 325, 50, 50, 2)); // bottom left
-    this.addButton(new Gunslot('gunslot', 550, 325, 50, 50, 3)); // bottom right
+    this.addButton(new Gunslot('gunslot', 475, 175, 50, 50, 0)); // upper
+    this.addButton(new Gunslot('gunslot', 475, 325, 50, 50, 1)); // bottom
 
     this.addButton(new Roundshot('roundshot', 700, 50, 50, 50));
     this.addButton(new Chainshot('chainshot', 760, 50, 50, 50));

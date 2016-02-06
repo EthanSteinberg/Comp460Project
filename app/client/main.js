@@ -370,6 +370,7 @@ class Game {
       } else if (this.selectionState.gui.type === 'mine' || this.selectionState.gui.type === 'shipyard') {
         const buildingType = this.selectionState.gui.type;
         sendMessage({ type: 'MakeBuilding', building: buildingType, x: mouseRoundedX, y: mouseRoundedY });
+        this.updateSelectionState({ ...this.selectionState, gui: null });
       } else if (this.selectionState.gui.type === 'roundshot' && item != null && (item.type === 'ship' || item.type === 'shipyard')) {
         if (item.type === 'ship') {
           item = this.map.getHardpointItem(mouseX, mouseY) || item;
