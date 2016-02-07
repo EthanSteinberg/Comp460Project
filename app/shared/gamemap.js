@@ -64,8 +64,6 @@ export default class GameMap {
   }
 
   init(initialState) {
-    console.log(initialState);
-
     this.entities = new Map();
 
     for (const [key, value] of initialState) {
@@ -147,7 +145,7 @@ export default class GameMap {
       const isSelected = selectionState.map === entity.id;
 
       if (entity.type === 'ship') {
-        Ships.render(entity, this, context, images, isSelected);
+        Ships.render(entity, this, context, images, isSelected, selectionState.gui);
       } else if (entity.type === 'projectile') {
         Projectiles.render(entity, this, context, images, isSelected);
       } else if (entity.type === 'shipyard') {

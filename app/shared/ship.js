@@ -52,7 +52,7 @@ export function getOrientation(ship) {
   return Math.atan2(ship.lastDy, ship.lastDx) + Math.PI / 2;
 }
 
-export function render(ship, map, context, images, isSelected) {
+export function render(ship, map, context, images, isSelected, guiSelection) {
   context.save();
   context.translate(ship.x * 50, ship.y * 50);
 
@@ -86,6 +86,13 @@ export function render(ship, map, context, images, isSelected) {
     context.strokeStyle = 'cyan';
     context.beginPath();
     context.arc(ship.x * 50, ship.y * 50, 25, 0, Math.PI * 2, true);
+    context.stroke();
+  }
+
+  if (guiSelection != null && guiSelection.type === 'roundshot' && ship.hardpoints.indexOf(guiSelection.templateNum) !== -1) {
+    context.strokeStyle = 'black';
+    context.beginPath();
+    context.arc(ship.x * 50, ship.y * 50, 2 * 50, 0, 2 * Math.PI);
     context.stroke();
   }
 
