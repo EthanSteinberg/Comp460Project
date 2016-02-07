@@ -36,6 +36,8 @@ export default class GameMap {
 
     this.islands = new Map();
 
+    this.team = null;
+
     this.mode = 'strategic';
 
     const template = {
