@@ -5,6 +5,7 @@ import * as Ships from '../shared/ship';
 import * as Hardpoints from '../shared/hardpoint';
 import Types from '../shared/types';
 import * as Vectors from '../shared/vector';
+import { getStats } from '../shared/template';
 
 const http = require('http');
 const ws = require('ws');
@@ -67,13 +68,7 @@ function updateGameState() {
 
   for (const updateMessage of updateMessages) {
     for (const playerSocket of playerSockets) {
-      if (updateMessage.type == 'DesignateTeam') {
-        if (playerSockets.indexOf(playerSocket) == updateMessage.playerTeam) {
-          playerSocket.send(JSON.stringify(updateMessage));
-        }
-      } else {
-        playerSocket.send(JSON.stringify(updateMessage));
-      }
+      playerSocket.send(JSON.stringify(updateMessage));
     }
   }
 }
@@ -91,30 +86,39 @@ function moveShipHandler({ shipId, targetLocation }, playerTeam) {
   // Move the ship
   const ship = map.getEntity(shipId);
 
-  if (ship.team == playerTeam) {
+  if (ship.team === playerTeam) {
     Ships.moveTo(ship, map, targetLocation);
   }
 }
 
 function makeBuildingHandler({ building, x, y }, playerTeam) {
   const island = map.getIsland(x, y);
-  if (island !== -1) {
+  if (island !== -1 && island.team === playerTeam) {
     const buildingStats = buildingConstants[building];
-    if (buildingStats.coinCost > map.getEntity(String(playerTeam)).coins) {
+    if (buildingStats.coinCost > map.getEntity(playerTeam).coins) {
       console.error('Trying to build a buildng you cant afford');
       return;
     }
-    map.getEntity(String(playerTeam)).coins -= buildingStats.coinCost;
+    map.getEntity(playerTeam).coins -= buildingStats.coinCost;
     map.addBuilding(building, x, y, island.getId(), playerTeam);
   }
 }
 
 function makeShipHandler({ islandID, x, y, template }, playerTeam) {
   if (map.isNextToIsland(islandID, x, y)) {
-    if (map.getIslandById(islandID).team != playerTeam) {
+    if (map.getIslandById(islandID).team !== playerTeam) {
       console.error('Not allowed to use enemy shipyard');
       return;
     }
+
+    const stats = getStats(template);
+
+    if (stats.wcost > map.getEntity(playerTeam).coins) {
+      console.error('Trying to build a ship you cant afford');
+      return;
+    }
+
+    map.getEntity(playerTeam).coins -= stats.wcost;
     Ships.createShipAndHardpoints(map, x, y, template, playerTeam);
   }
 }
@@ -123,8 +127,8 @@ function attackShipHandler({ id, targetId }, playerTeam) {
   const sourceShip = map.getEntity(id);
   const targetShip = map.getEntity(targetId);
 
-  if (sourceShip.team != playerTeam) {
-    console.error("You are not allowed to command enemy ships.");
+  if (sourceShip.team !== playerTeam) {
+    console.error('You are not allowed to command enemy ships.');
     return;
   }
 
@@ -136,8 +140,8 @@ function fireShotHandler({ targetId, id }, playerTeam) {
   const hardpoint = map.getEntity(id);
   const ship = map.getEntity(hardpoint.shipId);
 
-  if (ship.team != playerTeam) {
-    console.error("You are not allowed to command enemy ships.");
+  if (ship.team !== playerTeam) {
+    console.error('You are not allowed to command enemy ships.');
     return;
   }
 
@@ -145,8 +149,6 @@ function fireShotHandler({ targetId, id }, playerTeam) {
 
   const targetPosition = Types[target.type].getPosition(target, map);
   const position = Ships.getPosition(ship);
-
-  console.log(Vectors.getDistance(position, targetPosition));
 
   if (hardpoint.timeTillNextFire !== 0 || Vectors.getDistance(position, targetPosition) >= 2) {
     // Don't fire if still waiting or out of distance.
@@ -156,12 +158,7 @@ function fireShotHandler({ targetId, id }, playerTeam) {
   Hardpoints.fire(hardpoint, map, map.getEntity(targetId));
 }
 
-function getTeamHandler({}, playerTeam) {
-    pendingUpdates.push({ type: 'DesignateTeam', playerTeam });
-}
-
 const messageHandlers = {
-  'GetTeam': getTeamHandler,
   'MoveShip': moveShipHandler,
   'MakeBuilding': makeBuildingHandler,
   'MakeShip': makeShipHandler,
@@ -169,14 +166,20 @@ const messageHandlers = {
   'FireShot': fireShotHandler,
 };
 
+let nextTeam = 0;
+
 wss.on('connection', function connection(socket) {
+  const playerTeam = String(nextTeam);
+  nextTeam += 1;
+
   playerSockets.push(socket);
+  socket.send(JSON.stringify({ type: 'StartGame', initialState: map.getInitialState(), team: playerTeam }));
 
   socket.on('message', function incoming(message) {
     console.error('received: "%s"', message);
     const actualMessage = JSON.parse(message);
     if (actualMessage.type in messageHandlers) {
-      messageHandlers[actualMessage.type](actualMessage, playerSockets.indexOf(socket));
+      messageHandlers[actualMessage.type](actualMessage, playerTeam);
     }
   });
 

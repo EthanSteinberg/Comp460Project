@@ -38,27 +38,39 @@ export default class GameMap {
 
     this.mode = 'strategic';
 
-    this.team = '0';
-
     const template = {
       hull: 'gunboat',
       hardpoints: ['roundshot'],
     };
 
-    Ships.createShipAndHardpoints(this, 0, 4, template, 0);
-    Ships.createShipAndHardpoints(this, 4, 4, template, 1);
+    Ships.createShipAndHardpoints(this, 0, 4, template, '0');
+    Ships.createShipAndHardpoints(this, 4, 4, template, '1');
 
     const island1coordinates = [
       [1, 1],
     ];
-    this.addIsland(new Island(this, island1coordinates));
+    this.addIsland(new Island(this, island1coordinates, '0'));
     const island2coordinates = [
       [6, 6],
     ];
-    this.addIsland(new Island(this, island2coordinates));
+    this.addIsland(new Island(this, island2coordinates, '1'));
 
     this.width = MAP_WIDTH;
     this.height = MAP_HEIGHT;
+  }
+
+  getInitialState() {
+    return [...this.entities];
+  }
+
+  init(initialState) {
+    console.log(initialState);
+
+    this.entities = new Map();
+
+    for (const [key, value] of initialState) {
+      this.entities.set(key, value);
+    }
   }
 
   addEntity(entity) {
@@ -238,6 +250,10 @@ export default class GameMap {
    * Update the map and get the corresponding update messages.
    */
   processUpdate() {
+    for (const team of ['0', '1']) {
+      this.getEntity(team).coins += 0.2;
+    }
+
     for (const entity of this.entities.values()) {
       if (entity.type === 'ship') {
         Ships.processUpdate(entity, this);

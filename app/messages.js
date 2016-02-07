@@ -9,9 +9,11 @@ The basic message wrapper is simply:
 
 The various data types are:
 
-GetTeam {
-	
+StartGame: {
+	initialState: All the entities in an Object,
+	team: The team for the player
 }
+
 
 MoveShip: {
 	shipId: the id of the ship to move
@@ -51,7 +53,4 @@ RemoveEntity: {
 	data: The new data for the entity
 }
 
-DesignateTeam: {
-	playerTeam: the team the client belongs to
-}
 */

@@ -58,7 +58,11 @@ export function render(ship, map, context, images, isSelected) {
 
   const angle = getOrientation(ship);
 
-  (ship.team) ? context.fillStyle = 'firebrick': context.fillStyle = 'royalblue';
+  if (ship.team === '1') {
+    context.fillStyle = 'firebrick';
+  } else {
+    context.fillStyle = 'royalblue';
+  }
   context.beginPath();
   context.arc(0, 0, 25, 0, Math.PI * 2, true);
   context.fill();

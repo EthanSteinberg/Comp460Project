@@ -23,7 +23,12 @@ export function createShipyard(map, x, y, islandID, team) {
 }
 
 export function render(shipyard, map, context, images, isSelected) {
-  (shipyard.team) ? context.fillStyle = 'firebrick': context.fillStyle = 'royalblue';
+  if (shipyard.team === '1') {
+    context.fillStyle = 'firebrick';
+  } else {
+    context.fillStyle = 'royalblue';
+  }
+
   context.beginPath();
   context.arc(shipyard.x * 50, shipyard.y * 50, 25, 0, Math.PI * 2, true);
   context.fill();

@@ -92,7 +92,7 @@ class Main {
     this.messageHandlerMap = {
       'UpdateEntity': this.game._updateEntity.bind(this.game),
       'RemoveEntity': this.game._removeEntity.bind(this.game),
-      'DesignateTeam': this.game._designateTeam.bind(this.game),
+      'StartGame': this._startGame.bind(this),
     };
   }
 
@@ -107,15 +107,15 @@ class Main {
   start() {
     this.ws = new WebSocket('ws://localhost:3000');
     this.ws.onmessage = this._onMessage.bind(this);
+  }
 
+  _startGame({ initialState, team }) {
     setInterval(this.render.bind(this), MILLISECONDS_PER_RENDER_UPDATE);
     this.lastUpdate = performance.now();
 
     this.start = performance.now();
-  }
 
-  assignTeam() {
-    this.sendMessage({ type: 'GetTeam' });
+    this.game.init(initialState, team);
   }
 
   _onMessage(event) {
@@ -153,11 +153,6 @@ class Main {
    * Render the game. Also performs updates if necessary.
    */
   render() {
-    if (this.teamAssigned == false) {
-      this.assignTeam();
-      this.teamAssigned = true;
-    }
-
     const time = performance.now();
 
     this.update(time);
@@ -197,17 +192,19 @@ class Game {
     this.y = 0;
   }
 
+  init(initialState, team) {
+    this.map.init(initialState);
+
+    this.team = team;
+    this.map.team = team;
+  }
+
   _updateEntity({ data }) {
     this.map.addEntity(data);
   }
 
   _removeEntity({ id }) {
     this.map.removeEntity(id);
-  }
-
-  _designateTeam({ playerTeam }) {
-    this.team = String(playerTeam);
-    this.map.team = this.team;
   }
 
   updateSelectionState(newState) {

@@ -7,11 +7,11 @@ import { MAP_HEIGHT } from './gamemap';
 
 export default class Island {
 
-  constructor(map, coordinates) {
+  constructor(map, coordinates, team) {
     this.map = map;
     this.coordinates = coordinates;
     this.id = map.getNextEntityId();
-    this.team = null;
+    this.team = team;
 
     this.perimeter = [];
     for (const [iX, iY] of this.coordinates) {
