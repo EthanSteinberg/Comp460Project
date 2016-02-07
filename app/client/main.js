@@ -125,7 +125,7 @@ class Main {
     } else {
       console.error('Unknown type: ', messageData.type);
     }
-    console.log('Got' + event.data);
+    // console.log('Got' + event.data);
   }
 
   /**
@@ -258,8 +258,8 @@ class Game {
     let mouseX = x / (50);
     let mouseY = y / (50);
     if (this.map.getMode() === 'tactical') {
-      mouseX = (x + 50 * SCALE) / (50 * SCALE);
-      mouseY = (y + 50 * SCALE) / (50 * SCALE);
+      mouseX /= SCALE;
+      mouseY /= SCALE;
     }
 
     let item = this.map.getItem(mouseX, mouseY);
@@ -348,8 +348,8 @@ class Game {
     let mouseX = x / (50);
     let mouseY = y / (50);
     if (this.map.getMode() === 'tactical') {
-      mouseX = (x + 50 * SCALE) / (50 * SCALE) - 1;
-      mouseY = (y + 50 * SCALE) / (50 * SCALE) - 1;
+      mouseX /= SCALE;
+      mouseY /= SCALE;
     }
 
     const mouseRoundedX = Math.round(mouseX);
