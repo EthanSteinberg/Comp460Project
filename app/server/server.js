@@ -104,8 +104,7 @@ function makeBuildingHandler({ building, x, y }, playerTeam) {
   }
 }
 
-function makeShipHandler({ islandID, x, y, template }, playerTeam) {
-  if (map.isNextToIsland(islandID, x, y)) {
+function makeShipHandler({ islandID, template }, playerTeam) {
     if (map.getIslandById(islandID).team !== playerTeam) {
       console.error('Not allowed to use enemy shipyard');
       return;
@@ -118,9 +117,15 @@ function makeShipHandler({ islandID, x, y, template }, playerTeam) {
       return;
     }
 
+    var { x, y } = map.getShipBuildCoords(islandID);
+
+    if (x == null) {
+      console.error('No space available to build ship.');
+      return;
+    }
+
     map.getEntity(playerTeam).coins -= stats.wcost;
     Ships.createShipAndHardpoints(map, x, y, template, playerTeam);
-  }
 }
 
 function attackShipHandler({ id, targetId }, playerTeam) {

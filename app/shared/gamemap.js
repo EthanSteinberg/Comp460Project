@@ -228,6 +228,27 @@ export default class GameMap {
     return this.islands.get(islandID);
   }
 
+  getShipBuildCoords(islandID) {
+    for (let x = 0; x < this.width; x++) {
+      for (let y = 0; y < this.height; y++) {
+        if (this.isNextToIsland(islandID, x, y)) {
+          var flag = true;
+          for (const entity of this.entities.values()) {
+            if (entity.x == x && entity.y == y) {
+              flag = false;
+            }
+          }
+
+          if (flag) {
+            return { x, y }
+          } 
+        }
+      }
+    }
+
+    return { null, null }
+  }
+
   addBuilding(type, x, y, islandID, team) {
     switch (type) {
       case 'mine':

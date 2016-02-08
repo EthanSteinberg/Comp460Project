@@ -220,7 +220,7 @@ class Game {
       const { rawX, rawY } = this.getRawMouseCords(event);
 
       if (rawX > this.width - (8 * 50)) {
-        return this.processGuiLeftMouseClick(rawX, rawY);
+        return this.processGuiLeftMouseClick(rawX, rawY, sendMessage);
       }
 
       this.processMapLeftMouseClick(rawX, rawY, sendMessage);
@@ -296,13 +296,17 @@ class Game {
     };
   }
 
-  processGuiLeftMouseClick(rawX, rawY) {
+  processGuiLeftMouseClick(rawX, rawY, sendMessage) {
     // In the gui
     const item = this.gui.getItem(Math.floor(rawX / 50), Math.floor(rawY / 50));
     if (item != null) {
       if (item.getType() === 'shipbuilder') {
         return 'shipbuilder';
-      }
+      } else if (item.getType() === 'shiptemplate') {
+        const template = templates[item.templateNum];
+        sendMessage({ type: 'MakeShip', islandID: this.getSelectedMap().islandID, template });
+        return 'game';
+      } 
       this.updateSelectionState({ ...this.selectionState, gui: { type: item.getType(), templateNum: item.getTemplateNum() } });
 
       if (item.getType() === 'strategic') {
@@ -366,11 +370,7 @@ class Game {
     if (this.selectionState.gui != null) {
       // The gui stuff always has priority.
       // If an empty tile on an island is selected then add a building
-      if (this.selectionState.gui.type === 'shiptemplate') {
-        const template = templates[this.selectionState.gui.templateNum];
-        sendMessage({ type: 'MakeShip', islandID: this.getSelectedMap().islandID, x: mouseRoundedX, y: mouseRoundedY, template });
-        this.updateSelectionState({ ...this.selectionState, gui: null });
-      } else if (this.selectionState.gui.type === 'mine' || this.selectionState.gui.type === 'shipyard') {
+      if (this.selectionState.gui.type === 'mine' || this.selectionState.gui.type === 'shipyard') {
         const buildingType = this.selectionState.gui.type;
         sendMessage({ type: 'MakeBuilding', building: buildingType, x: mouseRoundedX, y: mouseRoundedY });
         this.updateSelectionState({ ...this.selectionState, gui: null });

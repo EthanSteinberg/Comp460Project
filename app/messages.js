@@ -28,8 +28,6 @@ MakeBuilding: {
 
 MakeShip {
 	islandID: the island the ship will be made on
-	x: x position of the building location
-	y: y position of the building location
 	template: the template of the ship
 }
 
