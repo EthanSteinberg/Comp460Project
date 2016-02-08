@@ -80,10 +80,51 @@ export default class Gui {
       button.render(context, images, isSelected);
     }
 
+    if (hoverCoords != null) {
+      const roundedX = Math.floor(hoverCoords.x / 50);
+      const roundedY = Math.floor(hoverCoords.y / 50);
+
+      const item = this.getItem(roundedX, roundedY);
+
+      if (item != null && item.isBuilding()) {
+        const buildingType = item.getBuilding();
+
+        const details = buildingConstants[buildingType];
+
+        // Display a tooltip
+        context.fillStyle = 'white';
+        context.strokeStyle = 'black';
+        context.strokeRect((roundedX - 2) * 50, (roundedY + 1) * 50, 200, 50);
+        context.fillRect((roundedX - 2) * 50, (roundedY + 1) * 50, 200, 50);
+
+        context.fillStyle = 'black';
+        context.textBaseline = 'top';
+        context.font = '14px sans-serif';
+        context.fillText(details.name, (roundedX - 2) * 50, (roundedY + 1) * 50);
+        context.fillText(details.description, (roundedX - 2) * 50, (roundedY + 1) * 50 + 20);
+        context.fillText('Cost: ' + details.coinCost + ' coin, ' + details.buildTime + ' seconds', (roundedX - 2) * 50, (roundedY + 1) * 50 + 34);
+      } else if (item != null && item.getType() === "shiptemplate") {
+        const template = this.templates[item.templateNum];
+        statsDisplay((this.x + 3.5) * 50, (this.y + 6.25) * 50, getStats(template), context, images);
+
+        context.strokeStyle = 'cyan';
+        context.strokeRect(item.x * 50, item.y * 50, 50, 50);
+      }
+    }
+  }
+
+  drawUnitGuiBox(context) {
+    for (let x = this.x; x < this.width + this.x; x++) {
+      for (let y = this.y + this.height + 1; y < this.height + 5; y++) {
+        context.fillStyle = 'gray';
+        context.fillRect(x * 50, y * 50, 50, 50);
+      }
+    }
+
     if (this.getSelectedMap() != null) {
       if (this.getSelectedMap().type === 'ship') {
         this.getSelectedMap().hardpoints.forEach((hardpointId, i) => {
-          const hardpoint = map.getEntity(hardpointId);
+          const hardpoint = this.map.getEntity(hardpointId);
           if (hardpoint != null && hardpoint.timeTillNextFire !== 0) {
             context.save();
             context.beginPath();
@@ -111,47 +152,13 @@ export default class Gui {
             context.restore();
           }
         });
-      } else if (this.getSelectedMap().type === 'shipyard') {
-        if (this.selectionState.gui != null && this.selectionState.gui.type === 'shiptemplate') {
-          const template = this.templates[this.selectionState.gui.templateNum];
-          statsDisplay((this.x + 3.5) * 50, (this.y + 6.25) * 50, getStats(template), context, images);
-        }
-      }
-    }
-
-    if (hoverCoords != null) {
-      const roundedX = Math.floor(hoverCoords.x / 50);
-      const roundedY = Math.floor(hoverCoords.y / 50);
-
-      const item = this.getItem(roundedX, roundedY);
-
-      if (item != null && item.isBuilding()) {
-        const buildingType = item.getBuilding();
-
-        const details = buildingConstants[buildingType];
-
-        // Display a tooltip
-        context.fillStyle = 'white';
-        context.strokeStyle = 'black';
-        context.strokeRect((roundedX - 2) * 50, (roundedY + 1) * 50, 200, 50);
-        context.fillRect((roundedX - 2) * 50, (roundedY + 1) * 50, 200, 50);
-
-        context.fillStyle = 'black';
-        context.textBaseline = 'top';
-        context.font = '14px sans-serif';
-        context.fillText(details.name, (roundedX - 2) * 50, (roundedY + 1) * 50);
-        context.fillText(details.description, (roundedX - 2) * 50, (roundedY + 1) * 50 + 20);
-        context.fillText('Cost: ' + details.coinCost + ' coin, ' + details.buildTime + ' seconds', (roundedX - 2) * 50, (roundedY + 1) * 50 + 34);
-      }
-    }
-  }
-
-  drawUnitGuiBox(context) {
-    for (let x = this.x; x < this.width + this.x; x++) {
-      for (let y = this.y + this.height + 1; y < this.height + 5; y++) {
-        context.fillStyle = 'gray';
-        context.fillRect(x * 50, y * 50, 50, 50);
-      }
+      } 
+      // else if (this.getSelectedMap().type === 'shipyard') {
+      //   if (this.selectionState.gui != null && this.selectionState.gui.type === 'shiptemplate') {
+      //     const template = this.templates[this.selectionState.gui.templateNum];
+      //     statsDisplay((this.x + 3.5) * 50, (this.y + 6.25) * 50, getStats(template), context, images);
+      //   }
+      // }
     }
   }
 
