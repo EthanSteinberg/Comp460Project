@@ -34,7 +34,7 @@ export function processUpdate(projectile, map) {
     target.health -= 50;
 
     if (target.health <= 0) {
-      map.removeEntity(projectile.targetId);
+      Types[target.type].remove(target, map);
     }
   } else {
     const movement = Math.min(dist, 0.1);

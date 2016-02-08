@@ -74,3 +74,7 @@ export function processUpdate(hardpoint) {
     hardpoint.timeTillNextFire -= 1;
   }
 }
+
+export function remove(hardpoint, map) {
+  map.removeEntity(hardpoint.id);
+}

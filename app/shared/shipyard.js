@@ -64,3 +64,7 @@ export function getPosition(shipyard) {
 export function processUpdate(shipyard, map) {
   // Do nothing for now
 }
+
+export function remove(shipyard, map) {
+  map.removeEntity(shipyard.id);
+}

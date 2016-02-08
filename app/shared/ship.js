@@ -342,3 +342,10 @@ export function getPosition(ship) {
 export function getHealth(ship) {
   return ship.health;
 }
+
+export function remove(ship, map) {
+  map.removeEntity(ship.id);
+  for (const hardpointId of ship.hardpoints) {
+    map.removeEntity(hardpointId);
+  }
+}
