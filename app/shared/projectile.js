@@ -17,7 +17,7 @@ export function createProjectile(map, position, target) {
 export function processUpdate(projectile, map) {
   const target = map.getEntity(projectile.targetId);
   if (target == null) {
-    map.removeEntity(projectile);
+    map.removeEntity(projectile.id);
     return;
   }
 
