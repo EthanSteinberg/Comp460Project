@@ -86,6 +86,7 @@ export default class Gui {
           const hardpoint = map.getEntity(hardpointId);
           if (hardpoint != null && hardpoint.timeTillNextFire !== 0) {
             context.save();
+            context.beginPath();
             context.rect((this.x + i) * 50, 7 * 50, 50, 50);
             context.clip();
 
