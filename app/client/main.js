@@ -305,9 +305,14 @@ class Game {
       this.updateSelectionState({ ...this.selectionState, gui: { type: item.getType(), templateNum: item.getTemplateNum() } });
 
       if (item.getType() === 'strategic') {
-        if (this.getSelectedMap().type === 'ship') {
-          this.x = this.getSelectedMap().x * 50 * SCALE - this.width / 2 + 100;
-          this.y = this.getSelectedMap().y * 50 * SCALE - this.height / 2;
+        if (this.getSelectedMap != null) {
+          if (this.getSelectedMap().type === 'ship') {
+            this.x = this.getSelectedMap().x * 50 * SCALE - this.width / 2 + 100;
+            this.y = this.getSelectedMap().y * 50 * SCALE - this.height / 2;
+          } else {
+          this.x += this.width / 2;
+          this.y += this.height / 2;
+          }
         } else {
           this.x += this.width / 2;
           this.y += this.height / 2;
