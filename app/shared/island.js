@@ -26,6 +26,10 @@ export default class Island {
     }
   }
 
+  getCoordinates() {
+    return this.coordinates;
+  }
+
   addToPerimeter(x, y) {
     if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT && this.isIsland(x,y) == false) {
       this.perimeter.push([x,y]);

@@ -179,7 +179,7 @@ const messageHandlers = {
 let nextTeam = 0;
 
 wss.on('connection', function connection(socket) {
-  const playerTeam = String(nextTeam);
+  const playerTeam = '0'; // String(nextTeam);
   nextTeam += 1;
 
   playerSockets.push(socket);

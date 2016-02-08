@@ -49,7 +49,7 @@ export function getPosition(ship) {
 }
 
 export function getOrientation(ship) {
-  return Math.atan2(ship.lastDy, ship.lastDx) + Math.PI / 2;
+  return 0; //Math.atan2(ship.lastDy, ship.lastDx) + Math.PI / 2;
 }
 
 export function render(ship, map, context, images, isSelected, guiSelection) {
@@ -113,15 +113,10 @@ function setPosition(ship, x, y) {
 }
 
 export function moveTo(ship, map, targetLocation) {
-  const moves = performAStar(ship, map, targetLocation);
-
-  if (moves != null) {
-    ship.mode = {
-      type: 'MOVING',
-      moves: moves,
-      moveIndex: 0,
-    };
-  }
+  ship.mode = {
+    type: 'MOVING',
+    targetLocation,
+  };
 }
 
 export function attackTarget(ship, target) {
@@ -131,57 +126,62 @@ export function attackTarget(ship, target) {
   };
 }
 
-function performAStar(ship, map, targetLocation) {
-  const startPosition = { x: Math.round(ship.x), y: Math.round(ship.y) };
-  const endPosition = { x: Math.round(targetLocation.x), y: Math.round(targetLocation.y) };
+function getAvoidencVector(sourceVector, targetVector, factor) {
+  const xDistance = sourceVector.x - targetVector.x;
+  const yDistance = sourceVector.y - targetVector.y;
+  const distanceSquared = xDistance * xDistance + yDistance * yDistance;
+  const distance = Math.sqrt(distanceSquared);
 
-  const isEmpty = ({ x: tempX, y: tempY }) => {
-    return !map.isIsland(tempX, tempY);
+  const magnitude = factor / (distance * distance);
+
+  return {
+    x: xDistance * magnitude / distance,
+    y: yDistance * magnitude / distance,
   };
-  const isValid = ({ x: tempX, y: tempY }) => {
-    return tempX >= 0 && tempX < map.width && tempY >= 0 && tempY < map.height;
-  };
-  const moves = astar(startPosition, endPosition, isEmpty, isValid);
-
-  if (moves == null) {
-    console.log('no such path');
-    return null;
-  }
-
-  moves.splice(0, 1); // Remove the first item
-  moves[moves.length - 1] = targetLocation;
-  return moves;
 }
 
-function canMove(ship, map, move) {
+function getAvoidencVectors(ship, map) {
+  const result = {
+    x: 0,
+    y: 0,
+  };
+
+  const pos = { x: ship.x, y: ship.y };
+
+  for (const island of map.getIslands()) {
+    for (const [x, y] of island.getCoordinates()) {
+      const avoid = getAvoidencVector(pos, { x, y }, 0.05);
+      result.x += avoid.x;
+      result.y += avoid.y;
+    }
+  }
+
   for (const otherShip of map.getShips()) {
     if (otherShip.id === ship.id) {
       continue;
     }
 
-    const xDistance = move.x - otherShip.x;
-    const yDistance = move.y - otherShip.y;
-    const distanceSquared = xDistance * xDistance + yDistance * yDistance;
-    if (distanceSquared < 1) {
-      return false;
-    }
-
-    // TODO: Need to check surrounding island borders
+    const avoid = getAvoidencVector(pos, { x: otherShip.x, y: otherShip.y }, 0.05);
+    result.x += avoid.x;
+    result.y += avoid.y;
   }
-  return true;
+
+  return result;
 }
 
-function tryMove(ship, map, move) {
-  if (canMove(ship, map, move)) {
-    setPosition(ship, move.x, move.y);
-  }
+function moveDelta(ship, delta) {
+  const move = {
+    x: delta.x + ship.x,
+    y: delta.y + ship.y,
+  };
+  setPosition(ship, move.x, move.y);
 }
 
 /**
  * Are you close enough to the current waypoint?
  */
-function closeEnoughToWayPoint(ship) {
-  return getDistanceToTarget(ship, ship.mode.moves[ship.mode.moveIndex]) <= 0.01;
+function closeEnoughToTarget(ship) {
+  return getDistanceToTarget(ship, ship.mode.targetLocation) <= 0.1;
 }
 
 function getDistanceToTarget(ship, target) {
@@ -190,38 +190,46 @@ function getDistanceToTarget(ship, target) {
 
 
 /**
- * Perform a move using ship.mode.moveIndex and ship.mode.moves.
+ * Perform a move using ship.mode.targetLocation
  * Returns the move update
  */
 function performMove(ship, map) {
-  const currentMove = ship.mode.moves[ship.mode.moveIndex];
+  const currentMove = ship.mode.targetLocation;
 
   const scale = Math.min(shipMoveSpeed, getDistanceToTarget(ship, currentMove));
 
-  const move = {
-    x: ship.x + (currentMove.x - ship.x) / getDistanceToTarget(ship, currentMove) * scale,
-    y: ship.y + (currentMove.y - ship.y) / getDistanceToTarget(ship, currentMove) * scale,
+  const delta = {
+    x: (currentMove.x - ship.x) / getDistanceToTarget(ship, currentMove) * scale,
+    y: (currentMove.y - ship.y) / getDistanceToTarget(ship, currentMove) * scale,
   };
 
-  tryMove(ship, map, move);
+  const avoid = getAvoidencVectors(ship, map);
+
+  const finalVector = {
+    x: avoid.x + delta.x,
+    y: avoid.y + delta.y,
+  };
+
+  const finalDistance = Math.sqrt(finalVector.x * finalVector.x + finalVector.y * finalVector.y);
+  const deltaDistance = Math.sqrt(delta.x * delta.x + delta.y * delta.y);
+
+  const dotProduct = (delta.x * finalVector.x + delta.y * finalVector.y) / (deltaDistance * finalDistance);
+
+  const angle = Math.acos(dotProduct) * 180 / Math.PI;
+
+  finalVector.x *= scale / finalDistance;
+  finalVector.y *= scale / finalDistance;
+
+  if (angle < 120) {
+    moveDelta(ship, finalVector);
+  }
 }
 
 /**
  * Move the ship and perform the corresponding updates.
  */
 function processMove(ship, map) {
-  if (ship.mode.moveIndex === ship.mode.moves.length) {
-    ship.mode = {
-      type: 'IDLE',
-    };
-    return;
-  }
-
-  if (closeEnoughToWayPoint(ship)) {
-    ship.mode.moveIndex += 1;
-  }
-
-  if (ship.mode.moveIndex === ship.mode.moves.length) {
+  if (closeEnoughToTarget(ship)) {
     ship.mode = {
       type: 'IDLE',
     };
@@ -245,9 +253,9 @@ function processAttack(ship, map) {
     return;
   }
 
-  const targetPosition = Types[target.type].getPosition(target, map);
+  const targetLocation = Types[target.type].getPosition(target, map);
 
-  if (getDistanceToTarget(ship, targetPosition) < 2) {
+  if (getDistanceToTarget(ship, targetLocation) < 2) {
     for (const hardpointId of ship.hardpoints) {
       const hardpoint = map.getEntity(hardpointId);
       if (hardpoint != null) {
@@ -258,49 +266,9 @@ function processAttack(ship, map) {
     }
   }
 
-  // Try all posible sides if the main way doesn't work.
+  ship.mode.targetLocation = targetLocation;
 
-  const right = { x: targetPosition.x + 1, y: targetPosition.y };
-  const left = { x: targetPosition.x - 1, y: targetPosition.y };
-
-  const up = { x: targetPosition.x, y: targetPosition.y - 1 };
-  const down = { x: targetPosition.x, y: targetPosition.y + 1 };
-
-  const posibilities = [
-    targetPosition,
-    right,
-    left,
-    up,
-    down,
-  ];
-
-  let bestOne = null;
-
-  for (const possib of posibilities) {
-    const moves = performAStar(ship, map, possib);
-    if (moves != null && (bestOne == null || bestOne.length > moves.length)) {
-      bestOne = moves;
-    }
-  }
-
-  ship.mode.moves = bestOne;
-
-  if (ship.mode.moves == null) {
-    // No such path
-    return;
-  }
-
-  ship.mode.moveIndex = 0;
-
-  if (ship.mode.moveIndex === ship.mode.moves.length) {
-    return;
-  }
-
-  if (closeEnoughToWayPoint(ship)) {
-    ship.mode.moveIndex += 1;
-  }
-
-  if (ship.mode.moveIndex === ship.mode.moves.length) {
+  if (closeEnoughToTarget(ship)) {
     return;
   }
 

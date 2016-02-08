@@ -109,6 +109,10 @@ export default class GameMap {
     this.islands.set(island.getId(), island);
   }
 
+  getIslands() {
+    return [...this.islands.values()];
+  }
+
   /**
    * Render both the map and all ships on it.
    */
