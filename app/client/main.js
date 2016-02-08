@@ -272,7 +272,8 @@ class Game {
         sendMessage({ type: 'MoveShip', shipId: this.getSelectedMap().id, targetLocation });
       }
     } else {
-      if ((item.type === 'ship' || item.type === 'shipyard') && this.getSelectedMap().type === 'ship' && item.id !== this.getSelectedMap().id) {
+      if ((item.type === 'ship' || item.type === 'shipyard') && this.getSelectedMap().type === 'ship' 
+        && item.id !== this.getSelectedMap().id && item.team !== this.map.team) {
         // Trying to attack something
         if (item.type === 'ship') {
           item = this.map.getHardpointItem(mouseX, mouseY) || item;
@@ -373,7 +374,8 @@ class Game {
         const buildingType = this.selectionState.gui.type;
         sendMessage({ type: 'MakeBuilding', building: buildingType, x: mouseRoundedX, y: mouseRoundedY });
         this.updateSelectionState({ ...this.selectionState, gui: null });
-      } else if (this.selectionState.gui.type === 'roundshot' && item != null && (item.type === 'ship' || item.type === 'shipyard')) {
+      } else if (this.selectionState.gui.type === 'roundshot' && item != null && (item.type === 'ship' || item.type === 'shipyard')
+        && this.map.team !== item.team) {
         if (item.type === 'ship') {
           item = this.map.getHardpointItem(mouseX, mouseY) || item;
         }

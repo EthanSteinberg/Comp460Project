@@ -18,7 +18,7 @@ export function createShipAndHardpoints(map, x, y, template, team) {
       return null;
     }
 
-    return Hardpoints.createHardpoint(map, shipId, index, hardpoint);
+    return Hardpoints.createHardpoint(map, shipId, index, hardpoint, team);
   });
 
   const ship = {

@@ -17,7 +17,7 @@ const gunPositions = [
   gun2Position,
 ];
 
-export function createHardpoint(map, shipId, index, gunType) {
+export function createHardpoint(map, shipId, index, gunType, team) {
   const point = {
     id: map.getNextEntityId(),
     type: 'hardpoint',
@@ -27,6 +27,7 @@ export function createHardpoint(map, shipId, index, gunType) {
     shipId,
     offset: gunPositions[index],
     index,
+    team,
 
     radius: 5.625 / 50,
   };
