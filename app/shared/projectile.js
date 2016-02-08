@@ -28,7 +28,7 @@ export function processUpdate(projectile, map) {
 
   const dist = Math.sqrt(dx * dx + dy * dy);
 
-  if (dist < 0.01) {
+  if (dist < 0.1) {
     map.removeEntity(projectile.id);
 
     target.health -= 50;
@@ -37,7 +37,7 @@ export function processUpdate(projectile, map) {
       Types[target.type].remove(target, map);
     }
   } else {
-    const movement = Math.min(dist, 0.1);
+    const movement = Math.min(dist, 0.2);
 
     projectile.position.x += dx / dist * movement;
     projectile.position.y += dy / dist * movement;

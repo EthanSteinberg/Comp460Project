@@ -127,6 +127,11 @@ function attackShipHandler({ id, targetId }, playerTeam) {
   const sourceShip = map.getEntity(id);
   const targetShip = map.getEntity(targetId);
 
+  if (targetShip == null) {
+    // Target is already dead!
+    return;
+  }
+
   if (sourceShip.team !== playerTeam) {
     console.error('You are not allowed to command enemy ships.');
     return;
