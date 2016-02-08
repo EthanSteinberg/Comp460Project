@@ -305,7 +305,7 @@ class Game {
       this.updateSelectionState({ ...this.selectionState, gui: { type: item.getType(), templateNum: item.getTemplateNum() } });
 
       if (item.getType() === 'strategic') {
-        if (this.getSelectedMap != null) {
+        if (this.getSelectedMap() != null) {
           if (this.getSelectedMap().type === 'ship') {
             this.x = this.getSelectedMap().x * 50 * SCALE - this.width / 2 + 100;
             this.y = this.getSelectedMap().y * 50 * SCALE - this.height / 2;
