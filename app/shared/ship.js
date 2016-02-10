@@ -31,8 +31,7 @@ export function createShipAndHardpoints(map, x, y, template, team) {
     health: JSON.parse(JSON.stringify(hulls[template.hull])).health,
     hardpoints,
 
-    lastDx: 0,
-    lastDy: -1,
+    lastPositions: [],
 
     mode: {
       type: 'IDLE',
@@ -49,7 +48,13 @@ export function getPosition(ship) {
 }
 
 export function getOrientation(ship) {
-  return 0; //Math.atan2(ship.lastDy, ship.lastDx) + Math.PI / 2;
+  const lastPosition = ship.lastPositions[0] || null;
+
+  if (lastPosition == null) {
+    return 0;
+  }
+
+  return Math.atan2(ship.y - lastPosition.y, ship.x - lastPosition.x) + Math.PI / 2;
 }
 
 export function render(ship, map, context, images, isSelected, guiSelection) {
@@ -105,8 +110,11 @@ export function render(ship, map, context, images, isSelected, guiSelection) {
 }
 
 function setPosition(ship, x, y) {
-  ship.lastDx = x - ship.x;
-  ship.lastDy = y - ship.y;
+  ship.lastPositions.push({ x, y });
+
+  if (ship.lastPositions.length > 5) {
+    ship.lastPositions.shift();
+  }
 
   ship.x = x;
   ship.y = y;
