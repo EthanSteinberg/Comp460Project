@@ -126,7 +126,7 @@ export default class GameMap {
   }
 
   renderMiniMap(context, images, x, y, width, height) {
-    this.renderMap(context, images, { gui: null, map: null });
+    this.renderMap(context, images, { gui: null, map: [] });
 
     if (this.mode === 'tactical') {
       this.miniview.render(context, images, x, y, width, height, SCALE);
@@ -148,7 +148,7 @@ export default class GameMap {
     }
 
     for (const entity of this.entities.values()) {
-      const isSelected = selectionState.map === entity.id;
+      const isSelected = selectionState.map.indexOf(entity.id) !== -1;
 
       if (entity.type === 'ship') {
         Ships.render(entity, this, context, images, isSelected, selectionState.gui);
@@ -184,6 +184,43 @@ export default class GameMap {
     }
 
     return null;
+  }
+
+  interecting(x1, y1, x2, y2, entity) {
+    const centerX = (x1 + x2) / 2;
+    const centerY = (y1 + y2) / 2;
+
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+
+    const xDist = Math.abs(entity.x - centerX);
+    const yDist = Math.abs(entity.y - centerY);
+
+    if (xDist < dx / 2) {
+      return yDist < (0.5 + dy / 2);
+    }
+
+    if (yDist < dy / 2) {
+      return xDist < (0.5 + dx / 2);
+    }
+
+    const distanceToCorner = Math.sqrt((xDist - dx / 2) * (xDist - dx / 2) + (yDist - dy / 2) * (yDist - dy / 2));
+
+    return distanceToCorner < 0.5;
+  }
+
+  getItemsWithinRectangle(x1, y1, x2, y2) {
+    const result = [];
+
+    for (const entity of this.entities.values()) {
+      if (entity.type === 'ship') {
+        if (this.interecting(x1, y1, x2, y2, entity)) {
+          result.push(entity.id);
+        }
+      }
+    }
+
+    return result;
   }
 
   getHardpointItem(x, y) {

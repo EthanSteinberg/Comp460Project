@@ -67,7 +67,7 @@ class Main {
 
     this.canvas.addEventListener('mousedown', (event) => {
       if (this.mode === 'game') {
-        this.mode = this.game.mousedown(event, this.sendMessage.bind(this));
+        this.game.mousedown(event, this.sendMessage.bind(this));
       } else if (this.mode === 'shipbuilder') {
         this.mode = this.shipbuilder.mousedown(event);
       }
@@ -75,7 +75,7 @@ class Main {
 
     this.canvas.addEventListener('mouseup', (event) => {
       if (this.mode === 'game') {
-        // Nothing for now
+        this.mode = this.game.mouseup(event, this.sendMessage.bind(this));
       } else if (this.mode === 'shipbuilder') {
         this.shipbuilder.mouseup(event);
       }
@@ -179,7 +179,7 @@ class Game {
 
     this.selectionState = {
       gui: null,
-      map: null,
+      map: [],
     };
 
     this.images = images;
@@ -190,6 +190,8 @@ class Game {
 
     this.x = 0;
     this.y = 0;
+
+    this.startingDownPosition = null;
   }
 
   init(initialState, team) {
@@ -213,7 +215,8 @@ class Game {
     this.gui.setSelectionState(this.selectionState);
   }
 
-  mousedown(event, sendMessage) {
+  performMouseUp(event, sendMessage) {
+
     if (event.button === 0) {
       // Select/Deselect on left click or do button thingy
 
@@ -242,7 +245,7 @@ class Game {
         return 'game';
       }
 
-      if (this.getSelectedMap() != null) {
+      if (this.getSelectedMapItems().length !== 0) {
         this.processRightClickOnMap(rawX, rawY, sendMessage);
       }
     }
@@ -250,7 +253,26 @@ class Game {
     return 'game';
   }
 
-  processRightClickOnMap(rawX, rawY, sendMessage) {
+  mouseup(event, sendMessage) {
+    const result = this.performMouseUp(event, sendMessage);
+
+    this.mouseDownRawPosition = null;
+    this.mouseDownGamePosition = null;
+
+    return result;
+  }
+
+  mousedown(event) {
+    const { rawX, rawY } = this.getRawMouseCords(event);
+
+    this.mouseDownRawPosition = { rawX, rawY };
+
+    if (rawX < this.width - (8 * 50)) {
+      this.mouseDownGamePosition = this.getMouseGamePosition(rawX, rawY);
+    }
+  }
+
+  getMouseGamePosition(rawX, rawY) {
     const x = rawX + this.x - 25;
     const y = rawY + this.y - 25;
 
@@ -262,23 +284,30 @@ class Game {
       mouseY /= SCALE;
     }
 
+    return { mouseX, mouseY };
+  }
+
+  processRightClickOnMap(rawX, rawY, sendMessage) {
+    const { mouseX, mouseY } = this.getMouseGamePosition(rawX, rawY);
+
     let item = this.map.getItem(mouseX, mouseY);
 
     if (item == null) {
-      if (this.getSelectedMap().type === 'ship') {
+      if (this.getSelectedMapItems().every(entity => entity.type === 'ship')) {
         // Try to move to that location.
         const targetLocation = { x: mouseX, y: mouseY };
         // Move to an empty place
-        sendMessage({ type: 'MoveShip', shipId: this.getSelectedMap().id, targetLocation });
+
+        this.getSelectedMapItems().forEach(ship => sendMessage({ type: 'MoveShip', shipId: ship.id, targetLocation }));
       }
     } else {
-      if ((item.type === 'ship' || item.type === 'shipyard') && this.getSelectedMap().type === 'ship' 
-        && item.id !== this.getSelectedMap().id && item.team !== this.map.team) {
+      if ((item.type === 'ship' || item.type === 'shipyard') && this.getSelectedMapItems().every(entity => entity.type === 'ship')
+        && item.team !== this.map.team) {
         // Trying to attack something
         if (item.type === 'ship') {
           item = this.map.getHardpointItem(mouseX, mouseY) || item;
         }
-        sendMessage({ type: 'AttackShip', id: this.getSelectedMap().id, targetId: item.id });
+        this.getSelectedMapItems().forEach(ship => sendMessage({ type: 'AttackShip', id: ship.id, targetId: item.id }));
       }
     }
   }
@@ -304,9 +333,9 @@ class Game {
         return 'shipbuilder';
       } else if (item.getType() === 'shiptemplate') {
         const template = templates[item.templateNum];
-        sendMessage({ type: 'MakeShip', islandID: this.getSelectedMap().islandID, template });
+        this.getSelectedMapItems().forEach(shipyard => sendMessage({ type: 'MakeShip', islandID: shipyard.islandID, template }));
         return 'game';
-      } 
+      }
       this.updateSelectionState({ ...this.selectionState, gui: { type: item.getType(), templateNum: item.getTemplateNum() } });
 
       if (item.getType() === 'strategic') {
@@ -315,8 +344,8 @@ class Game {
             this.x = this.getSelectedMap().x * 50 * SCALE - this.width / 2 + 100;
             this.y = this.getSelectedMap().y * 50 * SCALE - this.height / 2;
           } else {
-          this.x += this.width / 2;
-          this.y += this.height / 2;
+            this.x += this.width / 2;
+            this.y += this.height / 2;
           }
         } else {
           this.x += this.width / 2;
@@ -346,8 +375,26 @@ class Game {
     return 'game';
   }
 
-  getSelectedMap() {
-    return this.map.getEntity(this.selectionState.map);
+  getSelectedMapItems() {
+    return this.selectionState.map.map(id => this.map.getEntity(id));
+  }
+
+  isDragAction(mouseX, mouseY) {
+    const hoverGameCoords = this.getMouseGamePosition(this.hoveredCoords.x, this.hoveredCoords.y);
+
+    if (this.mouseDownGamePosition == null ||
+      this.mouseDownGamePosition.mouseX === mouseX ||
+      this.mouseDownGamePosition.mouseY === mouseY) {
+      return false;
+    }
+
+    if (
+      hoverGameCoords.mouseX < this.mouseDownGamePosition.mouseX ||
+      hoverGameCoords.mouseY < this.mouseDownGamePosition.mouseY) {
+      return false;
+    }
+
+    return true;
   }
 
   processMapLeftMouseClick(rawX, rawY, sendMessage) {
@@ -381,12 +428,19 @@ class Game {
         }
         sendMessage({ type: 'FireShot', id: this.selectionState.gui.templateNum, targetId: item.id });
       }
+    } else if (this.isDragAction(mouseX, mouseY)) {
+      // Perform a drag select.
+      const hoverGameCoords = this.getMouseGamePosition(this.hoveredCoords.x, this.hoveredCoords.y);
+
+      const items = this.map.getItemsWithinRectangle(this.mouseDownGamePosition.mouseX, this.mouseDownGamePosition.mouseY, hoverGameCoords.mouseX, hoverGameCoords.mouseY);
+
+      this.updateSelectionState({ ...this.selectionState, map: items });
     } else if (item != null) {
       // Select
-      this.updateSelectionState({ ...this.selectionState, map: item.id });
+      this.updateSelectionState({ ...this.selectionState, map: [item.id] });
     } else {
       // Deselect
-      this.updateSelectionState({ ...this.selectionState, map: null });
+      this.updateSelectionState({ ...this.selectionState, map: [] });
     }
   }
 
@@ -404,6 +458,20 @@ class Game {
 
     // Render the map and everything on it.
     this.map.render(this.context, this.images, this.selectionState);
+
+    if (this.hoveredCoords && this.hoveredCoords.x < 400 && this.selectionState.gui == null) {
+      if (this.mouseDownGamePosition != null) {
+        const hoverGameCoords = this.getMouseGamePosition(this.hoveredCoords.x, this.hoveredCoords.y);
+
+        const dx = hoverGameCoords.mouseX - this.mouseDownGamePosition.mouseX;
+        const dy = hoverGameCoords.mouseY - this.mouseDownGamePosition.mouseY;
+
+        if (dx > 0 && dy > 0) {
+          this.context.strokeStyle = 'white';
+          this.context.strokeRect(this.mouseDownGamePosition.mouseX * 50, this.mouseDownGamePosition.mouseY * 50, dx * 50, dy * 50);
+        }
+      }
+    }
 
     this.context.restore();
 

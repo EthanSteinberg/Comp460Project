@@ -1,6 +1,5 @@
 const shipMoveSpeed = 0.05;
 
-import astar from './astar';
 import { hulls } from './template';
 import * as Hardpoints from './hardpoint';
 import Types from './types';

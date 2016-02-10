@@ -34,8 +34,8 @@ export default class Gui {
     this.selectionState = newSelectionState;
   }
 
-  getSelectedMap() {
-    return this.map.getEntity(this.selectionState.map);
+  getSelectedMapItems() {
+    return this.selectionState.map.map(id => this.map.getEntity(id));
   }
 
   /**
@@ -121,9 +121,9 @@ export default class Gui {
       }
     }
 
-    if (this.getSelectedMap() != null) {
-      if (this.getSelectedMap().type === 'ship') {
-        this.getSelectedMap().hardpoints.forEach((hardpointId, i) => {
+    if (this.getSelectedMapItems().length !== 0) {
+      if (this.getSelectedMapItems().every(entity => entity.type === 'ship')) {
+        this.getSelectedMapItems()[0].hardpoints.forEach((hardpointId, i) => {
           const hardpoint = this.map.getEntity(hardpointId);
           if (hardpoint != null && hardpoint.timeTillNextFire !== 0) {
             context.save();
@@ -163,19 +163,20 @@ export default class Gui {
   }
 
   getUnitButtons() {
-    if (this.getSelectedMap() == null) {
+    if (this.getSelectedMapItems().length === 0) {
       return null;
-    } else if (this.getSelectedMap().type === 'ship') {
+    } else if (this.getSelectedMapItems().every(entity => entity.type === 'ship')) {
       const result = [];
 
-      for (let i = 0; i < this.getSelectedMap().hardpoints.length; i++) {
-        const hardpoint = this.map.getEntity(this.getSelectedMap().hardpoints[i]);
+      // TODO: Actually take into consideration the multiple ships;
+      for (let i = 0; i < this.getSelectedMapItems()[0].hardpoints.length; i++) {
+        const hardpoint = this.map.getEntity(this.getSelectedMapItems()[0].hardpoints[i]);
         if (hardpoint != null) {
           result.push(new Button(hardpoint.gunType, this.x + i, 7, hardpoint.id));
         }
       }
       return result;
-    } else if (this.getSelectedMap().type === 'shipyard') {
+    } else if (this.getSelectedMapItems().every(entity => entity.type === 'shipyard')) {
       return [
         new Button('shiptemplate', this.x, 7, 0),
         new Button('shiptemplate', this.x + 1, 7, 1),
