@@ -325,7 +325,7 @@ export default class GameMap {
    */
   processUpdate() {
     for (const team of ['0', '1']) {
-      // this.getEntity(team).coins += 0.2;
+      this.getEntity(team).coins += 0.2;
     }
 
     for (const entity of this.entities.values()) {
