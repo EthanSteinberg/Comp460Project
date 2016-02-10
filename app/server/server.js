@@ -179,6 +179,7 @@ const messageHandlers = {
   'MakeShip': makeShipHandler,
   'AttackShip': attackShipHandler,
   'FireShot': fireShotHandler,
+  'UpdateMode': updateModeHandler,
 };
 
 let nextTeam = 0;
@@ -195,6 +196,8 @@ wss.on('connection', function connection(socket) {
     const actualMessage = JSON.parse(message);
     if (actualMessage.type in messageHandlers) {
       messageHandlers[actualMessage.type](actualMessage, playerTeam);
+    } else {
+      console.error('No handler for type:', actualMessage.type);
     }
   });
 
