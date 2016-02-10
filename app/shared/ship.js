@@ -29,6 +29,7 @@ export function createShipAndHardpoints(map, x, y, template, team) {
     template: template,
     health: JSON.parse(JSON.stringify(hulls[template.hull])).health,
     hardpoints,
+    targetMode: 'hardpoints',
 
     lastPositions: [],
 
@@ -323,4 +324,8 @@ export function remove(ship, map) {
   for (const hardpointId of ship.hardpoints) {
     map.removeEntity(hardpointId);
   }
+}
+
+export function updateMode(ship, targetMode) {
+  ship.targetMode = targetMode;
 }

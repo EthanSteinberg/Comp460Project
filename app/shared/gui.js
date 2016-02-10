@@ -175,6 +175,8 @@ export default class Gui {
           result.push(new Button(hardpoint.gunType, this.x + i, 7, hardpoint.id));
         }
       }
+
+      result.push(new Button(this.getSelectedMapItems()[0].targetMode, this.x, 6)); 
       return result;
     } else if (this.getSelectedMapItems().every(entity => entity.type === 'shipyard')) {
       return [

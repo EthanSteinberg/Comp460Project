@@ -67,6 +67,40 @@ export default class Button {
         context.drawImage(images.roundshot, this.x * 50, this.y * 50, 50, 50);
         break;
 
+      case 'hull':
+        context.fillStyle = 'red';
+        context.fillRect(this.x * 50, this.y * 50, 50, 50);
+        context.font = '10px Arial';
+        context.fillStyle = 'black';
+        context.fillText('TARGET', this.x * 50 + 5, this.y * 50 + 10);
+        context.fillText('HULL', this.x * 50 + 10, this.y * 50 + 20);
+        context.fillStyle = 'DimGrey';
+        context.fillRect((this.x + 1) * 50, this.y * 50, 50, 50);
+        context.font = '10px Arial';
+        context.fillStyle = 'black';
+        context.fillText('TARGET', (this.x + 1) * 50 + 5, this.y * 50 + 10);
+        context.fillText('CANNONS', (this.x + 1) * 50, this.y * 50 + 20);
+        context.strokeStyle = 'black';
+        context.strokeRect(this.x * 50, this.y * 50, 100, 50);
+        break;
+      case 'hardpoints':
+        context.fillStyle = 'DimGrey';
+        context.fillRect(this.x * 50, this.y * 50, 50, 50);
+        context.font = '10px Arial';
+        context.fillStyle = 'black';
+        context.fillText('TARGET', this.x * 50 + 5, this.y * 50 + 10);
+        context.fillText('HULL', this.x * 50 + 10, this.y * 50 + 20);
+        context.fillStyle = 'red';
+        context.fillRect((this.x + 1) * 50, this.y * 50, 50, 50);
+        context.font = '10px Arial';
+        context.fillStyle = 'black';
+        context.fillText('TARGET', (this.x + 1) * 50 + 5, this.y * 50 + 10);
+        context.fillText('CANNONS', (this.x + 1) * 50, this.y * 50 + 20);
+        context.strokeStyle = 'black';
+        context.strokeRect(this.x * 50, this.y * 50, 100, 50);
+        break;
+
+
       default:
         console.error('Trying to render unknown button: ',  this.type);
     }

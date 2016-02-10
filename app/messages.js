@@ -34,6 +34,7 @@ MakeShip {
 AttackShip: {
 	id: the ship to attack with,
 	targetId: the ship to attack
+	targetMode: what attack mode the ship is in
 }
 
 FireShot: {

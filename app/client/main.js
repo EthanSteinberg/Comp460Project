@@ -202,6 +202,7 @@ class Game {
   }
 
   _updateEntity({ data }) {
+    console.log(data)
     this.map.addEntity(data);
   }
 
@@ -305,7 +306,11 @@ class Game {
         && item.team !== this.map.team) {
         // Trying to attack something
         if (item.type === 'ship') {
-          item = this.map.getHardpointItem(mouseX, mouseY) || item;
+          if (this.getSelectedMapItems()[0].targetMode === 'hull') {
+            // return the item
+          } else if (this.getSelectedMapItems()[0].targetMode === 'hardpoints') {
+            item = this.map.getShipHardpointItem(item.id) || item;
+          }
         }
         this.getSelectedMapItems().forEach(ship => sendMessage({ type: 'AttackShip', id: ship.id, targetId: item.id }));
       }
@@ -334,6 +339,12 @@ class Game {
       } else if (item.getType() === 'shiptemplate') {
         const template = templates[item.templateNum];
         this.getSelectedMapItems().forEach(shipyard => sendMessage({ type: 'MakeShip', islandID: shipyard.islandID, template }));
+        return 'game';
+      } else if (item.getType() === 'hull') {
+        this.getSelectedMapItems().forEach(ship => sendMessage({ type: 'UpdateMode', id: ship.id, targetMode: 'hardpoints' }));
+        return 'game';
+      } else if (item.getType() === 'hardpoints') {
+        this.getSelectedMapItems().forEach(ship => sendMessage({ type: 'UpdateMode', id: ship.id, targetMode: 'hull' }));
         return 'game';
       }
       this.updateSelectionState({ ...this.selectionState, gui: { type: item.getType(), templateNum: item.getTemplateNum() } });

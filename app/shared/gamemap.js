@@ -238,6 +238,18 @@ export default class GameMap {
     return null;
   }
 
+  getShipHardpointItem(enemyShipId) {
+    for (const entity of this.entities.values()) {
+      if (entity.type === 'hardpoint') {
+        if (entity.shipId === enemyShipId) {
+          return entity;
+        }
+      }
+    }
+
+    return null;
+  }
+
   setView(mouseX, mouseY) {
     return this.miniview.setView(mouseX, mouseY, MAP_WIDTH * 50, MAP_HEIGHT * 50);
   }
@@ -313,7 +325,7 @@ export default class GameMap {
    */
   processUpdate() {
     for (const team of ['0', '1']) {
-      this.getEntity(team).coins += 0.2;
+      // this.getEntity(team).coins += 0.2;
     }
 
     for (const entity of this.entities.values()) {
