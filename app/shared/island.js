@@ -6,7 +6,6 @@ import { MAP_HEIGHT } from './gamemap';
  */
 
 function addToPerimeter(island, x, y) {
-  console.log(x, y);
   if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT && !isIsland(island, x, y)) {
     for (const [oldX, oldY] of island.perimeter) {
       if (oldX === x && oldY === y) {
