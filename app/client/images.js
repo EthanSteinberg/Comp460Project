@@ -18,6 +18,8 @@ const sources = {
   exit: 'exit.png',
   smoke: 'smoke.png',
   cannon: 'cannon.png',
+  blueFlag: 'blueFlag.png',
+  redFlag: 'redFlag.png',
 };
 
 /**

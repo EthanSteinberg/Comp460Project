@@ -3,7 +3,7 @@ import * as Projectiles from './projectile';
 import * as Mines from './mine';
 import * as Shipyards from './shipyard';
 import * as Hardpoints from './hardpoint';
-import Island from './island';
+import * as Islands from './island';
 import MiniView from './miniview';
 
 export const MAP_WIDTH = 8;
@@ -34,8 +34,6 @@ export default class GameMap {
       coins: 100,
     });
 
-    this.islands = new Map();
-
     this.team = null;
 
     this.mode = 'strategic';
@@ -50,12 +48,14 @@ export default class GameMap {
 
     const island1coordinates = [
       [1, 1],
+      [1, 2],
     ];
-    this.addIsland(new Island(this, island1coordinates, '0'));
+    Islands.createIsland(this, island1coordinates);
     const island2coordinates = [
+      [6, 5],
       [6, 6],
     ];
-    this.addIsland(new Island(this, island2coordinates, '1'));
+    Islands.createIsland(this, island2coordinates);
 
     this.width = MAP_WIDTH;
     this.height = MAP_HEIGHT;
@@ -105,14 +105,6 @@ export default class GameMap {
     return this.mode;
   }
 
-  addIsland(island) {
-    this.islands.set(island.getId(), island);
-  }
-
-  getIslands() {
-    return [...this.islands.values()];
-  }
-
   /**
    * Render both the map and all ships on it.
    */
@@ -139,12 +131,9 @@ export default class GameMap {
         context.fillStyle = 'blue';
         context.strokeStyle = 'black';
         context.fillRect((x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
-        context.strokeRect((x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
+        // Show grid
+        // context.strokeRect((x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
       }
-    }
-
-    for (const island of this.islands.values()) {
-      island.render(context);
     }
 
     for (const entity of this.entities.values()) {
@@ -158,6 +147,8 @@ export default class GameMap {
         Shipyards.render(entity, this, context, images, isSelected);
       } else if (entity.type === 'mine') {
         Mines.render(entity, this, context, images, isSelected);
+      } else if (entity.type === 'island') {
+        Islands.render(entity, this, context, images);
       }
     }
   }
@@ -254,31 +245,18 @@ export default class GameMap {
     return this.miniview.setView(mouseX, mouseY, MAP_WIDTH * 50, MAP_HEIGHT * 50);
   }
 
-  isIsland(x, y) {
-    for (const island of this.islands.values()) {
-      if (island.isIsland(x, y)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   isNextToIsland(islandID, x, y) {
-    const island = this.islands.get(islandID);
-    return island.isNextToIsland(x, y);
+    const island = this.getEntity(islandID);
+    return Islands.isNextToIsland(island, x, y);
   }
 
   getIsland(x, y) {
-    for (const island of this.islands.values()) {
-      if (island.isIsland(x, y)) {
+    for (const island of this.entities.values()) {
+      if (island.type === 'island' && Islands.isIsland(island, x, y)) {
         return island;
       }
     }
-    return -1;
-  }
-
-  getIslandById(islandID) {
-    return this.islands.get(islandID);
+    return null;
   }
 
   getShipBuildCoords(islandID) {
@@ -309,7 +287,6 @@ export default class GameMap {
         break;
       case 'shipyard':
         Shipyards.createShipyard(this, x, y, islandID, team);
-        this.getIsland(x, y).team = team;
         break;
       default:
         console.error('Unexpected building type: ', type);
@@ -318,6 +295,10 @@ export default class GameMap {
 
   getShips() {
     return [...this.entities.values()].filter(a => a.type === 'ship');
+  }
+
+  getIslands() {
+    return [...this.entities.values()].filter(a => a.type === 'island');
   }
 
   /**
@@ -337,6 +318,8 @@ export default class GameMap {
         Shipyards.processUpdate(entity, this);
       } else if (entity.type === 'mine') {
         Mines.processUpdate(entity, this);
+      } else if (entity.type === 'island') {
+        Islands.processUpdate(entity, this);
       }
     }
   }
