@@ -18,6 +18,9 @@ const sources = {
   exit: 'exit.png',
   smoke: 'smoke.png',
   cannon: 'cannon.png',
+  designer: 'designer.png',
+  targettoggleHull: 'targettoggleHull.png',
+  targettoggleCannon: 'targettoggleCannon.png',
 };
 
 /**

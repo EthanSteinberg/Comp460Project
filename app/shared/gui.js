@@ -1,7 +1,16 @@
-import Button from './button';
 import { statsDisplay } from './guibuttons/statsdisplay';
 import buildingConstants from './buildingconstants';
 import { getStats } from './template';
+
+import Mine from './guibuttons/mine';
+import Shipyard from './guibuttons/shipyard';
+import Shiptemplate from './guibuttons/shiptemplate';
+import Shipbuilder from './guibuttons/shipbuilder';
+import Roundshot from './guibuttons/roundshot';
+import Grapeshot from './guibuttons/grapeshot';
+import Chainshot from './guibuttons/chainshot';
+import Shell from './guibuttons/shell';
+import TargetToggle from './guibuttons/targettoggle';
 
 /**
  * A map of the game containing islands and all current ships.
@@ -9,18 +18,17 @@ import { getStats } from './template';
 export default class Gui {
 
   constructor(canvasWidth, canvasHeight, templates, selectionState, map) {
-    this.width = 8;
-    this.height = 5;
+    this.width = 200;
+    this.height = canvasHeight;
 
-    this.x = Math.round(canvasWidth / 50) - this.width;
+    this.x = canvasWidth - this.width;
     this.y = 0;
 
     this.buttons = [
       // Temporarily disable mines
-      // new Button('mine', 1 + this.x, 1),
-      new Button('shipyard', this.x, 1),
-      new Button('shipbuilder', 1 + this.x, 4),
-      new Button('strategic', 2 + this.x, 4),
+      // new Mine('mine', 1 + this.x, 1),
+      new Shipyard('shipyard', this.x + 25, this.y + 175, 50, 50),
+      new Shipbuilder('shipbuilder', this.x + 50, this.height - 75, 102, 26),
     ];
 
     this.templates = templates;
@@ -42,12 +50,8 @@ export default class Gui {
    * Render the gui
    */
   render(context, images, map, hoverCoords) {
-    for (let x = this.x; x < this.width + this.x; x++) {
-      for (let y = this.y; y < this.height; y++) {
-        context.fillStyle = 'gray';
-        context.fillRect(x * 50, y * 50, 50, 50);
-      }
-    }
+    context.fillStyle = 'gray';
+    context.fillRect(this.x, this.y, this.width, this.height);
 
     if (this.getUnitButtons() != null) {
       this.drawUnitGuiBox(context, images);
@@ -58,31 +62,32 @@ export default class Gui {
     context.fillStyle = 'black';
     context.textBaseline = 'top';
     context.font = '24px sans-serif';
-    context.fillText(moneyText, (this.x * 50) + 30, (this.y * 50) + 5);
+    context.fillText(moneyText, this.x + 30, this.y + 5);
 
     const width = context.measureText(moneyText).width;
 
     context.strokeStyle = 'black';
-    context.strokeRect(this.x * 50, this.y * 50, width + 40, 35);
-    context.drawImage(images.money, (this.x * 50), (this.y * 50) + 5, 25, 25);
+    context.strokeRect(this.x, this.y, width + 40, 35);
+    context.drawImage(images.money, (this.x), (this.y) + 5, 25, 25);
 
-    context.fillText('Team: ', (this.x * 50) + 100, (this.y * 50) + 5);
+    context.fillText('Team: ', (this.x) + 100, (this.y) + 5);
     if (this.map.team === '1') {
       context.fillStyle = 'firebrick';
     } else {
       context.fillStyle = 'royalblue';
     }
-    context.fillRect(this.x * 50 + 175, this.y * 50 + 5, 25, 25);
+    context.fillRect(this.x + 175, this.y + 5, 25, 25);
 
     for (const button of this.getButtons()) {
       const isSelected = this.selectionState.gui != null && this.selectionState.gui.type === button.type &&
-        this.selectionState.gui.templateNum === button.templateNum;
-      button.render(context, images, isSelected);
+        this.selectionState.gui.slotNum === button.slotNum;
+      button.render(context, images);
+      button.selected = isSelected;
     }
 
     if (hoverCoords != null) {
-      const roundedX = Math.floor(hoverCoords.x / 50);
-      const roundedY = Math.floor(hoverCoords.y / 50);
+      const roundedX = hoverCoords.x;
+      const roundedY = hoverCoords.y;
 
       const item = this.getItem(roundedX, roundedY);
 
@@ -94,21 +99,19 @@ export default class Gui {
         // Display a tooltip
         context.fillStyle = 'white';
         context.strokeStyle = 'black';
-        context.strokeRect((roundedX - 2) * 50, (roundedY + 1) * 50, 200, 50);
-        context.fillRect((roundedX - 2) * 50, (roundedY + 1) * 50, 200, 50);
+        context.strokeRect((roundedX - 2), (roundedY + 1), 200, 50);
+        context.fillRect((roundedX - 2), (roundedY + 1), 200, 50);
 
         context.fillStyle = 'black';
         context.textBaseline = 'top';
         context.font = '14px sans-serif';
-        context.fillText(details.name, (roundedX - 2) * 50, (roundedY + 1) * 50);
-        context.fillText(details.description, (roundedX - 2) * 50, (roundedY + 1) * 50 + 20);
-        context.fillText('Cost: ' + details.coinCost + ' coin, ' + details.buildTime + ' seconds', (roundedX - 2) * 50, (roundedY + 1) * 50 + 34);
+        context.fillText(details.name, (roundedX - 2), (roundedY + 1));
+        context.fillText(details.description, (roundedX - 2), (roundedY + 1) + 20);
+        context.fillText('Cost: ' + details.coinCost + ' coin, ' + details.buildTime + ' seconds', (roundedX - 2), (roundedY + 1) + 34);
       } else if (item != null && item.getType() === "shiptemplate") {
-        const template = this.templates[item.templateNum];
-        statsDisplay((this.x + 3.5) * 50, (this.y + 6.25) * 50, getStats(template), context, images);
-
+        const template = this.templates[item.slotNum];
         context.strokeStyle = 'cyan';
-        context.strokeRect(item.x * 50, item.y * 50, 50, 50);
+        context.strokeRect(item.x, item.y, item.width, item.height);
       }
     }
   }
@@ -117,7 +120,7 @@ export default class Gui {
     for (let x = this.x; x < this.width + this.x; x++) {
       for (let y = this.y + this.height + 1; y < this.height + 5; y++) {
         context.fillStyle = 'gray';
-        context.fillRect(x * 50, y * 50, 50, 50);
+        context.fillRect(x, y, 50, 50);
       }
     }
 
@@ -128,7 +131,7 @@ export default class Gui {
           if (hardpoint != null && hardpoint.timeTillNextFire !== 0) {
             context.save();
             context.beginPath();
-            context.rect((this.x + i) * 50, 7 * 50, 50, 50);
+            context.rect((this.x + i), 7, 50, 50);
             context.clip();
 
             const angle = (100 - hardpoint.timeTillNextFire) / 100 * Math.PI * 2;
@@ -136,55 +139,65 @@ export default class Gui {
             context.globalCompositeOperation = 'multiply';
             context.fillStyle = 'rgba(0,0,0,.5)';
             context.beginPath();
-            context.arc((this.x + i) * 50 + 25, 7 * 50 + 25, 50, 0, angle, true);
-            context.lineTo((this.x + i) * 50 + 25, 7 * 50 + 25);
+            context.arc((this.x + i) + 25, 7 + 25, 50, 0, angle, true);
+            context.lineTo((this.x + i) + 25, 7 + 25);
             context.fill();
             context.globalCompositeOperation = 'source-over';
 
             context.strokeStyle = 'white';
             context.beginPath();
-            context.moveTo((this.x + i) * 50 + 25, 7 * 50 + 25);
-            context.lineTo((this.x + i) * 50 + 25 + 50, 7 * 50 + 25);
-            context.arc((this.x + i) * 50 + 25, 7 * 50 + 25, 50, 0, angle, true);
-            context.lineTo((this.x + i) * 50 + 25, 7 * 50 + 25);
+            context.moveTo((this.x + i) + 25, 7 + 25);
+            context.lineTo((this.x + i) + 25 + 50, 7 + 25);
+            context.arc((this.x + i) + 25, 7 + 25, 50, 0, angle, true);
+            context.lineTo((this.x + i) + 25, 7 + 25);
             context.stroke();
 
             context.restore();
           }
         });
       } 
-      // else if (this.getSelectedMap().type === 'shipyard') {
-      //   if (this.selectionState.gui != null && this.selectionState.gui.type === 'shiptemplate') {
-      //     const template = this.templates[this.selectionState.gui.templateNum];
-      //     statsDisplay((this.x + 3.5) * 50, (this.y + 6.25) * 50, getStats(template), context, images);
-      //   }
-      // }
     }
   }
 
   getUnitButtons() {
-    if (this.getSelectedMapItems().length === 0) {
-      return null;
-    } else if (this.getSelectedMapItems().every(entity => entity.type === 'ship')) {
-      const result = [];
+    // if (this.getSelectedMapItems().length === 0) {
+    //   return null;
+    // } else if (this.getSelectedMapItems().every(entity => entity.type === 'ship')) {
+    //   const result = [];
 
-      // TODO: Actually take into consideration the multiple ships;
-      for (let i = 0; i < this.getSelectedMapItems()[0].hardpoints.length; i++) {
-        const hardpoint = this.map.getEntity(this.getSelectedMapItems()[0].hardpoints[i]);
-        if (hardpoint != null) {
-          result.push(new Button(hardpoint.gunType, this.x + i, 7, hardpoint.id));
-        }
-      }
+    //   // TODO: Actually take into consideration the multiple ships;
+    //   for (let i = 0; i < this.getSelectedMapItems()[0].hardpoints.length; i++) {
+    //     const hardpoint = this.map.getEntity(this.getSelectedMapItems()[0].hardpoints[i]);
+    //     if (hardpoint != null) {
+    //       result.push(new Roundshot(hardpoint.gunType, this.x + (i), 350, 50, 50, hardpoint.id));
+    //     }
+    //   }
 
-      result.push(new Button(this.getSelectedMapItems()[0].targetMode, this.x, 6)); 
-      return result;
-    } else if (this.getSelectedMapItems().every(entity => entity.type === 'shipyard')) {
-      return [
-        new Button('shiptemplate', this.x, 7, 0),
-        new Button('shiptemplate', this.x + 1, 7, 1),
-        new Button('shiptemplate', this.x + 2, 7, 2),
-      ];
+    //   result.push(new TargetToggle(this.getSelectedMapItems()[0].targetMode, this.x+35, 300, 128, 26)); 
+    //   return result;
+    // } else if (this.getSelectedMapItems().every(entity => entity.type === 'shipyard')) {
+    //   return [
+    //     new Shiptemplate('shiptemplate', this.x, 350, 50, 50, 0),
+    //     new Shiptemplate('shiptemplate', this.x + 50, 350, 50, 50, 1),
+    //     new Shiptemplate('shiptemplate', this.x + 100, 350, 50, 50, 2),
+    //   ];
+    // }
+
+    const result = [];
+    if (this.getSelectedMapItems().length !== 0 && this.getSelectedMapItems().every(entity => entity.type === 'shipyard')) {
+      result.push(new Shiptemplate('shiptemplate', this.x + 25, 250, 50, 50, 0));
+      result.push(new Shiptemplate('shiptemplate', this.x + 75, 250, 50, 50, 1));
+      result.push(new Shiptemplate('shiptemplate', this.x + 125, 250, 50, 50, 2));
+    } else {
+      result.push(new Shiptemplate('shiptemplateGrayed', this.x + 25, 250, 50, 50, 0));
+      result.push(new Shiptemplate('shiptemplateGrayed', this.x + 75, 250, 50, 50, 1));
+      result.push(new Shiptemplate('shiptemplateGrayed', this.x + 125, 250, 50, 50, 2));
     }
+
+
+
+    result.push(new TargetToggle(this.map.targetMode, this.x+35, 350, 128, 26));
+    return result;
   }
 
   getButtons() {
@@ -193,7 +206,7 @@ export default class Gui {
 
   getItem(x, y) {
     for (const button of this.getButtons()) {
-      if (button.getX() === x && button.getY() === y) {
+      if (button.isOver(x, y)) {
         return button;
       }
     }

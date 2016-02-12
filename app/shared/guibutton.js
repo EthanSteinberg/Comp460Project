@@ -24,6 +24,7 @@ export default class GuiButton {
     this.visible = true;
 
     this.slotNum = slotNum;
+    this.templateNum = slotNum;
   }
 
   getX() {
@@ -44,6 +45,10 @@ export default class GuiButton {
 
   getSlotNum() {
     return this.slotNum;
+  }
+
+  getTemplateNum() {
+    return this.templateNum;
   }
 
   getRenderType() {
@@ -87,6 +92,36 @@ export default class GuiButton {
 
   deselect() {
     this.selected = false;
+  }
+
+  isBuilding() {
+    switch (this.type) {
+      case 'mine':
+      case 'shipyard':
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  getBuilding() {
+    switch (this.type) {
+      case 'mine':
+        return 'mine';
+      case 'shipyard':
+        return 'shipyard';
+      default:
+        console.error('unknown building type');
+        return null;
+    }
+  }
+
+  getType() {
+    return this.type;
+  }
+
+  setType(type) {
+    this.type = type;
   }
 
 

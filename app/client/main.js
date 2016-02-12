@@ -202,7 +202,7 @@ class Game {
   }
 
   _updateEntity({ data }) {
-    console.log(data)
+    // console.log(data)
     this.map.addEntity(data);
   }
 
@@ -280,10 +280,6 @@ class Game {
     // The mouse coordinates in grid coordinatess.
     let mouseX = x / (50);
     let mouseY = y / (50);
-    if (this.map.getMode() === 'tactical') {
-      mouseX /= SCALE;
-      mouseY /= SCALE;
-    }
 
     return { mouseX, mouseY };
   }
@@ -306,9 +302,9 @@ class Game {
         && item.team !== this.map.team) {
         // Trying to attack something
         if (item.type === 'ship') {
-          if (this.getSelectedMapItems()[0].targetMode === 'hull') {
+          if (this.map.targetMode === 'hull') {
             // return the item
-          } else if (this.getSelectedMapItems()[0].targetMode === 'hardpoints') {
+          } else if (this.map.targetMode === 'hardpoints') {
             item = this.map.getShipHardpointItem(item.id) || item;
           }
         }
@@ -332,7 +328,7 @@ class Game {
 
   processGuiLeftMouseClick(rawX, rawY, sendMessage) {
     // In the gui
-    const item = this.gui.getItem(Math.floor(rawX / 50), Math.floor(rawY / 50));
+    const item = this.gui.getItem(rawX, rawY);
     if (item != null) {
       if (item.getType() === 'shipbuilder') {
         return 'shipbuilder';
@@ -341,46 +337,15 @@ class Game {
         this.getSelectedMapItems().forEach(shipyard => sendMessage({ type: 'MakeShip', islandID: shipyard.islandID, template }));
         return 'game';
       } else if (item.getType() === 'hull') {
-        this.getSelectedMapItems().forEach(ship => sendMessage({ type: 'UpdateMode', id: ship.id, targetMode: 'hardpoints' }));
+        this.map.targetMode = 'hardpoints';
+        this.updateTargetMode(sendMessage, 'hardpoints');
         return 'game';
       } else if (item.getType() === 'hardpoints') {
-        this.getSelectedMapItems().forEach(ship => sendMessage({ type: 'UpdateMode', id: ship.id, targetMode: 'hull' }));
+        this.map.targetMode = 'hull';
+        this.updateTargetMode(sendMessage, 'hull');
         return 'game';
       }
       this.updateSelectionState({ ...this.selectionState, gui: { type: item.getType(), templateNum: item.getTemplateNum() } });
-
-      if (item.getType() === 'strategic') {
-        if (this.getSelectedMap() != null) {
-          if (this.getSelectedMap().type === 'ship') {
-            this.x = this.getSelectedMap().x * 50 * SCALE - this.width / 2 + 100;
-            this.y = this.getSelectedMap().y * 50 * SCALE - this.height / 2;
-          } else {
-            this.x += this.width / 2;
-            this.y += this.height / 2;
-          }
-        } else {
-          this.x += this.width / 2;
-          this.y += this.height / 2;
-        }
-        this.map.setMode('tactical');
-        item.setType('tactical');
-        this.updateSelectionState({ ...this.selectionState, gui: null });
-      } else if (item.getType() === 'tactical') {
-        this.x = 0;
-        this.y = 0;
-        this.map.setMode('strategic');
-        item.setType('strategic');
-        this.updateSelectionState({ ...this.selectionState, gui: null });
-      }
-    }
-
-    if (this.map.mode === 'tactical') {
-      // Minimap selection logic
-      const view = this.miniMap.setView(rawX, rawY);
-      if (view != null) {
-        this.x = view.x;
-        this.y = view.y;
-      }
     }
 
     return 'game';
@@ -388,6 +353,14 @@ class Game {
 
   getSelectedMapItems() {
     return this.selectionState.map.map(id => this.map.getEntity(id));
+  }
+
+  updateTargetMode(sendMessage, mode) {
+    for (const entity of this.map.entities.values()) {
+      if (entity.team === this.team) {
+        sendMessage({ type: 'UpdateMode', id: entity.id, targetMode: mode });
+      }
+    }
   }
 
   isDragAction(mouseX, mouseY) {
@@ -415,10 +388,6 @@ class Game {
     // The mouse coordinates in grid coordinatess.
     let mouseX = x / (50);
     let mouseY = y / (50);
-    if (this.map.getMode() === 'tactical') {
-      mouseX /= SCALE;
-      mouseY /= SCALE;
-    }
 
     const mouseRoundedX = Math.round(mouseX);
     const mouseRoundedY = Math.round(mouseY);
@@ -492,11 +461,11 @@ class Game {
       this.gui.render(this.context, this.images, this.map, null);
     }
 
-    this.context.translate(this.width - 175, 25);
+    this.context.translate(this.width - 150, 50);
     this.context.scale(0.25, 0.25);
     this.miniMap.renderMiniMap(this.context, this.images, this.x, this.y, this.width, this.height);
     this.context.scale(4, 4);
-    this.context.translate(-this.width + 175, -25);
+    this.context.translate(-this.width + 150, -50);
   }
 
   keydown(event, pressedKeys) {

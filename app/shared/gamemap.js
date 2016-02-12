@@ -26,19 +26,19 @@ export default class GameMap {
       id: '0',
       type: 'playerstate',
       coins: 100,
+      targetMode: 'hull',
     });
 
     this.entities.set('1', {
       id: '1',
       type: 'playerstate',
       coins: 100,
+      targetMode: 'hull',
     });
 
     this.islands = new Map();
 
     this.team = null;
-
-    this.mode = 'strategic';
 
     const template = {
       hull: 'gunboat',
@@ -59,6 +59,8 @@ export default class GameMap {
 
     this.width = MAP_WIDTH;
     this.height = MAP_HEIGHT;
+
+    this.targetMode = 'hull'
   }
 
   getInitialState() {
