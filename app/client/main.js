@@ -302,9 +302,9 @@ class Game {
         && item.team !== this.map.team) {
         // Trying to attack something
         if (item.type === 'ship') {
-          if (this.map.targetMode === 'hull') {
+          if (this.map.getEntity(this.map.team).targetMode === 'hull') {
             // return the item
-          } else if (this.map.targetMode === 'hardpoints') {
+          } else if (this.map.getEntity(this.map.team).targetMode === 'hardpoints') {
             item = this.map.getShipHardpointItem(item.id) || item;
           }
         }
@@ -337,12 +337,10 @@ class Game {
         this.getSelectedMapItems().forEach(shipyard => sendMessage({ type: 'MakeShip', islandID: shipyard.islandID, template }));
         return 'game';
       } else if (item.getType() === 'hull') {
-        this.map.targetMode = 'hardpoints';
-        this.updateTargetMode(sendMessage, 'hardpoints');
+        sendMessage({ type: 'UpdateMode', targetMode: 'hardpoints' });
         return 'game';
       } else if (item.getType() === 'hardpoints') {
-        this.map.targetMode = 'hull';
-        this.updateTargetMode(sendMessage, 'hull');
+        sendMessage({ type: 'UpdateMode', targetMode: 'hull' });
         return 'game';
       }
       this.updateSelectionState({ ...this.selectionState, gui: { type: item.getType(), templateNum: item.getTemplateNum() } });
@@ -353,14 +351,6 @@ class Game {
 
   getSelectedMapItems() {
     return this.selectionState.map.map(id => this.map.getEntity(id));
-  }
-
-  updateTargetMode(sendMessage, mode) {
-    for (const entity of this.map.entities.values()) {
-      if (entity.team === this.team) {
-        sendMessage({ type: 'UpdateMode', id: entity.id, targetMode: mode });
-      }
-    }
   }
 
   isDragAction(mouseX, mouseY) {

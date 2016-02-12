@@ -170,9 +170,8 @@ function fireShotHandler({ targetId, id }, playerTeam) {
   Hardpoints.fire(hardpoint, map, map.getEntity(targetId));
 }
 
-function updateModeHandler({ id, targetMode }, playerTeam) {
-  const ship = map.getEntity(id);
-  Ships.updateMode(ship, targetMode);
+function updateModeHandler({ targetMode }, playerTeam) {
+  map.getEntity(playerTeam).targetMode = targetMode;
 }
 
 const messageHandlers = {

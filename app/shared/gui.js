@@ -160,29 +160,6 @@ export default class Gui {
   }
 
   getUnitButtons() {
-    // if (this.getSelectedMapItems().length === 0) {
-    //   return null;
-    // } else if (this.getSelectedMapItems().every(entity => entity.type === 'ship')) {
-    //   const result = [];
-
-    //   // TODO: Actually take into consideration the multiple ships;
-    //   for (let i = 0; i < this.getSelectedMapItems()[0].hardpoints.length; i++) {
-    //     const hardpoint = this.map.getEntity(this.getSelectedMapItems()[0].hardpoints[i]);
-    //     if (hardpoint != null) {
-    //       result.push(new Roundshot(hardpoint.gunType, this.x + (i), 350, 50, 50, hardpoint.id));
-    //     }
-    //   }
-
-    //   result.push(new TargetToggle(this.getSelectedMapItems()[0].targetMode, this.x+35, 300, 128, 26)); 
-    //   return result;
-    // } else if (this.getSelectedMapItems().every(entity => entity.type === 'shipyard')) {
-    //   return [
-    //     new Shiptemplate('shiptemplate', this.x, 350, 50, 50, 0),
-    //     new Shiptemplate('shiptemplate', this.x + 50, 350, 50, 50, 1),
-    //     new Shiptemplate('shiptemplate', this.x + 100, 350, 50, 50, 2),
-    //   ];
-    // }
-
     const result = [];
     if (this.getSelectedMapItems().length !== 0 && this.getSelectedMapItems().every(entity => entity.type === 'shipyard')) {
       result.push(new Shiptemplate('shiptemplate', this.x + 25, 250, 50, 50, 0));
@@ -194,9 +171,7 @@ export default class Gui {
       result.push(new Shiptemplate('shiptemplateGrayed', this.x + 125, 250, 50, 50, 2));
     }
 
-
-
-    result.push(new TargetToggle(this.map.targetMode, this.x+35, 350, 128, 26));
+    result.push(new TargetToggle(this.map.getEntity(this.map.team).targetMode, this.x+35, 350, 128, 26));
     return result;
   }
 

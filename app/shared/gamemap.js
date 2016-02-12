@@ -59,8 +59,6 @@ export default class GameMap {
 
     this.width = MAP_WIDTH;
     this.height = MAP_HEIGHT;
-
-    this.targetMode = 'hull'
   }
 
   getInitialState() {
