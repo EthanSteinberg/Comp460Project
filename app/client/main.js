@@ -364,6 +364,10 @@ class Game {
   }
 
   isDragAction(mouseX, mouseY) {
+    if (this.hoveredCoords.x >= this.width - (8 * 50)) {
+      return false;
+    }
+
     const hoverGameCoords = this.getMouseGamePosition(this.hoveredCoords.x, this.hoveredCoords.y);
 
     if (this.mouseDownGamePosition == null ||
@@ -439,7 +443,7 @@ class Game {
     // Render the map and everything on it.
     this.map.render(this.context, this.images, this.selectionState);
 
-    if (this.hoveredCoords && this.hoveredCoords.x < 400 && this.selectionState.gui == null) {
+    if (this.hoveredCoords && this.hoveredCoords.x < this.width - (8 * 50) && this.selectionState.gui == null) {
       if (this.mouseDownGamePosition != null) {
         const hoverGameCoords = this.getMouseGamePosition(this.hoveredCoords.x, this.hoveredCoords.y);
 
@@ -455,7 +459,7 @@ class Game {
 
     this.context.restore();
 
-    if (this.hoveredCoords && this.hoveredCoords.x >= 400) {
+    if (this.hoveredCoords && this.hoveredCoords.x >= this.width - (8 * 50)) {
       this.gui.render(this.context, this.images, this.map, this.hoveredCoords);
     } else {
       this.gui.render(this.context, this.images, this.map, null);

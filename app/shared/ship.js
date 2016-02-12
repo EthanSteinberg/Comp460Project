@@ -157,7 +157,7 @@ function getAvoidencVectors(ship, map) {
   const pos = { x: ship.x, y: ship.y };
 
   for (const island of map.getIslands()) {
-    for (const [x, y] of island.getCoordinates()) {
+    for (const [x, y] of island.coordinates) {
       const avoid = getAvoidencVector(pos, { x, y }, 0.05);
       result.x += avoid.x;
       result.y += avoid.y;

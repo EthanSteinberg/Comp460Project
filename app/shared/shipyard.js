@@ -61,7 +61,7 @@ export function getPosition(shipyard) {
   return { x: shipyard.x, y: shipyard.y };
 }
 
-export function processUpdate(shipyard, map) {
+export function processUpdate(shipyard) {
   // Do nothing for now
 }
 

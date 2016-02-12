@@ -93,39 +93,41 @@ function moveShipHandler({ shipId, targetLocation }, playerTeam) {
 
 function makeBuildingHandler({ building, x, y }, playerTeam) {
   const island = map.getIsland(x, y);
-  if (island !== -1 && island.team === playerTeam) {
+  if (island != null && island.team === playerTeam) {
     const buildingStats = buildingConstants[building];
     if (buildingStats.coinCost > map.getEntity(playerTeam).coins) {
       console.error('Trying to build a buildng you cant afford');
       return;
     }
     map.getEntity(playerTeam).coins -= buildingStats.coinCost;
-    map.addBuilding(building, x, y, island.getId(), playerTeam);
+    map.addBuilding(building, x, y, island.id, playerTeam);
+  } else {
+    console.error('Wrong team for island', island, playerTeam);
   }
 }
 
 function makeShipHandler({ islandID, template }, playerTeam) {
-    if (map.getIslandById(islandID).team !== playerTeam) {
-      console.error('Not allowed to use enemy shipyard');
-      return;
-    }
+  if (map.getEntity(islandID).team !== playerTeam) {
+    console.error('Not allowed to use enemy shipyard');
+    return;
+  }
 
-    const stats = getStats(template);
+  const stats = getStats(template);
 
-    if (stats.wcost > map.getEntity(playerTeam).coins) {
-      console.error('Trying to build a ship you cant afford');
-      return;
-    }
+  if (stats.wcost > map.getEntity(playerTeam).coins) {
+    console.error('Trying to build a ship you cant afford');
+    return;
+  }
 
-    var { x, y } = map.getShipBuildCoords(islandID);
+  const { x, y } = map.getShipBuildCoords(islandID);
 
-    if (x == null) {
-      console.error('No space available to build ship.');
-      return;
-    }
+  if (x == null) {
+    console.error('No space available to build ship.');
+    return;
+  }
 
-    map.getEntity(playerTeam).coins -= stats.wcost;
-    Ships.createShipAndHardpoints(map, x, y, template, playerTeam);
+  map.getEntity(playerTeam).coins -= stats.wcost;
+  Ships.createShipAndHardpoints(map, x, y, template, playerTeam);
 }
 
 function attackShipHandler({ id, targetId }, playerTeam) {
@@ -185,7 +187,7 @@ const messageHandlers = {
 let nextTeam = 0;
 
 wss.on('connection', function connection(socket) {
-  const playerTeam = '0'; // String(nextTeam);
+  const playerTeam = String(nextTeam);
   nextTeam += 1;
 
   playerSockets.push(socket);

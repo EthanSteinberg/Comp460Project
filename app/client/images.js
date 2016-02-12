@@ -21,6 +21,8 @@ const sources = {
   designer: 'designer.png',
   targettoggleHull: 'targettoggleHull.png',
   targettoggleCannon: 'targettoggleCannon.png',
+  blueFlag: 'blueFlag.png',
+  redFlag: 'redFlag.png',
 };
 
 /**
