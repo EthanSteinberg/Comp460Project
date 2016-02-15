@@ -52,7 +52,7 @@ export default class Gui {
   }
 
   getSelectedMapItems() {
-    return this.selectionState.map.map(id => this.map.getEntity(id));
+    return this.selectionState.map.map(id => this.map.getEntity(id)).filter(item => item != null);
   }
 
   /**

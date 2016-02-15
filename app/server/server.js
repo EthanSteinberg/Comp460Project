@@ -184,7 +184,7 @@ let nextTeam = 0;
 
 wss.on('connection', function connection(socket) {
   const playerTeam = String(nextTeam);
-  //nextTeam += 1;
+  nextTeam += 1;
 
   playerSockets.push(socket);
   socket.send(JSON.stringify({ type: 'StartGame', initialState: map.getInitialState(), team: playerTeam }));

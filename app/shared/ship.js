@@ -247,11 +247,62 @@ function processMove(ship, map) {
   performMove(ship, map);
 }
 
+function getActualTarget(ship, map, target) {
+  if (target == null) {
+    return null;
+  }
+
+  if (target.type === 'ship' && map.getEntity(ship.team).targetMode === 'hardpoints') {
+    let minHardpoint = null;
+    for (const hardpointId of target.hardpoints) {
+      const hardpoint = map.getEntity(hardpointId);
+      if (hardpoint != null) {
+        if (minHardpoint == null || hardpoint.health < minHardpoint.health) {
+          minHardpoint = hardpoint;
+        }
+      }
+
+      return minHardpoint;
+    }
+  } else {
+    return target;
+  }
+}
+
+function shootAt(ship, map, target) {
+  for (const hardpointId of ship.hardpoints) {
+    const hardpoint = map.getEntity(hardpointId);
+    if (hardpoint != null) {
+      if (hardpoint.timeTillNextFire === 0) {
+        Hardpoints.fire(hardpoint, map, target);
+      }
+    }
+  }
+}
+
+/**
+ * Shoot at any enemy ships in range with the current attack pattern
+ */
+function processIdleAttack(ship, map) {
+  for (const entity of map.entities.values()) {
+    if (entity.type === 'ship' && entity.team !== ship.team) {
+      const targetLocation = getPosition(entity, map);
+      if (getDistanceToTarget(ship, targetLocation) < 2) {
+        const actualTarget = getActualTarget(ship, map, entity);
+        if (actualTarget != null) {
+          shootAt(ship, map, actualTarget);
+        }
+      }
+    }
+  }
+}
+
 /**
  * Try to attack if in range, or move into range otherwise
  */
 function processAttack(ship, map) {
-  const target = map.getEntity(ship.mode.targetId);
+  const pseudoTarget = map.getEntity(ship.mode.targetId);
+  const target = getActualTarget(ship, map, pseudoTarget);
 
   if (target == null) {
     // Target is gone or dead
@@ -261,17 +312,10 @@ function processAttack(ship, map) {
     return;
   }
 
-  const targetLocation = Types[target.type].getPosition(target, map);
+  const targetLocation = Types[pseudoTarget.type].getPosition(pseudoTarget, map);
 
   if (getDistanceToTarget(ship, targetLocation) < 2) {
-    for (const hardpointId of ship.hardpoints) {
-      const hardpoint = map.getEntity(hardpointId);
-      if (hardpoint != null) {
-        if (hardpoint.timeTillNextFire === 0) {
-          Hardpoints.fire(hardpoint, map, target);
-        }
-      }
-    }
+    shootAt(ship, map, target);
   }
 
   ship.mode.targetLocation = targetLocation;
@@ -304,6 +348,7 @@ export function processUpdate(ship, map) {
       break;
 
     case 'IDLE':
+      processIdleAttack(ship, map);
       break;
 
     default:

@@ -291,13 +291,6 @@ class Game {
       if ((item.type === 'ship' || item.type === 'shipyard') && this.getSelectedMapItems().every(entity => entity.type === 'ship')
         && item.team !== this.map.team) {
         // Trying to attack something
-        if (item.type === 'ship') {
-          if (this.map.getEntity(this.map.team).targetMode === 'hull') {
-            // return the item
-          } else if (this.map.getEntity(this.map.team).targetMode === 'hardpoints') {
-            item = this.map.getShipHardpointItem(item.id) || item;
-          }
-        }
         this.getSelectedMapItems().forEach(ship => sendMessage({ type: 'AttackShip', id: ship.id, targetId: item.id }));
       }
     }
@@ -325,7 +318,7 @@ class Game {
     }
 
     if (this.gui.displayMode === 'designer') {
-      this.gui.designerSelection(item)
+      this.gui.designerSelection(item);
     } else {
       switch (item.getType()) {
         case 'shipbuilder':
@@ -344,17 +337,16 @@ class Game {
           sendMessage({ type: 'UpdateMode', targetMode: 'hull' });
           break;
         default:
-          // Ignore by default
+          this.updateSelectionState({ ...this.selectionState, gui: { type: item.getType(), templateNum: item.getTemplateNum() } });
+
       }
     }
-
-    this.updateSelectionState({ ...this.selectionState, gui: { type: item.getType(), templateNum: item.getTemplateNum() } });
 
     return 'game';
   }
 
   getSelectedMapItems() {
-    return this.selectionState.map.map(id => this.map.getEntity(id));
+    return this.selectionState.map.map(id => this.map.getEntity(id)).filter(item => item != null);
   }
 
   isDragAction(mouseX, mouseY) {
@@ -466,7 +458,6 @@ class Game {
       this.context.scale(4, 4);
       this.context.translate(-this.width + 150, -50);
     }
-
   }
 
   keydown(event, pressedKeys) {
