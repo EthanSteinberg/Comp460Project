@@ -1,10 +1,12 @@
+import buildingConstants from './buildingconstants';
+
 export function createBuildingTemplate(map, x, y, team, islandID, buildingType) {
   const template = {
     x,
     y,
     id: map.getNextEntityId(),
     buildingType,
-    timeTillBuild: 100,
+    progressTowardsBuild: 0,
     type: 'buildingTemplate',
     team,
     islandID,
@@ -43,7 +45,7 @@ export function render(template, map, context, images) {
   context.rect((template.x - 0.5) * 50, (template.y - 0.5) * 50, 50, 50);
   context.clip();
 
-  const angle = (100 - template.timeTillBuild) / 100 * Math.PI * 2;
+  const angle = (template.progressTowardsBuild) / buildingConstants[template.buildingType].buildTime * Math.PI * 2;
 
   context.globalCompositeOperation = 'multiply';
   context.fillStyle = 'rgba(0,0,0,.5)';
@@ -65,8 +67,8 @@ export function render(template, map, context, images) {
 }
 
 export function processUpdate(template, map) {
-  template.timeTillBuild -= 1;
-  if (template.timeTillBuild === 0) {
+  template.progressTowardsBuild += 1;
+  if (template.progressTowardsBuild === buildingConstants[template.buildingType].buildTime) {
     map.addBuilding(
       template.buildingType,
       template.x,

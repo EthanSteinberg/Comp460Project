@@ -69,10 +69,13 @@ export function processUpdate(shipyard, map) {
   if (shipyard.buildingQueue.length > 0) {
     shipyard.progressTowardsNextBuild += 1;
 
-    if (shipyard.progressTowardsNextBuild === 100) {
-      const { template, templateNumber } = shipyard.buildingQueue.shift();
+    const { template, templateNumber } = shipyard.buildingQueue[0];
+    const stats = getStats(template);
+
+
+    if (shipyard.progressTowardsNextBuild === stats.tcost) {
+      shipyard.buildingQueue.shift();
       shipyard.counters[templateNumber]--;
-      const stats = getStats(template);
 
       const { x, y } = map.getShipBuildCoords(shipyard.islandID);
 

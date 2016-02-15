@@ -1,4 +1,5 @@
 import GuiButton from '../guibutton';
+import { getStats } from '../template';
 
 
 export default class Shiptemplate extends GuiButton {
@@ -18,12 +19,15 @@ export default class Shiptemplate extends GuiButton {
 
         if (this.selection.buildingQueue.length > 0 &&
           this.selection.buildingQueue[0].templateNumber === this.slotNum) {
+          const nextTemplate = this.selection.buildingQueue[0].template;
+          const stats = getStats(nextTemplate);
+
           context.save();
           context.beginPath();
           context.rect(this.x, this.y, 50, 50);
           context.clip();
 
-          const angle = this.selection.progressTowardsNextBuild / 100 * Math.PI * 2;
+          const angle = this.selection.progressTowardsNextBuild / stats.tcost * Math.PI * 2;
 
           context.globalCompositeOperation = 'multiply';
           context.fillStyle = 'rgba(0,0,0,.5)';
