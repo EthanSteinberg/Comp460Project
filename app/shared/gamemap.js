@@ -4,6 +4,7 @@ import * as Mines from './mine';
 import * as Shipyards from './shipyard';
 import * as Hardpoints from './hardpoint';
 import * as Islands from './island';
+import * as BuildingTemplates from './buildingtemplate';
 import MiniView from './miniview';
 
 export const MAP_WIDTH = 8;
@@ -25,7 +26,7 @@ export default class GameMap {
     this.entities.set('0', {
       id: '0',
       type: 'playerstate',
-      coins: 100,
+      coins: 10000,
       targetMode: 'hull',
     });
 
@@ -43,7 +44,7 @@ export default class GameMap {
       hardpoints: ['roundshot'],
     };
 
-    Ships.createShipAndHardpoints(this, 0, 4, template, '0');
+    Ships.createShipAndHardpoints(this, 0, 3, template, '0');
     Ships.createShipAndHardpoints(this, 4, 4, template, '1');
 
     const island1coordinates = [
@@ -149,6 +150,8 @@ export default class GameMap {
         Mines.render(entity, this, context, images, isSelected);
       } else if (entity.type === 'island') {
         Islands.render(entity, this, context, images);
+      } else if (entity.type === 'buildingTemplate') {
+        BuildingTemplates.render(entity, this, context, images);
       }
     }
   }
@@ -271,19 +274,19 @@ export default class GameMap {
           }
 
           if (flag) {
-            return { x, y }
-          } 
+            return { x, y };
+          }
         }
       }
     }
 
-    return { null, null }
+    return { x: null, y: null };
   }
 
   addBuilding(type, x, y, islandID, team) {
     switch (type) {
       case 'mine':
-        Mines.createMine(this, x, y);
+        Mines.createMine(this, x, y, islandID, team);
         break;
       case 'shipyard':
         Shipyards.createShipyard(this, x, y, islandID, team);
@@ -305,10 +308,6 @@ export default class GameMap {
    * Update the map and get the corresponding update messages.
    */
   processUpdate() {
-    for (const team of ['0', '1']) {
-      this.getEntity(team).coins += 0.2;
-    }
-
     for (const entity of this.entities.values()) {
       if (entity.type === 'ship') {
         Ships.processUpdate(entity, this);
@@ -320,6 +319,8 @@ export default class GameMap {
         Mines.processUpdate(entity, this);
       } else if (entity.type === 'island') {
         Islands.processUpdate(entity, this);
+      } else if (entity.type === 'buildingTemplate') {
+        BuildingTemplates.processUpdate(entity, this);
       }
     }
   }

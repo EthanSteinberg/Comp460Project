@@ -3,6 +3,7 @@ import buildingConstants from '../shared/buildingconstants';
 
 import * as Ships from '../shared/ship';
 import * as Hardpoints from '../shared/hardpoint';
+import * as BuildingTemplates from '../shared/buildingtemplate';
 import Types from '../shared/types';
 import * as Vectors from '../shared/vector';
 import { getStats } from '../shared/template';
@@ -100,7 +101,7 @@ function makeBuildingHandler({ building, x, y }, playerTeam) {
       return;
     }
     map.getEntity(playerTeam).coins -= buildingStats.coinCost;
-    map.addBuilding(building, x, y, island.id, playerTeam);
+    BuildingTemplates.createBuildingTemplate(map, x, y, playerTeam, island.id, building);
   } else {
     console.error('Wrong team for island', island, playerTeam);
   }
