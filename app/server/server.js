@@ -110,6 +110,10 @@ function makeBuildingHandler({ building, x, y }, playerTeam) {
 
 function makeShipHandler({ shipyardId, template, templateNumber }, playerTeam) {
   const shipyard = map.getEntity(shipyardId);
+  if (shipyard == null) {
+    return;
+  }
+
   if (shipyard.team !== playerTeam) {
     console.error('Not allowed to use enemy shipyard');
     return;

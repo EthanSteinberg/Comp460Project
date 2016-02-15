@@ -7,8 +7,8 @@ import * as Islands from './island';
 import * as BuildingTemplates from './buildingtemplate';
 import MiniView from './miniview';
 
-export const MAP_WIDTH = 12;
-export const MAP_HEIGHT = 12;
+export const MAP_WIDTH = 20;
+export const MAP_HEIGHT = 20;
 
 const SCALE = 3;
 
@@ -45,7 +45,7 @@ export default class GameMap {
     };
 
     Ships.createShipAndHardpoints(this, 0, 3, template, '0');
-    Ships.createShipAndHardpoints(this, 8, 8, template, '1');
+    Ships.createShipAndHardpoints(this, 9, 9, template, '1');
 
     const island1coordinates = [
       [1, 1],

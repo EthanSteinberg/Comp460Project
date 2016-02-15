@@ -287,7 +287,7 @@ function processIdleAttack(ship, map) {
   for (const entity of map.entities.values()) {
     if (entity.type === 'ship' && entity.team !== ship.team) {
       const targetLocation = getPosition(entity, map);
-      if (getDistanceToTarget(ship, targetLocation) < 2) {
+      if (getDistanceToTarget(ship, targetLocation) < 1.5) {
         const actualTarget = getActualTarget(ship, map, entity);
         if (actualTarget != null) {
           shootAt(ship, map, actualTarget);
@@ -305,7 +305,6 @@ function processAttack(ship, map) {
   const target = getActualTarget(ship, map, pseudoTarget);
 
   if (target == null) {
-    console.log('target is gone or dead');
     // Target is gone or dead
     ship.mode = {
       type: 'IDLE',
@@ -317,15 +316,15 @@ function processAttack(ship, map) {
 
   if (getDistanceToTarget(ship, targetLocation) < 2) {
     shootAt(ship, map, target);
+  } else {
+    ship.mode.targetLocation = targetLocation;
+
+    if (closeEnoughToTarget(ship)) {
+      return;
+    }
+
+    performMove(ship, map);
   }
-
-  ship.mode.targetLocation = targetLocation;
-
-  if (closeEnoughToTarget(ship)) {
-    return;
-  }
-
-  performMove(ship, map);
 }
 
 /**
@@ -342,6 +341,7 @@ export function processUpdate(ship, map) {
   switch (ship.mode.type) {
     case 'MOVING':
       processMove(ship, map);
+      processIdleAttack(ship, map);
       break;
 
     case 'ATTACKING':
