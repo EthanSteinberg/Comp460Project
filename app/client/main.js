@@ -288,7 +288,7 @@ class Game {
         this.getSelectedMapItems().forEach(ship => sendMessage({ type: 'MoveShip', shipId: ship.id, targetLocation }));
       }
     } else {
-      if ((item.type === 'ship' || item.type === 'shipyard') && this.getSelectedMapItems().every(entity => entity.type === 'ship')
+      if ((item.type === 'ship' || item.type === 'shipyard' || item.type === 'mine') && this.getSelectedMapItems().every(entity => entity.type === 'ship')
         && item.team !== this.map.team) {
         // Trying to attack something
         this.getSelectedMapItems().forEach(ship => sendMessage({ type: 'AttackShip', id: ship.id, targetId: item.id }));
@@ -391,12 +391,6 @@ class Game {
         const buildingType = this.selectionState.gui.type;
         sendMessage({ type: 'MakeBuilding', building: buildingType, x: mouseRoundedX, y: mouseRoundedY });
         this.updateSelectionState({ ...this.selectionState, gui: null });
-      } else if (this.selectionState.gui.type === 'roundshot' && item != null && (item.type === 'ship' || item.type === 'shipyard')
-        && this.map.team !== item.team) {
-        if (item.type === 'ship') {
-          item = this.map.getHardpointItem(mouseX, mouseY) || item;
-        }
-        sendMessage({ type: 'FireShot', id: this.selectionState.gui.templateNum, targetId: item.id });
       }
     } else if (this.isDragAction(mouseX, mouseY)) {
       // Perform a drag select.

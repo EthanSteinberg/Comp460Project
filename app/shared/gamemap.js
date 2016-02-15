@@ -26,14 +26,14 @@ export default class GameMap {
     this.entities.set('0', {
       id: '0',
       type: 'playerstate',
-      coins: 100,
+      coins: 5000,
       targetMode: 'hull',
     });
 
     this.entities.set('1', {
       id: '1',
       type: 'playerstate',
-      coins: 100,
+      coins: 5000,
       targetMode: 'hull',
     });
 
@@ -41,7 +41,7 @@ export default class GameMap {
 
     const template = {
       hull: 'gunboat',
-      hardpoints: ['roundshot'],
+      hardpoints: [],
     };
 
     Ships.createShipAndHardpoints(this, 0, 3, template, '0');

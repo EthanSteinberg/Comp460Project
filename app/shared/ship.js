@@ -305,6 +305,7 @@ function processAttack(ship, map) {
   const target = getActualTarget(ship, map, pseudoTarget);
 
   if (target == null) {
+    console.log('target is gone or dead');
     // Target is gone or dead
     ship.mode = {
       type: 'IDLE',
