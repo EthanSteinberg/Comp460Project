@@ -1,4 +1,5 @@
 import buildingConstants from './buildingconstants';
+import { hardpoints, getStats } from './template';
 
 import Shipyard from './guibuttons/shipyard';
 import Shiptemplate from './guibuttons/shiptemplate';
@@ -80,12 +81,37 @@ export default class Gui {
       button.render(context, images);
     }
 
+    context.fillStyle = 'black';
+    context.textBaseline = 'top';
+    context.font = '14px sans-serif';
+    context.fillText('Cost: ' + getStats(this.workingTemplate).ccost, this.x + 76, this.height - 50);
+    context.fillText('Build Time: ' + getStats(this.workingTemplate).tcost, this.x + 75, this.height - 25);
+
     // Hovering logic
     if (hoverCoords != null) {
       const roundedX = hoverCoords.x;
       const roundedY = hoverCoords.y;
 
       const item = this.getItem(roundedX, roundedY);
+
+      if (item != null && item.isBuilding()) {
+        const buildingType = item.getBuilding();
+
+        const details = buildingConstants[buildingType];
+
+        // Display a tooltip
+        context.fillStyle = 'white';
+        context.strokeStyle = 'black';
+        context.strokeRect((roundedX - 2), (roundedY + 1), 200, 50);
+        context.fillRect((roundedX - 2), (roundedY + 1), 200, 50);
+
+        context.fillStyle = 'black';
+        context.textBaseline = 'top';
+        context.font = '14px sans-serif';
+        context.fillText(details.name, (roundedX - 2), (roundedY + 1));
+        context.fillText(details.description, (roundedX - 2), (roundedY + 1) + 20);
+        context.fillText('Cost: ' + details.coinCost + ' coin, ' + details.buildTime + ' seconds', (roundedX - 2), (roundedY + 1) + 34);
+      }
     }
   }
 
