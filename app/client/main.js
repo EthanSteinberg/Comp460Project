@@ -333,7 +333,9 @@ class Game {
           break;
         case 'shiptemplate':
           const template = templates[item.templateNum];
-          this.getSelectedMapItems().forEach(shipyard => sendMessage({ type: 'MakeShip', islandID: shipyard.islandID, template }));
+          this.getSelectedMapItems().forEach(shipyard =>
+            sendMessage({ type: 'MakeShip', templateNumber: item.templateNum, shipyardId: shipyard.id, template })
+          );
           break;
         case 'hull':
           sendMessage({ type: 'UpdateMode', targetMode: 'hardpoints' });
@@ -341,10 +343,10 @@ class Game {
         case 'hardpoints':
           sendMessage({ type: 'UpdateMode', targetMode: 'hull' });
           break;
+        default:
+          // Ignore by default
       }
     }
-
-
 
     this.updateSelectionState({ ...this.selectionState, gui: { type: item.getType(), templateNum: item.getTemplateNum() } });
 

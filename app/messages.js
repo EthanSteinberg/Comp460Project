@@ -27,7 +27,8 @@ MakeBuilding: {
 }
 
 MakeShip {
-	islandID: the island the ship will be made on
+	shipyardId: the id of the shipyard to build from
+	templateNumber: the number for the template
 	template: the template of the ship
 }
 

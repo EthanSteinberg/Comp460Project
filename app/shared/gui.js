@@ -1,8 +1,5 @@
-import { statsDisplay } from './guibuttons/statsdisplay';
 import buildingConstants from './buildingconstants';
-import { getStats } from './template';
 
-import Mine from './guibuttons/mine';
 import Shipyard from './guibuttons/shipyard';
 import Shiptemplate from './guibuttons/shiptemplate';
 import Shipbuilder from './guibuttons/shipbuilder';
@@ -158,9 +155,9 @@ export default class Gui {
   getUnitButtons() {
     const result = [];
     if (this.getSelectedMapItems().length !== 0 && this.getSelectedMapItems().every(entity => entity.type === 'shipyard')) {
-      result.push(new Shiptemplate('shiptemplate', this.x + 25, 250, 50, 50, 0));
-      result.push(new Shiptemplate('shiptemplate', this.x + 75, 250, 50, 50, 1));
-      result.push(new Shiptemplate('shiptemplate', this.x + 125, 250, 50, 50, 2));
+      result.push(new Shiptemplate('shiptemplate', this.x + 25, 250, 50, 50, 0, this.getSelectedMapItems()[0]));
+      result.push(new Shiptemplate('shiptemplate', this.x + 75, 250, 50, 50, 1, this.getSelectedMapItems()[0]));
+      result.push(new Shiptemplate('shiptemplate', this.x + 125, 250, 50, 50, 2, this.getSelectedMapItems()[0]));
     } else {
       result.push(new Shiptemplate('shiptemplateGrayed', this.x + 25, 250, 50, 50, 0));
       result.push(new Shiptemplate('shiptemplateGrayed', this.x + 75, 250, 50, 50, 1));

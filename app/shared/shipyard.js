@@ -1,4 +1,5 @@
-import buildingConstants from './buildingconstants';
+import * as Ships from './ship';
+import { getStats } from '../shared/template';
 
 /**
  * A shipyard entity.
@@ -15,6 +16,9 @@ export function createShipyard(map, x, y, islandID, team) {
     id: map.getNextEntityId(),
     set: true,
     type: 'shipyard',
+    buildingQueue: [],
+    progressTowardsNextBuild: 0,
+    counters: { 0: 0, 1: 0, 2: 0 },
   };
 
   map.addEntity(shipyard);
@@ -61,10 +65,34 @@ export function getPosition(shipyard) {
   return { x: shipyard.x, y: shipyard.y };
 }
 
-export function processUpdate(shipyard) {
-  // Do nothing for now
+export function processUpdate(shipyard, map) {
+  if (shipyard.buildingQueue.length > 0) {
+    shipyard.progressTowardsNextBuild += 1;
+
+    if (shipyard.progressTowardsNextBuild === 100) {
+      const { template, templateNumber } = shipyard.buildingQueue.shift();
+      shipyard.counters[templateNumber]--;
+      const stats = getStats(template);
+
+      const { x, y } = map.getShipBuildCoords(shipyard.islandID);
+
+      if (x == null) {
+        console.error('No space available to build ship.');
+        map.getEntity(shipyard.team).coins += stats.wcost;
+      } else {
+        Ships.createShipAndHardpoints(map, x, y, template, shipyard.team);
+      }
+
+      shipyard.progressTowardsNextBuild = 0;
+    }
+  }
 }
 
 export function remove(shipyard, map) {
   map.removeEntity(shipyard.id);
+}
+
+export function addTemplateToQueue(shipyard, templateNumber, template) {
+  shipyard.counters[templateNumber]++;
+  shipyard.buildingQueue.push({ template, templateNumber });
 }

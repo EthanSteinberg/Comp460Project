@@ -4,6 +4,7 @@ import buildingConstants from '../shared/buildingconstants';
 import * as Ships from '../shared/ship';
 import * as Hardpoints from '../shared/hardpoint';
 import * as BuildingTemplates from '../shared/buildingtemplate';
+import * as Shipyards from '../shared/shipyard';
 import Types from '../shared/types';
 import * as Vectors from '../shared/vector';
 import { getStats } from '../shared/template';
@@ -107,8 +108,9 @@ function makeBuildingHandler({ building, x, y }, playerTeam) {
   }
 }
 
-function makeShipHandler({ islandID, template }, playerTeam) {
-  if (map.getEntity(islandID).team !== playerTeam) {
+function makeShipHandler({ shipyardId, template, templateNumber }, playerTeam) {
+  const shipyard = map.getEntity(shipyardId);
+  if (shipyard.team !== playerTeam) {
     console.error('Not allowed to use enemy shipyard');
     return;
   }
@@ -120,15 +122,9 @@ function makeShipHandler({ islandID, template }, playerTeam) {
     return;
   }
 
-  const { x, y } = map.getShipBuildCoords(islandID);
-
-  if (x == null) {
-    console.error('No space available to build ship.');
-    return;
-  }
-
   map.getEntity(playerTeam).coins -= stats.wcost;
-  Ships.createShipAndHardpoints(map, x, y, template, playerTeam);
+
+  Shipyards.addTemplateToQueue(shipyard, templateNumber, template);
 }
 
 function attackShipHandler({ id, targetId }, playerTeam) {
@@ -188,7 +184,7 @@ let nextTeam = 0;
 
 wss.on('connection', function connection(socket) {
   const playerTeam = String(nextTeam);
-  nextTeam += 1;
+  //nextTeam += 1;
 
   playerSockets.push(socket);
   socket.send(JSON.stringify({ type: 'StartGame', initialState: map.getInitialState(), team: playerTeam }));
