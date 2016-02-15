@@ -4,8 +4,8 @@ import GuiButton from '../guibutton';
 export default class Frigate extends GuiButton {
 
   render(context, images) {
-    if (this.selected) {
-      context.strokeStyle = 'cyan';
+    if (this.type == 'frigateSelected') {
+      context.strokeStyle = 'lightgreen';
       context.strokeRect(this.x, this.y, 50, 50);
     }
     
@@ -13,7 +13,6 @@ export default class Frigate extends GuiButton {
     context.fillStyle = 'black';
 
     context.drawImage(images.frigate, this.x, this.y, 50, 50);
-    context.fillText('FRIGATE', this.x, this.y + 60);     
   }
 
 }

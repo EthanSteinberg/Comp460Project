@@ -9,6 +9,7 @@ const sources = {
   chainshot: 'chainshot.png',
   grapeshot: 'grapeshot.png',
   shell: 'shell.png',
+  cancelshot: 'cancelshot.png',
   gunboat: 'gunboat.png',
   frigate: 'frigate.png',
   galleon: 'galleon.png',

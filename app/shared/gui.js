@@ -10,7 +10,16 @@ import Roundshot from './guibuttons/roundshot';
 import Grapeshot from './guibuttons/grapeshot';
 import Chainshot from './guibuttons/chainshot';
 import Shell from './guibuttons/shell';
+import Cancelshot from './guibuttons/cancelshot';
 import TargetToggle from './guibuttons/targettoggle';
+import Exit from './guibuttons/exit';
+import Template from './guibuttons/template';
+import Gunboat from './guibuttons/gunboat';
+import Frigate from './guibuttons/frigate';
+import Galleon from './guibuttons/galleon';
+import ShipSkeleton from './guibuttons/shipskeleton';
+import Gunslot from './guibuttons/gunslot';
+import Save from './guibuttons/save';
 
 /**
  * A map of the game containing islands and all current ships.
@@ -24,18 +33,21 @@ export default class Gui {
     this.x = canvasWidth - this.width;
     this.y = 0;
 
-    this.buttons = [
-      // Temporarily disable mines
-      // new Mine('mine', 1 + this.x, 1),
-      new Shipyard('shipyard', this.x + 25, this.y + 175, 50, 50),
-      new Shipbuilder('shipbuilder', this.x + 50, this.height - 75, 102, 26),
-    ];
+    this.buttons = [];
+    this.designerButtons = [];
 
     this.templates = templates;
 
     this.selectionState = selectionState;
 
     this.map = map;
+
+    this.displayMode = 'main';
+
+    this.changing = false;
+    this.selectedSlot = null;
+    this.chosenIndex = 0;
+    this.workingTemplate = JSON.parse(JSON.stringify(this.templates[this.chosenIndex]));
   }
 
   setSelectionState(newSelectionState) {
@@ -50,12 +62,39 @@ export default class Gui {
    * Render the gui
    */
   render(context, images, map, hoverCoords) {
+    if (this.displayMode === 'main') {
+      this.renderMain(context, images, map, hoverCoords);
+    } else if (this.displayMode === 'designer') {
+      this.renderDesigner(context, images, map, hoverCoords);
+    }
+  }
+
+  renderDesigner(context, images, map, hoverCoords) {
     context.fillStyle = 'gray';
     context.fillRect(this.x, this.y, this.width, this.height);
 
-    if (this.getUnitButtons() != null) {
-      this.drawUnitGuiBox(context, images);
+    const skeleton = new ShipSkeleton('shipskeleton', this.x + 50, this.y + 170, 100, 270);
+    skeleton.render(context, images);
+
+    for (const button of this.getDesignerButtons()) {
+      const isSelected = this.selectionState.gui != null && this.selectionState.gui.type === button.type &&
+        this.selectionState.gui.slotNum === button.slotNum;
+      button.selected = isSelected;
+      button.render(context, images);
     }
+
+    // Hovering logic
+    if (hoverCoords != null) {
+      const roundedX = hoverCoords.x;
+      const roundedY = hoverCoords.y;
+
+      const item = this.getItem(roundedX, roundedY);
+    }
+  }
+
+  renderMain(context, images, map, hoverCoords) {
+    context.fillStyle = 'gray';
+    context.fillRect(this.x, this.y, this.width, this.height);
 
     const moneyText = Math.floor(map.getEntity(this.map.team).coins).toString();
 
@@ -81,8 +120,8 @@ export default class Gui {
     for (const button of this.getButtons()) {
       const isSelected = this.selectionState.gui != null && this.selectionState.gui.type === button.type &&
         this.selectionState.gui.slotNum === button.slotNum;
-      button.render(context, images);
       button.selected = isSelected;
+      button.render(context, images);
     }
 
     if (hoverCoords != null) {
@@ -116,49 +155,6 @@ export default class Gui {
     }
   }
 
-  drawUnitGuiBox(context) {
-    for (let x = this.x; x < this.width + this.x; x++) {
-      for (let y = this.y + this.height + 1; y < this.height + 5; y++) {
-        context.fillStyle = 'gray';
-        context.fillRect(x, y, 50, 50);
-      }
-    }
-
-    if (this.getSelectedMapItems().length !== 0) {
-      if (this.getSelectedMapItems().every(entity => entity.type === 'ship')) {
-        this.getSelectedMapItems()[0].hardpoints.forEach((hardpointId, i) => {
-          const hardpoint = this.map.getEntity(hardpointId);
-          if (hardpoint != null && hardpoint.timeTillNextFire !== 0) {
-            context.save();
-            context.beginPath();
-            context.rect((this.x + i), 7, 50, 50);
-            context.clip();
-
-            const angle = (100 - hardpoint.timeTillNextFire) / 100 * Math.PI * 2;
-
-            context.globalCompositeOperation = 'multiply';
-            context.fillStyle = 'rgba(0,0,0,.5)';
-            context.beginPath();
-            context.arc((this.x + i) + 25, 7 + 25, 50, 0, angle, true);
-            context.lineTo((this.x + i) + 25, 7 + 25);
-            context.fill();
-            context.globalCompositeOperation = 'source-over';
-
-            context.strokeStyle = 'white';
-            context.beginPath();
-            context.moveTo((this.x + i) + 25, 7 + 25);
-            context.lineTo((this.x + i) + 25 + 50, 7 + 25);
-            context.arc((this.x + i) + 25, 7 + 25, 50, 0, angle, true);
-            context.lineTo((this.x + i) + 25, 7 + 25);
-            context.stroke();
-
-            context.restore();
-          }
-        });
-      } 
-    }
-  }
-
   getUnitButtons() {
     const result = [];
     if (this.getSelectedMapItems().length !== 0 && this.getSelectedMapItems().every(entity => entity.type === 'shipyard')) {
@@ -171,8 +167,112 @@ export default class Gui {
       result.push(new Shiptemplate('shiptemplateGrayed', this.x + 125, 250, 50, 50, 2));
     }
 
+    result.push(new Shipyard('shipyard', this.x + 25, this.y + 175, 50, 50));
+    result.push(new Shipbuilder('shipbuilder', this.x + 50, this.height - 75, 102, 26));
     result.push(new TargetToggle(this.map.getEntity(this.map.team).targetMode, this.x+35, 350, 128, 26));
     return result;
+  }
+
+  getDesignerButtons() {
+    const result = [];
+
+    result.push(new Exit('exit', this.x + this.width - 20, this.y, 20, 20));
+
+    result.push(new Template('template', this.x + 20, this.y + 25, 50, 50, 0));
+    result.push(new Template('template', this.x + 75, this.y + 25, 50, 50, 1));
+    result.push(new Template('template', this.x + 130, this.y + 25, 50, 50, 2));
+
+    result.push(new Gunboat('gunboat', this.x + 20, this.y + 90, 50, 50));
+    result.push(new Frigate('frigate', this.x + 75, this.y + 90, 50, 50));
+    result.push(new Galleon('galleon', this.x + 130, this.y + 90, 50, 50));
+
+    result.push(new Gunslot('gunslot', this.x + 75, this.y + 260, 40, 40, 0));
+    result.push(new Gunslot('gunslot', this.x + 75, this.y + 350, 40, 40, 1));
+
+    if (this.selectedSlot != null) {
+      result.push(new Roundshot('roundshot', this.selectedSlot.x - 60, this.selectedSlot.y + 5, 40, 40));
+      result.push(new Chainshot('chainshot', this.selectedSlot.x - 30, this.selectedSlot.y - 45, 40, 40));
+      result.push(new Grapeshot('grapeshot', this.selectedSlot.x + 30, this.selectedSlot.y - 45, 40, 40));
+      result.push(new Shell('shell', this.selectedSlot.x + 60, this.selectedSlot.y + 5, 40, 40));
+      result.push(new Cancelshot('cancelshot', this.selectedSlot.x + 5, this.selectedSlot.y + 50, 40, 40));
+    }
+
+    result.push(new Save('save', this.x, this.y + this.height - 50, 60, 50));
+
+
+    for (const button of result) {
+      button.setVisible(this.chosenIndex != null);
+
+      if (button.getType() === 'template') {
+        if (button.getSlotNum() === this.chosenIndex) {
+          button.placeItem('templateSelected');
+        } else {
+          button.placeItem('template');
+        }
+      } else if (button.getType() === 'gunboat' && this.workingTemplate.hull === 'gunboat') {
+        button.setType('gunboatSelected');
+      } else if (button.getType() === 'frigate' && this.workingTemplate.hull === 'frigate') {
+        button.setType('frigateSelected');
+      } else if (button.getType() === 'galleon' && this.workingTemplate.hull === 'galleon') {
+        button.setType('galleonSelected');
+      } else if (button.getType() === 'gunslot') {
+        const ship = this.templates[this.chosenIndex];
+        if (this.changing) {
+          button.placeItem(this.workingTemplate.hardpoints[button.getSlotNum()] || 'gunslot');
+        } else {
+          button.placeItem(this.workingTemplate.hardpoints[button.getSlotNum()] 
+            || ship.hardpoints[button.getSlotNum()] || 'gunslot');
+        }
+      }
+    }
+
+    return result;
+  }
+
+  designerSelection(item) {
+    const withItem = JSON.parse(JSON.stringify(this.workingTemplate));
+
+    switch (item.getType()) {
+      case 'exit':
+        this.displayMode = 'main';
+        this.workingTemplate = JSON.parse(JSON.stringify(this.templates[this.chosenIndex]));
+        this.changing = false;
+        break;
+      case 'template':
+        this.chosenIndex = item.getSlotNum();
+        this.workingTemplate = JSON.parse(JSON.stringify(this.templates[this.chosenIndex]));
+        this.changing = false;
+        break;
+      case 'gunboat':
+      case 'frigate':
+      case 'galleon':
+        this.workingTemplate.hull = item.getType();
+        break;
+      case 'gunslot':
+        this.selectedSlot = item;
+        break;
+      case 'roundshot':
+      case 'chainshot':
+      case 'grapeshot':
+      case 'shell':
+        withItem.hardpoints[this.selectedSlot.getSlotNum()] = item.getType();
+        this.workingTemplate = withItem;
+        this.selectedSlot = null;
+        break;
+      case 'cancelshot':
+        withItem.hardpoints[this.selectedSlot.getSlotNum()] = null;
+        this.workingTemplate = withItem;
+        this.selectedSlot = null;
+        this.changing = true;
+        break;
+      case 'save':
+        this.templates[this.chosenIndex] = this.workingTemplate;
+        this.displayMode = 'main';
+        this.workingTemplate = JSON.parse(JSON.stringify(this.templates[this.chosenIndex]));
+        this.changing = false;
+      default:
+        this.selectedSlot = null;
+    }
   }
 
   getButtons() {
@@ -180,9 +280,17 @@ export default class Gui {
   }
 
   getItem(x, y) {
-    for (const button of this.getButtons()) {
-      if (button.isOver(x, y)) {
-        return button;
+    if (this.displayMode === 'main') {
+      for (const button of this.getButtons()) {
+        if (button.isOver(x, y)) {
+          return button;
+        }
+      }
+    } else if (this.displayMode === 'designer') {
+      for (const button of this.getDesignerButtons()) {
+        if (button.isOver(x, y)) {
+          return button;
+        }
       }
     }
 

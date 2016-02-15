@@ -39,7 +39,7 @@ export default class Gunslot extends GuiButton {
         context.fillRect(this.x, this.y, 50, 50);
         break;
       default:
-        console.error('Trying to render unknown button');
+        console.error('Trying to render unknown button: ', this.rendertype);
     }
   }
 

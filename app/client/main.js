@@ -1,6 +1,5 @@
 import GameMap from '../shared/gamemap';
 import Gui from '../shared/gui';
-import ShipbuilderGui from '../shared/shipbuildergui';
 import loadImages from './images';
 import * as Ships from '../shared/ship';
 
@@ -39,7 +38,6 @@ class Main {
     this.templates = [];
 
     this.game = new Game(images);
-    this.shipbuilder = new Shipbuilder(images);
 
     this.pressedKeys = new Set();
 
@@ -68,24 +66,18 @@ class Main {
     this.canvas.addEventListener('mousedown', (event) => {
       if (this.mode === 'game') {
         this.game.mousedown(event, this.sendMessage.bind(this));
-      } else if (this.mode === 'shipbuilder') {
-        this.mode = this.shipbuilder.mousedown(event);
       }
     });
 
     this.canvas.addEventListener('mouseup', (event) => {
       if (this.mode === 'game') {
         this.mode = this.game.mouseup(event, this.sendMessage.bind(this));
-      } else if (this.mode === 'shipbuilder') {
-        this.shipbuilder.mouseup(event);
       }
     });
 
     this.canvas.addEventListener('mousemove', (event) => {
       if (this.mode === 'game') {
         this.game.mousemove(event);
-      } else if (this.mode === 'shipbuilder') {
-        this.shipbuilder.mousemove(event);
       }
     });
 
@@ -159,8 +151,6 @@ class Main {
 
     if (this.mode === 'game') {
       this.game.render();
-    } else if (this.mode === 'shipbuilder') {
-      this.shipbuilder.render();
     }
   }
 }
@@ -329,22 +319,34 @@ class Game {
   processGuiLeftMouseClick(rawX, rawY, sendMessage) {
     // In the gui
     const item = this.gui.getItem(rawX, rawY);
-    if (item != null) {
-      if (item.getType() === 'shipbuilder') {
-        return 'shipbuilder';
-      } else if (item.getType() === 'shiptemplate') {
-        const template = templates[item.templateNum];
-        this.getSelectedMapItems().forEach(shipyard => sendMessage({ type: 'MakeShip', islandID: shipyard.islandID, template }));
-        return 'game';
-      } else if (item.getType() === 'hull') {
-        sendMessage({ type: 'UpdateMode', targetMode: 'hardpoints' });
-        return 'game';
-      } else if (item.getType() === 'hardpoints') {
-        sendMessage({ type: 'UpdateMode', targetMode: 'hull' });
-        return 'game';
-      }
-      this.updateSelectionState({ ...this.selectionState, gui: { type: item.getType(), templateNum: item.getTemplateNum() } });
+
+    if (item == null) {
+      return 'game';
     }
+
+    if (this.gui.displayMode === 'designer') {
+      this.gui.designerSelection(item)
+    } else {
+      switch (item.getType()) {
+        case 'shipbuilder':
+          this.gui.displayMode = 'designer';
+          break;
+        case 'shiptemplate':
+          const template = templates[item.templateNum];
+          this.getSelectedMapItems().forEach(shipyard => sendMessage({ type: 'MakeShip', islandID: shipyard.islandID, template }));
+          break;
+        case 'hull':
+          sendMessage({ type: 'UpdateMode', targetMode: 'hardpoints' });
+          break;
+        case 'hardpoints':
+          sendMessage({ type: 'UpdateMode', targetMode: 'hull' });
+          break;
+      }
+    }
+
+
+
+    this.updateSelectionState({ ...this.selectionState, gui: { type: item.getType(), templateNum: item.getTemplateNum() } });
 
     return 'game';
   }
@@ -455,11 +457,14 @@ class Game {
       this.gui.render(this.context, this.images, this.map, null);
     }
 
-    this.context.translate(this.width - 150, 50);
-    this.context.scale(0.25, 0.25);
-    this.miniMap.renderMiniMap(this.context, this.images, this.x, this.y, this.width, this.height);
-    this.context.scale(4, 4);
-    this.context.translate(-this.width + 150, -50);
+    if (this.gui.displayMode === 'main') {
+      this.context.translate(this.width - 150, 50);
+      this.context.scale(0.25, 0.25);
+      this.miniMap.renderMiniMap(this.context, this.images, this.x, this.y, this.width, this.height);
+      this.context.scale(4, 4);
+      this.context.translate(-this.width + 150, -50);
+    }
+
   }
 
   keydown(event, pressedKeys) {
@@ -468,72 +473,6 @@ class Game {
 
   keyup(event, pressedKeys) {
     pressedKeys.delete(event.keyCode);
-  }
-}
-
-class Shipbuilder {
-  /**
-   * Contruct the shipbuilder menu
-   */
-  constructor(images) {
-    this.images = images;
-    this.shipbuildergui = new ShipbuilderGui(templates);
-
-    this.canvas = document.getElementById('canvas');
-    this.width = this.canvas.width;
-    this.height = this.canvas.height;
-    this.context = this.canvas.getContext('2d');
-
-    this.x = 0;
-    this.y = 0;
-  }
-
-  mousedown(event) {
-    const rect = this.canvas.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left + this.x - 25;
-    const mouseY = event.clientY - rect.top + this.y - 25;
-
-    if (event.button === 2) {
-      // Deselect on right click
-      this.shipbuildergui.deselect();
-      this.shipbuildergui.emptyslot(mouseX, mouseY);
-    } else if (event.button === 0) {
-      return this.shipbuildergui.select(mouseX, mouseY);
-    }
-    return 'shipbuilder';
-  }
-
-  mouseup(event) {
-    const rect = this.canvas.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left + this.x - 25;
-    const mouseY = event.clientY - rect.top + this.y - 25;
-
-    this.shipbuildergui.releaseItem(mouseX, mouseY);
-  }
-
-  mousemove(event) {
-    const rect = this.canvas.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left + this.x - 25;
-    const mouseY = event.clientY - rect.top + this.y - 25;
-
-    this.shipbuildergui.updatePos(mouseX, mouseY);
-  }
-
-  /**
-   * Render the game. Also performs updates if necessary.
-   */
-  render() {
-    this.context.clearRect(0, 0, this.width, this.height);
-    this.context.save();
-
-    this.context.translate(25, 25);
-
-    this.context.translate(-this.x, -this.y);
-
-    // Render the gui
-    this.shipbuildergui.render(this.context, this.images);
-
-    this.context.restore();
   }
 }
 
