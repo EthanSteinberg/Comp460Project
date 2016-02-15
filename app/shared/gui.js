@@ -100,18 +100,18 @@ export default class Gui {
 
         const details = buildingConstants[buildingType];
 
-        // Display a tooltip
-        context.fillStyle = 'white';
-        context.strokeStyle = 'black';
-        context.strokeRect((roundedX - 2), (roundedY + 1), 200, 50);
-        context.fillRect((roundedX - 2), (roundedY + 1), 200, 50);
+        // // Display a tooltip
+        // context.fillStyle = 'white';
+        // context.strokeStyle = 'black';
+        // context.strokeRect((roundedX - 2), (roundedY + 1), 200, 50);
+        // context.fillRect((roundedX - 2), (roundedY + 1), 200, 50);
 
-        context.fillStyle = 'black';
-        context.textBaseline = 'top';
-        context.font = '14px sans-serif';
-        context.fillText(details.name, (roundedX - 2), (roundedY + 1));
-        context.fillText(details.description, (roundedX - 2), (roundedY + 1) + 20);
-        context.fillText('Cost: ' + details.coinCost + ' coin, ' + details.buildTime + ' seconds', (roundedX - 2), (roundedY + 1) + 34);
+        // context.fillStyle = 'black';
+        // context.textBaseline = 'top';
+        // context.font = '14px sans-serif';
+        // context.fillText(details.name, (roundedX - 2), (roundedY + 1));
+        // context.fillText(details.description, (roundedX - 2), (roundedY + 1) + 20);
+        // context.fillText('Cost: ' + details.coinCost + ' coin, ' + details.buildTime + ' seconds', (roundedX - 2), (roundedY + 1) + 34);
       }
     }
   }
@@ -175,6 +175,17 @@ export default class Gui {
         const template = this.templates[item.slotNum];
         context.strokeStyle = 'cyan';
         context.strokeRect(item.x, item.y, item.width, item.height);
+
+        context.fillStyle = 'white';
+        context.strokeStyle = 'black';
+        context.strokeRect((roundedX - 2), (roundedY + 1), 200, 50);
+        context.fillRect((roundedX - 2), (roundedY + 1), 200, 50);
+
+        context.fillStyle = 'black';
+        context.textBaseline = 'top';
+        context.font = '14px sans-serif';
+        context.fillText('Cost: ' + getStats(template).ccost, (roundedX - 2), (roundedY + 1));
+        context.fillText('Build Time: ' + getStats(template).tcost, (roundedX - 2), (roundedY + 1) + 20);
       }
     }
   }
