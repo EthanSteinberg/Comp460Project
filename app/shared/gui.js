@@ -2,6 +2,7 @@ import buildingConstants from './buildingconstants';
 import { hardpoints, getStats } from './template';
 
 import Shipyard from './guibuttons/shipyard';
+import Mine from './guibuttons/mine';
 import Shiptemplate from './guibuttons/shiptemplate';
 import Shipbuilder from './guibuttons/shipbuilder';
 import Roundshot from './guibuttons/roundshot';
@@ -191,6 +192,8 @@ export default class Gui {
     }
 
     result.push(new Shipyard('shipyard', this.x + 25, this.y + 175, 50, 50));
+    result.push(new Mine('mine', this.x + 75, this.y + 175, 50, 50));
+
     result.push(new Shipbuilder('shipbuilder', this.x + 50, this.height - 75, 102, 26));
     result.push(new TargetToggle(this.map.getEntity(this.map.team).targetMode, this.x+35, 350, 128, 26));
     return result;
