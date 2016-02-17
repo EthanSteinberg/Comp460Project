@@ -21,13 +21,15 @@ import ShipSkeleton from './guibuttons/shipskeleton';
 import Gunslot from './guibuttons/gunslot';
 import Save from './guibuttons/save';
 
+export const GUI_WIDTH = 200;
+
 /**
  * A map of the game containing islands and all current ships.
  */
 export default class Gui {
 
   constructor(canvasWidth, canvasHeight, templates, selectionState, map) {
-    this.width = 200;
+    this.width = GUI_WIDTH;
     this.height = canvasHeight;
 
     this.x = canvasWidth - this.width;

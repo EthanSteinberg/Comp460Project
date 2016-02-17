@@ -1,5 +1,6 @@
 import GameMap from '../shared/gamemap';
 import Gui from '../shared/gui';
+import { GUI_WIDTH } from '../shared/gui';
 import loadImages from './images';
 import * as Ships from '../shared/ship';
 
@@ -206,14 +207,13 @@ class Game {
     this.gui.setSelectionState(this.selectionState);
   }
 
-  performMouseUp(event, sendMessage) {
-
+  performMouseUp(event, sendMessage) {g
     if (event.button === 0) {
       // Select/Deselect on left click or do button thingy
 
       const { rawX, rawY } = this.getRawMouseCords(event);
 
-      if (rawX > this.width - (8 * 50)) {
+      if (rawX > this.width - GUI_WIDTH) {
         return this.processGuiLeftMouseClick(rawX, rawY, sendMessage);
       }
 
@@ -231,7 +231,7 @@ class Game {
 
       const { rawX, rawY } = this.getRawMouseCords(event);
 
-      if (rawX > this.width - (8 * 50)) {
+      if (rawX > this.width - GUI_WIDTH) {
         // Ignore right clicks on the gui
         return 'game';
       }
@@ -258,7 +258,7 @@ class Game {
 
     this.mouseDownRawPosition = { rawX, rawY };
 
-    if (rawX < this.width - (8 * 50)) {
+    if (rawX < this.width - GUI_WIDTH) {
       this.mouseDownGamePosition = this.getMouseGamePosition(rawX, rawY);
     }
   }
@@ -350,7 +350,7 @@ class Game {
   }
 
   isDragAction(mouseX, mouseY) {
-    if (this.hoveredCoords.x >= this.width - (8 * 50)) {
+    if (this.hoveredCoords.x >= this.width - GUI_WIDTH) {
       return false;
     }
 
@@ -423,7 +423,7 @@ class Game {
     // Render the map and everything on it.
     this.map.render(this.context, this.images, this.selectionState);
 
-    if (this.hoveredCoords && this.hoveredCoords.x < this.width - (8 * 50) && this.selectionState.gui == null) {
+    if (this.hoveredCoords && this.hoveredCoords.x < this.width - GUI_WIDTH && this.selectionState.gui == null) {
       if (this.mouseDownGamePosition != null) {
         const hoverGameCoords = this.getMouseGamePosition(this.hoveredCoords.x, this.hoveredCoords.y);
 
@@ -439,7 +439,7 @@ class Game {
 
     this.context.restore();
 
-    if (this.hoveredCoords && this.hoveredCoords.x >= this.width - (8 * 50)) {
+    if (this.hoveredCoords && this.hoveredCoords.x >= this.width - GUI_WIDTH) {
       this.gui.render(this.context, this.images, this.map, this.hoveredCoords);
     } else {
       this.gui.render(this.context, this.images, this.map, null);
