@@ -54,6 +54,15 @@ export function render(hardpoint, map, context, images) {
   context.strokeRect(x * 50 - 10, y * 50 + 5, 20, 5);
 }
 
+export function renderTemplate(hardpoint, slotnum, x, y, context, images) {
+  var modifier = 10;
+  if (slotnum == 1) {
+    modifier = 30;
+  }
+
+  context.drawImage(images.cannon, x + 20, y + modifier, 10, 10);
+}
+
 export function getPosition(hardpoint, map) {
   const ship = map.getEntity(hardpoint.shipId);
 

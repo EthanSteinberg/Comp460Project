@@ -447,9 +447,9 @@ class Game {
 
     if (this.gui.displayMode === 'main') {
       this.context.translate(this.width - 150, 50);
-      this.context.scale(0.20, 0.20);
+      this.context.scale(0.10, 0.10);
       this.miniMap.renderMiniMap(this.context, this.images, this.x, this.y, this.width, this.height);
-      this.context.scale(5, 5);
+      this.context.scale(10, 10);
       this.context.translate(-this.width + 150, -50);
     }
   }

@@ -3,73 +3,80 @@
  */
 let nextId = 0;
 
-const roundshot = {
+export const roundshot = {
+  name: 'Roundshot',
+  description: 'Standard range. Deals 10 dmg.',
   health: 100,
   damage: 10,
   speed: 0,
   weight: -10,
-  wcost: 10,
-  ccost: 10,
+  cost: 10,
   tcost: 10,
 };
 
-const chainshot = {
+export const chainshot = {
+  name: 'Chainshot',
+  description: 'Slows ships. Deals 5 dmg.',
   health: 100,
   damage: 5,
   speed: 0,
   weight: -20,
-  wcost: 25,
-  ccost: 10,
+  cost: 25,
   tcost: 10,
 };
 
-const grapeshot = {
+export const grapeshot = {
+  name: 'Grapeshot',
+  description: 'Short range. Deals 20 dmg.',
   health: 100,
   damage: 20,
   speed: 0,
   weight: -5,
-  wcost: 50,
-  ccost: 50,
+  cost: 50,
   tcost: 20,
 };
 
-const shell = {
+export const shell = {
+  name: 'Shell',
+  description: 'Long range. Deals 5 dmg.',
   health: 100,
   damage: 5,
   speed: 0,
   weight: -20,
-  wcost: 50,
-  ccost: 100,
+  cost: 50,
   tcost: 20,
 };
 
-const gunboat = {
+export const gunboat = {
+  name: 'Gunboat',
+  description: 'Small fast ship.',
   health: 100,
   damage: 0,
   speed: 20,
   weight: 25,
-  wcost: 100,
-  ccost: 10,
+  cost: 100,
   tcost: 60,
 };
 
-const frigate = {
+export const frigate = {
+  name: 'Frigate',
+  description: 'Well balanced ship.',
   health: 300,
   damage: 0,
   speed: 10,
   weight: 50,
-  wcost: 200,
-  ccost: 50,
+  cost: 200,
   tcost: 120,
 };
 
-const galleon = {
+export const galleon = {
+  name: 'Galleon',
+  description: 'The pearl of the navy.',
   health: 600,
   damage: 0,
   speed: 5,
   weight: 100,
-  wcost: 300,
-  ccost: 100,
+  cost: 300,
   tcost: 180,
 };
 
@@ -91,8 +98,7 @@ const empty = {
   damage: 0,
   speed: 0,
   weight: 0,
-  wcost: 0,
-  ccost: 0,
+  cost: 0,
   tcost: 0,
 };
 

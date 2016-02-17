@@ -1,6 +1,6 @@
 import GuiButton from '../guibutton';
 import { getStats } from '../template';
-
+import * as Hardpoints from '../hardpoint';
 
 export default class Shiptemplate extends GuiButton {
 
@@ -16,6 +16,14 @@ export default class Shiptemplate extends GuiButton {
         context.fillStyle = 'black';
         context.fillText(count.toString(), this.x, this.y);
         context.drawImage(images.ship, this.x, this.y, this.width, this.height);
+
+        var i = 0;
+        for (const hardpoint of this.template.hardpoints) {
+          if (hardpoint != null) {
+            Hardpoints.renderTemplate(hardpoint, i, this.x, this.y, context, images);
+          }
+          i += 1;
+        }
 
         if (this.selection.buildingQueue.length > 0 &&
           this.selection.buildingQueue[0].templateNumber === this.slotNum) {

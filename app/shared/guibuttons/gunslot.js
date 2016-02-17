@@ -37,6 +37,9 @@ export default class Gunslot extends GuiButton {
       case 'gunslot':
         context.fillStyle = 'coral';
         context.fillRect(this.x, this.y, 50, 50);
+        context.globalAlpha = 0.25;
+        context.drawImage(images.cannon, this.x, this.y, 50, 50);
+        context.globalAlpha = 1.0;
         break;
       default:
         console.error('Trying to render unknown button: ', this.rendertype);

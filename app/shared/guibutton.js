@@ -10,7 +10,7 @@ let nextId = 0;
 
 export default class GuiButton {
 
-  constructor(type, x, y, width, height, slotNum, selection) {
+  constructor(type, x, y, width, height, slotNum, selection, template) {
     this.type = type;
     this.rendertype = type;
     this.originalX = x;
@@ -27,6 +27,8 @@ export default class GuiButton {
     this.templateNum = slotNum;
 
     this.selection = selection;
+
+    this.template = template;
   }
 
   getX() {

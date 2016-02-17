@@ -1,5 +1,6 @@
 import buildingConstants from './buildingconstants';
-import { hardpoints, getStats } from './template';
+import { roundshot, grapeshot, chainshot, shell,
+  gunboat, frigate, galleon, hardpoints, getStats } from './template';
 
 import Shipyard from './guibuttons/shipyard';
 import Mine from './guibuttons/mine';
@@ -72,6 +73,13 @@ export default class Gui {
     context.fillStyle = 'gray';
     context.fillRect(this.x, this.y, this.width, this.height);
 
+    // titles
+    context.fillStyle = 'black';
+    context.textBaseline = 'top';
+    context.font = '14px sans-serif';
+    context.fillText("SAVE SLOTS", this.x + 20, this.y + 10);
+    context.fillText("SELECT A HULL", this.x + 20, this.y + 85);
+
     const skeleton = new ShipSkeleton('shipskeleton', this.x + 50, this.y + 170, 100, 270);
     skeleton.render(context, images);
 
@@ -82,11 +90,16 @@ export default class Gui {
       button.render(context, images);
     }
 
+    // Display stats at the bottom of the gui
     context.fillStyle = 'black';
     context.textBaseline = 'top';
     context.font = '14px sans-serif';
-    context.fillText('Cost: ' + getStats(this.workingTemplate).ccost, this.x + 76, this.height - 50);
-    context.fillText('Build Time: ' + getStats(this.workingTemplate).tcost, this.x + 75, this.height - 25);
+    context.fillText(this.workingTemplate.hull.toUpperCase(), this.x + 60, this.height - 50);
+    context.fillText(this.workingTemplate.hardpoints, this.x + 60, this.height - 35);
+    context.fillText('Cost: ' + getStats(this.workingTemplate).cost + ' coin, ' 
+      + getStats(this.workingTemplate).tcost + ' sec', 
+      this.x + 60, this.height - 20);
+
 
     // Hovering logic
     if (hoverCoords != null) {
@@ -95,23 +108,62 @@ export default class Gui {
 
       const item = this.getItem(roundedX, roundedY);
 
-      if (item != null && item.isBuilding()) {
-        const buildingType = item.getBuilding();
+      if (item != null) {
+        var details = null;
+        var type = item.getType();
 
-        const details = buildingConstants[buildingType];
+        if (type == 'gunslot' && item.rendertype != 'gunslot') {
+          type = item.rendertype;
+        }
 
-        // // Display a tooltip
-        // context.fillStyle = 'white';
-        // context.strokeStyle = 'black';
-        // context.strokeRect((roundedX - 2), (roundedY + 1), 200, 50);
-        // context.fillRect((roundedX - 2), (roundedY + 1), 200, 50);
+        switch (type) {
+          case 'gunboat':
+          case 'gunboatSelected':
+            details = gunboat;
+            break;
+          case 'frigate':
+          case 'frigateSelected':
+            details = frigate;
+            break;
+          case 'galleon':
+          case 'galleonSelected':
+            details = galleon;
+            break;
+          case 'roundshot':
+            details = roundshot;
+            break;
+          case 'chainshot':
+            details = chainshot;
+            break;
+          case 'grapeshot':
+            details = grapeshot;
+            break;
+          case 'shell':
+            details = shell;
+            break;
+        }
 
-        // context.fillStyle = 'black';
-        // context.textBaseline = 'top';
-        // context.font = '14px sans-serif';
-        // context.fillText(details.name, (roundedX - 2), (roundedY + 1));
-        // context.fillText(details.description, (roundedX - 2), (roundedY + 1) + 20);
-        // context.fillText('Cost: ' + details.coinCost + ' coin, ' + details.buildTime + ' seconds', (roundedX - 2), (roundedY + 1) + 34);
+
+        if (details != null) {
+          // Display a tooltip
+          context.fillStyle = 'white';
+          context.strokeStyle = 'black';
+          var modifier = 0;
+          if ((roundedX - 2) > this.x + this.width/2 - 100) {
+            modifier = this.width/2 * -1
+          }
+
+          context.strokeRect((roundedX - 2) + modifier, (roundedY + 1), 200, 50);
+          context.fillRect((roundedX - 2) + modifier, (roundedY + 1), 200, 50);
+
+          context.fillStyle = 'black';
+          context.textBaseline = 'top';
+          context.font = '14px sans-serif';
+
+          context.fillText(details.name, (roundedX - 2) + modifier, (roundedY + 1));
+          context.fillText(details.description, (roundedX - 2) + modifier, (roundedY + 1) + 20);
+          context.fillText('Cost: ' + details.cost + ' coin, ' + details.tcost + ' seconds', (roundedX - 2) + modifier, (roundedY + 1) + 34);
+        }
       }
     }
   }
@@ -152,6 +204,11 @@ export default class Gui {
       const roundedX = hoverCoords.x;
       const roundedY = hoverCoords.y;
 
+      var modifier = 0;
+      if ((roundedX - 2) > this.x + this.width/2 - 100) {
+        modifier = this.width/2 * -1
+      }
+
       const item = this.getItem(roundedX, roundedY);
 
       if (item != null && item.isBuilding()) {
@@ -162,30 +219,33 @@ export default class Gui {
         // Display a tooltip
         context.fillStyle = 'white';
         context.strokeStyle = 'black';
-        context.strokeRect((roundedX - 2), (roundedY + 1), 200, 50);
-        context.fillRect((roundedX - 2), (roundedY + 1), 200, 50);
+        context.strokeRect((roundedX - 2) + modifier, (roundedY + 1), 200, 50);
+        context.fillRect((roundedX - 2) + modifier, (roundedY + 1), 200, 50);
 
         context.fillStyle = 'black';
         context.textBaseline = 'top';
         context.font = '14px sans-serif';
-        context.fillText(details.name, (roundedX - 2), (roundedY + 1));
-        context.fillText(details.description, (roundedX - 2), (roundedY + 1) + 20);
-        context.fillText('Cost: ' + details.coinCost + ' coin, ' + details.buildTime + ' seconds', (roundedX - 2), (roundedY + 1) + 34);
-      } else if (item != null && item.getType() === "shiptemplate") {
+        context.fillText(details.name, (roundedX - 2) + modifier, (roundedY + 1));
+        context.fillText(details.description, (roundedX - 2) + modifier, (roundedY + 1) + 20);
+        context.fillText('Cost: ' + details.coinCost + ' coin, ' + details.buildTime + ' seconds', (roundedX - 2) + modifier, (roundedY + 1) + 34);
+      } else if (item != null && (item.getType() === "shiptemplate" || item.getType() === "shiptemplateGrayed")) {
         const template = this.templates[item.slotNum];
         context.strokeStyle = 'cyan';
         context.strokeRect(item.x, item.y, item.width, item.height);
 
         context.fillStyle = 'white';
         context.strokeStyle = 'black';
-        context.strokeRect((roundedX - 2), (roundedY + 1), 200, 50);
-        context.fillRect((roundedX - 2), (roundedY + 1), 200, 50);
+        context.strokeRect((roundedX - 2) + modifier, (roundedY + 1), 200, 50);
+        context.fillRect((roundedX - 2) + modifier, (roundedY + 1), 200, 50);
 
         context.fillStyle = 'black';
         context.textBaseline = 'top';
         context.font = '14px sans-serif';
-        context.fillText('Cost: ' + getStats(template).ccost, (roundedX - 2), (roundedY + 1));
-        context.fillText('Build Time: ' + getStats(template).tcost, (roundedX - 2), (roundedY + 1) + 20);
+        context.fillText(template.hull.toUpperCase(), (roundedX - 2) + modifier, (roundedY + 1));
+        context.fillText(template.hardpoints, (roundedX - 2) + modifier, (roundedY + 1) + 20);
+        context.fillText('Cost: ' + getStats(template).cost + ' coin, ' 
+          + getStats(template).tcost + ' sec', 
+          (roundedX - 2) + modifier, (roundedY + 1) + 34);
       }
     }
   }
@@ -193,9 +253,12 @@ export default class Gui {
   getUnitButtons() {
     const result = [];
     if (this.getSelectedMapItems().length !== 0 && this.getSelectedMapItems().every(entity => entity.type === 'shipyard')) {
-      result.push(new Shiptemplate('shiptemplate', this.x + 25, 250, 50, 50, 0, this.getSelectedMapItems()[0]));
-      result.push(new Shiptemplate('shiptemplate', this.x + 75, 250, 50, 50, 1, this.getSelectedMapItems()[0]));
-      result.push(new Shiptemplate('shiptemplate', this.x + 125, 250, 50, 50, 2, this.getSelectedMapItems()[0]));
+      result.push(new Shiptemplate('shiptemplate', this.x + 25, 250, 50, 50, 0, 
+        this.getSelectedMapItems()[0], this.templates[0]));
+      result.push(new Shiptemplate('shiptemplate', this.x + 75, 250, 50, 50, 1, 
+        this.getSelectedMapItems()[0], this.templates[1]));
+      result.push(new Shiptemplate('shiptemplate', this.x + 125, 250, 50, 50, 2, 
+        this.getSelectedMapItems()[0], this.templates[2]));
     } else {
       result.push(new Shiptemplate('shiptemplateGrayed', this.x + 25, 250, 50, 50, 0));
       result.push(new Shiptemplate('shiptemplateGrayed', this.x + 75, 250, 50, 50, 1));
@@ -215,13 +278,13 @@ export default class Gui {
 
     result.push(new Exit('exit', this.x + this.width - 20, this.y, 20, 20));
 
-    result.push(new Template('template', this.x + 20, this.y + 25, 50, 50, 0));
-    result.push(new Template('template', this.x + 75, this.y + 25, 50, 50, 1));
-    result.push(new Template('template', this.x + 130, this.y + 25, 50, 50, 2));
+    result.push(new Template('template', this.x + 20, this.y + 25, 50, 50, 0, null, this.templates[0]));
+    result.push(new Template('template', this.x + 75, this.y + 25, 50, 50, 1, null, this.templates[1]));
+    result.push(new Template('template', this.x + 130, this.y + 25, 50, 50, 2, null, this.templates[2]));
 
-    result.push(new Gunboat('gunboat', this.x + 20, this.y + 90, 50, 50));
-    result.push(new Frigate('frigate', this.x + 75, this.y + 90, 50, 50));
-    result.push(new Galleon('galleon', this.x + 130, this.y + 90, 50, 50));
+    result.push(new Gunboat('gunboat', this.x + 20, this.y + 100, 50, 50));
+    result.push(new Frigate('frigate', this.x + 75, this.y + 100, 50, 50));
+    result.push(new Galleon('galleon', this.x + 130, this.y + 100, 50, 50));
 
     result.push(new Gunslot('gunslot', this.x + 75, this.y + 260, 40, 40, 0));
     result.push(new Gunslot('gunslot', this.x + 75, this.y + 350, 40, 40, 1));
