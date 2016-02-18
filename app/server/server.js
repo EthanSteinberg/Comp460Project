@@ -121,12 +121,12 @@ function makeShipHandler({ shipyardId, template, templateNumber }, playerTeam) {
 
   const stats = getStats(template);
 
-  if (stats.wcost > map.getEntity(playerTeam).coins) {
+  if (stats.cost > map.getEntity(playerTeam).coins) {
     console.error('Trying to build a ship you cant afford');
     return;
   }
 
-  map.getEntity(playerTeam).coins -= stats.wcost;
+  map.getEntity(playerTeam).coins -= stats.cost;
 
   Shipyards.addTemplateToQueue(shipyard, templateNumber, template);
 }

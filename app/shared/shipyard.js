@@ -81,7 +81,7 @@ export function processUpdate(shipyard, map) {
 
       if (x == null) {
         console.error('No space available to build ship.');
-        map.getEntity(shipyard.team).coins += stats.wcost;
+        map.getEntity(shipyard.team).coins += stats.cost;
       } else {
         Ships.createShipAndHardpoints(map, x, y, template, shipyard.team);
       }
@@ -93,6 +93,12 @@ export function processUpdate(shipyard, map) {
 
 export function remove(shipyard, map) {
   map.removeEntity(shipyard.id);
+
+  // Refund in progress ships
+  for (const { template } of shipyard.buildingQueue) {
+    const stats = getStats(template);
+    map.getEntity(shipyard.team).coins += stats.cost;
+  }
 }
 
 export function addTemplateToQueue(shipyard, templateNumber, template) {

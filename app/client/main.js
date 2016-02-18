@@ -1,16 +1,13 @@
 import GameMap from '../shared/gamemap';
+import { MAP_HEIGHT, MAP_WIDTH } from '../shared/gamemap';
 import Gui from '../shared/gui';
 import { GUI_WIDTH } from '../shared/gui';
 import loadImages from './images';
-import * as Ships from '../shared/ship';
 
 import { defaultTemplate } from '../shared/template';
 
 const MILLISECONDS_PER_LOGIC_UPDATE = 5;
 const MILLISECONDS_PER_RENDER_UPDATE = 15;
-
-const SCALE = 3;
-
 
 const templates = [defaultTemplate(), defaultTemplate(), defaultTemplate()];
 
@@ -45,10 +42,10 @@ class Main {
     this.teamAssigned = false;
 
     this.actionMap = {
-      37: () => this.game.x -= 1,
-      38: () => this.game.y -= 1,
-      39: () => this.game.x += 1,
-      40: () => this.game.y += 1,
+      37: () => this.moveGame(-1, 0),
+      38: () => this.moveGame(0, -1),
+      39: () => this.moveGame(1, 0),
+      40: () => this.moveGame(0, 1),
     };
 
     document.addEventListener('keydown', (event) => {
@@ -87,6 +84,26 @@ class Main {
       'RemoveEntity': this.game._removeEntity.bind(this.game),
       'StartGame': this._startGame.bind(this),
     };
+  }
+
+  moveGame(dx, dy) {
+    const newX = this.game.x + dx;
+    const newY = this.game.y + dy;
+
+    if (newX < 0 || newY < 0) {
+      return;
+    }
+
+    if (newY + this.height > MAP_HEIGHT * 50) {
+      return;
+    }
+
+    if (newX + this.width - GUI_WIDTH > MAP_WIDTH * 50) {
+      return;
+    }
+
+    this.game.x = newX;
+    this.game.y = newY;
   }
 
   sendMessage(message) {
@@ -207,7 +224,7 @@ class Game {
     this.gui.setSelectionState(this.selectionState);
   }
 
-  performMouseUp(event, sendMessage) {g
+  performMouseUp(event, sendMessage) {
     if (event.button === 0) {
       // Select/Deselect on left click or do button thingy
 
@@ -336,8 +353,13 @@ class Game {
         case 'hardpoints':
           sendMessage({ type: 'UpdateMode', targetMode: 'hull' });
           break;
-        default:
+
+        case 'mine':
+        case 'shipyard':
           this.updateSelectionState({ ...this.selectionState, gui: { type: item.getType(), templateNum: item.getTemplateNum() } });
+          break;
+
+        default:
 
       }
     }

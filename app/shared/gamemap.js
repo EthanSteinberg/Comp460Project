@@ -26,14 +26,14 @@ export default class GameMap {
     this.entities.set('0', {
       id: '0',
       type: 'playerstate',
-      coins: 5000,
+      coins: 50,
       targetMode: 'hull',
     });
 
     this.entities.set('1', {
       id: '1',
       type: 'playerstate',
-      coins: 5000,
+      coins: 50,
       targetMode: 'hull',
     });
 
