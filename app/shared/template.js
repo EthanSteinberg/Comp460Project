@@ -128,6 +128,6 @@ export function getStats(template) {
 export function defaultTemplate() {
   return {
     hull: 'gunboat',
-    hardpoints: [],
+    hardpoints: ['roundshot'],
   };
 }

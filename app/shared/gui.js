@@ -19,6 +19,7 @@ import Frigate from './guibuttons/frigate';
 import Galleon from './guibuttons/galleon';
 import ShipSkeleton from './guibuttons/shipskeleton';
 import Gunslot from './guibuttons/gunslot';
+import Hullslot from './guibuttons/hullslot';
 import Save from './guibuttons/save';
 
 export const GUI_WIDTH = 200;
@@ -80,9 +81,8 @@ export default class Gui {
     context.textBaseline = 'top';
     context.font = '14px sans-serif';
     context.fillText("SAVE SLOTS", this.x + 20, this.y + 10);
-    context.fillText("SELECT A HULL", this.x + 20, this.y + 85);
 
-    const skeleton = new ShipSkeleton('shipskeleton', this.x + 50, this.y + 170, 100, 270);
+    const skeleton = new ShipSkeleton('shipskeleton', this.x + 50, this.y + 110, 100, 340);
     skeleton.render(context, images);
 
     for (const button of this.getDesignerButtons()) {
@@ -96,11 +96,11 @@ export default class Gui {
     context.fillStyle = 'black';
     context.textBaseline = 'top';
     context.font = '14px sans-serif';
-    context.fillText(this.workingTemplate.hull.toUpperCase(), this.x + 60, this.height - 50);
-    context.fillText(this.workingTemplate.hardpoints, this.x + 60, this.height - 35);
+    context.fillText(this.workingTemplate.hull.toUpperCase(), this.x + 10, this.height - 50);
+    context.fillText(this.workingTemplate.hardpoints, this.x + 20, this.height - 35);
     context.fillText('Cost: ' + getStats(this.workingTemplate).cost + ' coin, ' 
       + getStats(this.workingTemplate).tcost + ' sec', 
-      this.x + 60, this.height - 20);
+      this.x + 20, this.height - 20);
 
 
     // Hovering logic
@@ -255,23 +255,23 @@ export default class Gui {
   getUnitButtons() {
     const result = [];
     if (this.getSelectedMapItems().length !== 0 && this.getSelectedMapItems().every(entity => entity.type === 'shipyard')) {
-      result.push(new Shiptemplate('shiptemplate', this.x + 25, 250, 50, 50, 0, 
+      result.push(new Shiptemplate('shiptemplate', this.x + 20, 250, 50, 50, 0, 
         this.getSelectedMapItems()[0], this.templates[0]));
       result.push(new Shiptemplate('shiptemplate', this.x + 75, 250, 50, 50, 1, 
         this.getSelectedMapItems()[0], this.templates[1]));
-      result.push(new Shiptemplate('shiptemplate', this.x + 125, 250, 50, 50, 2, 
+      result.push(new Shiptemplate('shiptemplate', this.x + 130, 250, 50, 50, 2, 
         this.getSelectedMapItems()[0], this.templates[2]));
     } else {
-      result.push(new Shiptemplate('shiptemplateGrayed', this.x + 25, 250, 50, 50, 0));
-      result.push(new Shiptemplate('shiptemplateGrayed', this.x + 75, 250, 50, 50, 1));
-      result.push(new Shiptemplate('shiptemplateGrayed', this.x + 125, 250, 50, 50, 2));
+      result.push(new Shiptemplate('shiptemplateGrayed', this.x + 20, 250, 50, 50, 0, null, this.templates[0]));
+      result.push(new Shiptemplate('shiptemplateGrayed', this.x + 75, 250, 50, 50, 1, null, this.templates[1]));
+      result.push(new Shiptemplate('shiptemplateGrayed', this.x + 130, 250, 50, 50, 2, null, this.templates[2]));
     }
 
     result.push(new Shipyard('shipyard', this.x + 25, this.y + 175, 50, 50));
     result.push(new Mine('mine', this.x + 75, this.y + 175, 50, 50));
 
-    result.push(new Shipbuilder('shipbuilder', this.x + 50, this.height - 75, 102, 26));
-    result.push(new TargetToggle(this.map.getEntity(this.map.team).targetMode, this.x+35, 350, 128, 26));
+    result.push(new TargetToggle(this.map.getEntity(this.map.team).targetMode, this.x+35, this.height - 75, 128, 26));
+    result.push(new Shipbuilder('shipbuilder', this.x + 50, 350, 102, 26));
     return result;
   }
 
@@ -284,22 +284,25 @@ export default class Gui {
     result.push(new Template('template', this.x + 75, this.y + 25, 50, 50, 1, null, this.templates[1]));
     result.push(new Template('template', this.x + 130, this.y + 25, 50, 50, 2, null, this.templates[2]));
 
-    result.push(new Gunboat('gunboat', this.x + 20, this.y + 100, 50, 50));
-    result.push(new Frigate('frigate', this.x + 75, this.y + 100, 50, 50));
-    result.push(new Galleon('galleon', this.x + 130, this.y + 100, 50, 50));
-
-    result.push(new Gunslot('gunslot', this.x + 75, this.y + 260, 40, 40, 0));
+    result.push(new Gunslot('gunslot', this.x + 75, this.y + 210, 40, 40, 0));
     result.push(new Gunslot('gunslot', this.x + 75, this.y + 350, 40, 40, 1));
+    result.push(new Hullslot('hullslot', this.x + 75, this.y + 280, 40, 40, 1));
 
     if (this.selectedSlot != null) {
-      result.push(new Roundshot('roundshot', this.selectedSlot.x - 60, this.selectedSlot.y + 5, 40, 40));
-      result.push(new Chainshot('chainshot', this.selectedSlot.x - 30, this.selectedSlot.y - 45, 40, 40));
-      result.push(new Grapeshot('grapeshot', this.selectedSlot.x + 30, this.selectedSlot.y - 45, 40, 40));
-      result.push(new Shell('shell', this.selectedSlot.x + 60, this.selectedSlot.y + 5, 40, 40));
-      result.push(new Cancelshot('cancelshot', this.selectedSlot.x + 5, this.selectedSlot.y + 50, 40, 40));
+      if (this.selectedSlot.getType() == 'gunslot') {
+        result.push(new Roundshot('roundshot', this.selectedSlot.x - 60, this.selectedSlot.y + 5, 40, 40));
+        result.push(new Chainshot('chainshot', this.selectedSlot.x - 30, this.selectedSlot.y - 45, 40, 40));
+        result.push(new Grapeshot('grapeshot', this.selectedSlot.x + 30, this.selectedSlot.y - 45, 40, 40));
+        result.push(new Shell('shell', this.selectedSlot.x + 60, this.selectedSlot.y + 5, 40, 40));
+        result.push(new Cancelshot('cancelshot', this.selectedSlot.x + 5, this.selectedSlot.y + 50, 40, 40));
+      } else if (this.selectedSlot.getType() == 'hullslot') {
+        result.push(new Gunboat('gunboat', this.selectedSlot.x - 60, this.selectedSlot.y + 5, 40, 40));
+        result.push(new Frigate('frigate', this.selectedSlot.x + 5, this.selectedSlot.y - 45, 40, 40));
+        result.push(new Galleon('galleon', this.selectedSlot.x + 60, this.selectedSlot.y + 5, 40, 40));
+      }
     }
 
-    result.push(new Save('save', this.x, this.y + this.height - 50, 60, 50));
+    result.push(new Save('save', this.x + 50, this.y + 77, 102, 26));
 
 
     for (const button of result) {
@@ -311,12 +314,13 @@ export default class Gui {
         } else {
           button.placeItem('template');
         }
-      } else if (button.getType() === 'gunboat' && this.workingTemplate.hull === 'gunboat') {
-        button.setType('gunboatSelected');
-      } else if (button.getType() === 'frigate' && this.workingTemplate.hull === 'frigate') {
-        button.setType('frigateSelected');
-      } else if (button.getType() === 'galleon' && this.workingTemplate.hull === 'galleon') {
-        button.setType('galleonSelected');
+      } else if (button.getType() === 'hullslot') {
+        const ship = this.templates[this.chosenIndex];
+        if (this.changing) {
+          button.placeItem(this.workingTemplate.hull || 'hullslot');
+        } else {
+          button.placeItem(this.workingTemplate.hull || ship.hull || 'hullslot');
+        }
       } else if (button.getType() === 'gunslot') {
         const ship = this.templates[this.chosenIndex];
         if (this.changing) {
@@ -332,6 +336,11 @@ export default class Gui {
   }
 
   designerSelection(item) {
+    if (item == null) {
+        this.selectedSlot = null;
+        return;
+    }
+
     const withItem = JSON.parse(JSON.stringify(this.workingTemplate));
 
     switch (item.getType()) {
@@ -349,8 +358,10 @@ export default class Gui {
       case 'frigate':
       case 'galleon':
         this.workingTemplate.hull = item.getType();
+        this.selectedSlot = null;
         break;
       case 'gunslot':
+      case 'hullslot':
         this.selectedSlot = item;
         break;
       case 'roundshot':

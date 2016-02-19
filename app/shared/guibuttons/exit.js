@@ -9,9 +9,8 @@ export default class Exit extends GuiButton {
       context.strokeRect(this.x, this.y, this.width, this.height);
     }
 
-    context.fillStyle = 'crimson';
-    context.fillRect(this.x, this.y, this.width, this.height);
-    context.drawImage(images.exit, this.x, this.y, this.width, this.height);
+	context.drawImage(images.exit, this.x, this.y, this.width, this.height);
+
   }
 
 }

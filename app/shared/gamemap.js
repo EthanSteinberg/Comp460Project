@@ -28,6 +28,7 @@ export default class GameMap {
       type: 'playerstate',
       coins: 50,
       targetMode: 'hull',
+      numItems: 0,
     });
 
     this.entities.set('1', {
@@ -35,6 +36,7 @@ export default class GameMap {
       type: 'playerstate',
       coins: 50,
       targetMode: 'hull',
+      numItems: 0,
     });
 
     this.team = null;
@@ -142,7 +144,18 @@ export default class GameMap {
       }
     }
 
+    var player0 = this.getEntity('0');
+    var player1 = this.getEntity('1');
+    player0.numItems = 0;
+    player1.numItems = 0;
+
     for (const entity of this.entities.values()) {
+      if (entity.team == '0') {
+        player0.numItems += 1;
+      } else if (entity.team == '1') {
+        player1.numItems += 1;
+      }
+
       const isSelected = selectionState.map.indexOf(entity.id) !== -1;
 
       if (entity.type === 'ship') {

@@ -11,7 +11,7 @@ export default class Chainshot extends GuiButton {
 
     context.fillStyle = 'lightgreen';
 	context.beginPath();
-	context.arc(this.x + this.width/2, this.y + this.width/2, this.width/2 + 5, 0, Math.PI * 2, true);
+	context.arc(this.x + this.width/2, this.y + this.width/2, this.height/2 + 5, 0, Math.PI * 2, true);
 	context.fill();
 
     context.drawImage(images.chainshot, this.x, this.y, this.width, this.height);

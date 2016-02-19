@@ -330,13 +330,13 @@ class Game {
     // In the gui
     const item = this.gui.getItem(rawX, rawY);
 
-    if (item == null) {
-      return 'game';
-    }
-
     if (this.gui.displayMode === 'designer') {
       this.gui.designerSelection(item);
     } else {
+      if (item == null) {
+        return 'game';
+      }
+      
       switch (item.getType()) {
         case 'shipbuilder':
           this.gui.displayMode = 'designer';

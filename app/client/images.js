@@ -24,6 +24,8 @@ const sources = {
   targettoggleCannon: 'targettoggleCannon.png',
   blueFlag: 'blueFlag.png',
   redFlag: 'redFlag.png',
+  save: 'save.png',
+  grayBack: 'grayBack.png',
 };
 
 /**

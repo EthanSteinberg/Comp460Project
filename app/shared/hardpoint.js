@@ -55,12 +55,28 @@ export function render(hardpoint, map, context, images) {
 }
 
 export function renderTemplate(hardpoint, slotnum, x, y, context, images) {
-  var modifier = 10;
+  var modifier = 0;
   if (slotnum == 1) {
-    modifier = 30;
+    modifier = 20;
   }
 
-  context.drawImage(images.cannon, x + 20, y + modifier, 10, 10);
+  context.fillStyle = 'coral';
+  context.fillRect(x + modifier, y, 10, 10);    
+
+  switch (hardpoint) {
+    case 'roundshot':
+      context.drawImage(images.roundshot, x + modifier, y, 10, 10);
+      break;
+    case 'grapeshot':
+      context.drawImage(images.grapeshot, x + modifier, y, 10, 10);
+      break;
+    case 'chainshot':
+      context.drawImage(images.chainshot, x + modifier, y, 10, 10);
+      break;
+    case 'shell':
+      context.drawImage(images.shell, x + modifier, y, 10, 10);
+      break;
+  }
 }
 
 export function getPosition(hardpoint, map) {

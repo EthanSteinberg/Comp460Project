@@ -12,15 +12,28 @@ export default class Shiptemplate extends GuiButton {
 
     switch (this.type) {
       case 'shiptemplate':
+        context.drawImage(images.grayBack, this.x, this.y, this.width, this.height);
+
         const count = this.selection.counters[this.slotNum];
         context.fillStyle = 'black';
         context.fillText(count.toString(), this.x, this.y);
-        context.drawImage(images.ship, this.x, this.y, this.width, this.height);
+
+        switch (this.template.hull) {
+          case 'gunboat':
+            context.drawImage(images.gunboat, this.x, this.y, this.width, this.height);
+            break;
+          case 'frigate':
+            context.drawImage(images.frigate, this.x, this.y, this.width, this.height);
+            break;
+          case 'galleon':
+            context.drawImage(images.galleon, this.x, this.y, this.width, this.height);
+            break;
+        }
 
         var i = 0;
         for (const hardpoint of this.template.hardpoints) {
           if (hardpoint != null) {
-            Hardpoints.renderTemplate(hardpoint, i, this.x, this.y, context, images);
+            Hardpoints.renderTemplate(hardpoint, i, this.x + 10, this.y + 38, context, images);
           }
           i += 1;
         }
@@ -57,10 +70,30 @@ export default class Shiptemplate extends GuiButton {
         }
         break;
       case 'shiptemplateGrayed':
+        switch (this.template.hull) {
+          case 'gunboat':
+            context.drawImage(images.gunboat, this.x, this.y, this.width, this.height);
+            break;
+          case 'frigate':
+            context.drawImage(images.frigate, this.x, this.y, this.width, this.height);
+            break;
+          case 'galleon':
+            context.drawImage(images.galleon, this.x, this.y, this.width, this.height);
+            break;
+        }
+
+        var i = 0;
+        for (const hardpoint of this.template.hardpoints) {
+          if (hardpoint != null) {
+            Hardpoints.renderTemplate(hardpoint, i, this.x + 10, this.y + 38, context, images);
+          }
+          i += 1;
+        }
+
         context.globalAlpha = 0.25;
-        context.drawImage(images.ship, this.x, this.y, this.width, this.height);
         context.fillStyle = 'gray';
         context.fillRect(this.x, this.y, this.width, this.height);
+        context.drawImage(images.grayBack, this.x, this.y, this.width, this.height);
         context.globalAlpha = 1.0;
         break;
     }

@@ -6,10 +6,15 @@ export default class Gunboat extends GuiButton {
   render(context, images) {
     if (this.type == 'gunboatSelected') {
       context.strokeStyle = 'lightgreen';
-      context.strokeRect(this.x, this.y, 50, 50);
+      context.strokeRect(this.x, this.y, this.width, this.height);
     }
 
-    context.drawImage(images.gunboat, this.x, this.y, 50, 50);
+    context.fillStyle = 'lightgreen';
+  	context.beginPath();
+  	context.arc(this.x + this.width/2, this.y + this.width/2, this.height/2 + 5, 0, Math.PI * 2, true);
+  	context.fill();
+
+    context.drawImage(images.gunboat, this.x, this.y, this.width, this.height);
    }
 
 }
