@@ -172,6 +172,18 @@ export default class GameMap {
         BuildingTemplates.render(entity, this, context, images);
       }
     }
+
+    if (player0.numItems == 0) {
+      context.fillStyle = 'firebrick';
+      context.textBaseline = 'top';
+      context.font = '24px sans-serif';
+      context.fillText("Red Team Wins", 100, 50);
+    } else if (player1.numItems == 0) {
+      context.fillStyle = 'royalblue';
+      context.textBaseline = 'top';
+      context.font = '24px sans-serif';
+      context.fillText("Blue Team Wins", 100, 50);
+    }
   }
 
   /**
