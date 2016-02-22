@@ -27,7 +27,7 @@ const MILLISECONDS_PER_LOGIC_UPDATE = 30;
 
 const map = new GameMap();
 
-const playerSockets = [];
+const playerSockets = {};
 
 let pendingUpdates = [];
 
@@ -69,7 +69,8 @@ function updateGameState() {
   pendingUpdates = [];
 
   for (const updateMessage of updateMessages) {
-    for (const playerSocket of playerSockets) {
+    for (const team of Object.keys(playerSockets)) {
+      const playerSocket = playerSockets[team];
       playerSocket.send(JSON.stringify(updateMessage));
     }
   }
@@ -175,6 +176,29 @@ function updateModeHandler({ targetMode }, playerTeam) {
   map.getEntity(playerTeam).targetMode = targetMode;
 }
 
+const teamReadyMap = {
+  '0': false,
+  '1': false,
+};
+
+function updateReadyState({ readyState }, playerTeam) {
+  teamReadyMap[playerTeam] = readyState;
+
+  for (const team of Object.keys(playerSockets)) {
+    playerSockets[team].send(JSON.stringify({ type: 'UpdateReadyStates', readyStates: teamReadyMap }));
+  }
+
+  for (const team of Object.keys(teamReadyMap)) {
+    if (teamReadyMap[team] === false) {
+      return; // Some is not ready yet
+    }
+  }
+
+  for (const team of Object.keys(playerSockets)) {
+    playerSockets[team].send(JSON.stringify({ type: 'StartGame', initialState: map.getInitialState(), team: playerTeam }));
+  }
+}
+
 const messageHandlers = {
   'MoveShip': moveShipHandler,
   'MakeBuilding': makeBuildingHandler,
@@ -182,6 +206,7 @@ const messageHandlers = {
   'AttackShip': attackShipHandler,
   'FireShot': fireShotHandler,
   'UpdateMode': updateModeHandler,
+  'SetReadyState': updateReadyState,
 };
 
 let nextTeam = 0;
@@ -190,8 +215,8 @@ wss.on('connection', function connection(socket) {
   const playerTeam = String(nextTeam);
   nextTeam += 1;
 
-  playerSockets.push(socket);
-  socket.send(JSON.stringify({ type: 'StartGame', initialState: map.getInitialState(), team: playerTeam }));
+  playerSockets[playerTeam] = socket;
+  socket.send(JSON.stringify({ type: 'AssignTeam', team: playerTeam, readyStates: teamReadyMap }));
 
   socket.on('message', function incoming(message) {
     console.error('received: "%s"', message);
@@ -204,8 +229,7 @@ wss.on('connection', function connection(socket) {
   });
 
   socket.on('close', function close() {
-    const index = playerSockets.indexOf(socket);
-    playerSockets.splice(index, 1);
+    // TODO: Need to implement this properly!
   });
 });
 
