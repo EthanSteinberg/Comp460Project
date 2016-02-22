@@ -166,7 +166,7 @@ const teamReadyMap = {
   '1': false,
 };
 
-const debug = true;
+const debug = false;
 
 function updateReadyState({ readyState }, playerTeam) {
   teamReadyMap[playerTeam] = readyState;
@@ -182,7 +182,7 @@ function updateReadyState({ readyState }, playerTeam) {
   }
 
   for (const team of Object.keys(playerSockets)) {
-    playerSockets[team].send(JSON.stringify({ type: 'StartGame', initialState: map.getInitialState(), team: playerTeam }));
+    playerSockets[team].send(JSON.stringify({ type: 'StartGame', initialState: map.getInitialState(), team }));
   }
 }
 

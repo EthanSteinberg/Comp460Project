@@ -10,7 +10,7 @@ export const roundshot = {
   damage: 10,
   speed: 0,
   weight: -10,
-  cost: 10,
+  cost: 30,
   tcost: 10,
 };
 
@@ -54,29 +54,29 @@ export const gunboat = {
   damage: 0,
   speed: 20,
   weight: 25,
-  cost: 100,
+  cost: 50,
   tcost: 60,
 };
 
 export const frigate = {
   name: 'Frigate',
   description: 'Well balanced ship.',
-  health: 300,
+  health: 200,
   damage: 0,
   speed: 10,
   weight: 50,
-  cost: 200,
+  cost: 100,
   tcost: 120,
 };
 
 export const galleon = {
   name: 'Galleon',
   description: 'The pearl of the navy.',
-  health: 600,
+  health: 300,
   damage: 0,
   speed: 5,
   weight: 100,
-  cost: 300,
+  cost: 125,
   tcost: 180,
 };
 

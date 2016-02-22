@@ -31,7 +31,7 @@ export function processUpdate(projectile, map) {
   if (dist < 0.1) {
     map.removeEntity(projectile.id);
 
-    target.health -= 50;
+    target.health -= 25;
 
     if (target.health <= 0) {
       Types[target.type].remove(target, map);
