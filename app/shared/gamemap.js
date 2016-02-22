@@ -47,7 +47,7 @@ export default class GameMap {
     };
 
     Ships.createShipAndHardpoints(this, 0, 3, template, '0');
-    Ships.createShipAndHardpoints(this, 9, 9, template, '1');
+    Ships.createShipAndHardpoints(this, 17, 17, template, '1');
 
     const island1coordinates = [
       [1, 1],
@@ -55,15 +55,20 @@ export default class GameMap {
     ];
     Islands.createIsland(this, island1coordinates);
     const island2coordinates = [
-      [10, 9],
-      [10, 10],
+      [18, 17],
+      [18, 18],
     ];
     Islands.createIsland(this, island2coordinates);
 
     const island3coordinates = [
-      [5, 5],
+      [17, 3],
+    ];
+    const island4coordinates = [
+      [3, 17],
     ];
     Islands.createIsland(this, island3coordinates);
+    Islands.createIsland(this, island4coordinates);
+
 
     this.width = MAP_WIDTH;
     this.height = MAP_HEIGHT;

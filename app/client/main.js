@@ -99,8 +99,7 @@ class Main {
     this.lastUpdate = performance.now();
   }
 
-  _startGame({ initialState }) {
-    const team = this.startscreen.getTeam();
+  _startGame({ initialState, team }) {
     this.game.init(initialState, team);
     this.mode = 'game';
   }

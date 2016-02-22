@@ -51,11 +51,6 @@ AttackShip: {
 	targetMode: what attack mode the ship is in
 }
 
-FireShot: {
-	id: The hardpoint to attack with,
-	targetId: The id of the target
-}
-
 UpdateEntity: {
 	id: The id of the entity,
 	data: The new data for the entity

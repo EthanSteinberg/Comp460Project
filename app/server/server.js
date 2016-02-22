@@ -89,6 +89,10 @@ function moveShipHandler({ shipId, targetLocation }, playerTeam) {
   // Move the ship
   const ship = map.getEntity(shipId);
 
+  if (ship == null) {
+    return;
+  }
+
   if (ship.team === playerTeam) {
     Ships.moveTo(ship, map, targetLocation);
   }
@@ -136,6 +140,10 @@ function attackShipHandler({ id, targetId }, playerTeam) {
   const sourceShip = map.getEntity(id);
   const targetShip = map.getEntity(targetId);
 
+  if (sourceShip == null) {
+    return;
+  }
+
   if (targetShip == null) {
     // Target is already dead!
     return;
@@ -149,29 +157,6 @@ function attackShipHandler({ id, targetId }, playerTeam) {
   Ships.attackTarget(sourceShip, targetShip);
 }
 
-
-function fireShotHandler({ targetId, id }, playerTeam) {
-  const hardpoint = map.getEntity(id);
-  const ship = map.getEntity(hardpoint.shipId);
-
-  if (ship.team !== playerTeam) {
-    console.error('You are not allowed to command enemy ships.');
-    return;
-  }
-
-  const target = map.getEntity(targetId);
-
-  const targetPosition = Types[target.type].getPosition(target, map);
-  const position = Ships.getPosition(ship);
-
-  if (hardpoint.timeTillNextFire !== 0 || Vectors.getDistance(position, targetPosition) >= 2) {
-    // Don't fire if still waiting or out of distance.
-    return;
-  }
-
-  Hardpoints.fire(hardpoint, map, map.getEntity(targetId));
-}
-
 function updateModeHandler({ targetMode }, playerTeam) {
   map.getEntity(playerTeam).targetMode = targetMode;
 }
@@ -180,6 +165,8 @@ const teamReadyMap = {
   '0': false,
   '1': false,
 };
+
+const debug = true;
 
 function updateReadyState({ readyState }, playerTeam) {
   teamReadyMap[playerTeam] = readyState;
@@ -204,7 +191,6 @@ const messageHandlers = {
   'MakeBuilding': makeBuildingHandler,
   'MakeShip': makeShipHandler,
   'AttackShip': attackShipHandler,
-  'FireShot': fireShotHandler,
   'UpdateMode': updateModeHandler,
   'SetReadyState': updateReadyState,
 };
@@ -212,11 +198,20 @@ const messageHandlers = {
 let nextTeam = 0;
 
 wss.on('connection', function connection(socket) {
-  const playerTeam = String(nextTeam);
+  let playerTeam = String(nextTeam);
+  if (debug) {
+    playerTeam = '0';
+  }
+
   nextTeam += 1;
 
   playerSockets[playerTeam] = socket;
-  socket.send(JSON.stringify({ type: 'AssignTeam', team: playerTeam, readyStates: teamReadyMap }));
+
+  if (debug) {
+    socket.send(JSON.stringify({ type: 'StartGame', initialState: map.getInitialState(), team: playerTeam }));
+  } else {
+    socket.send(JSON.stringify({ type: 'AssignTeam', team: playerTeam, readyStates: teamReadyMap }));
+  }
 
   socket.on('message', function incoming(message) {
     console.error('received: "%s"', message);
