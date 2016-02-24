@@ -309,7 +309,7 @@ export default class Game {
     this.context.translate(-this.x, -this.y);
 
     // Render the map and everything on it.
-    this.map.render(this.context, this.images, this.selectionState);
+    var mode = this.map.render(this.context, this.images, this.selectionState);
 
     if (this.hoveredCoords && this.hoveredCoords.x < this.width - GUI_WIDTH && this.selectionState.gui == null) {
       if (this.mouseDownGamePosition != null) {
@@ -340,6 +340,8 @@ export default class Game {
       this.context.scale(10, 10);
       this.context.translate(-this.width + 150, -50);
     }
+
+    return mode;
   }
 
   keydown(event) {

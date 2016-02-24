@@ -161,6 +161,18 @@ function updateModeHandler({ targetMode }, playerTeam) {
   map.getEntity(playerTeam).targetMode = targetMode;
 }
 
+function startNewGame({}, playerTeam) {
+  for (const team of Object.keys(teamReadyMap)) {
+    teamReadyMap[team] = false;
+  }
+
+  for (const team of Object.keys(playerSockets)) {
+    playerSockets[team].send(JSON.stringify({ type: 'UpdateReadyStates', readyStates: teamReadyMap }));
+  }
+
+  map.initialSetup();
+}
+
 const teamReadyMap = {
   '0': false,
   '1': false,
@@ -193,6 +205,7 @@ const messageHandlers = {
   'AttackShip': attackShipHandler,
   'UpdateMode': updateModeHandler,
   'SetReadyState': updateReadyState,
+  'StartNewGame': startNewGame,
 };
 
 let nextTeam = 0;

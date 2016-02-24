@@ -20,6 +20,15 @@ export default class GameMap {
   constructor() {
     this.miniview = new MiniView('miniview');
 
+    this.team = null;
+
+    this.initialSetup();
+
+    this.width = MAP_WIDTH;
+    this.height = MAP_HEIGHT;
+  }
+
+  initialSetup() {
     this.entities = new Map();
     this.nextEntityId = 2;
 
@@ -39,15 +48,13 @@ export default class GameMap {
       numItems: 0,
     });
 
-    this.team = null;
-
     const template = {
       hull: 'gunboat',
       hardpoints: [],
     };
 
     Ships.createShipAndHardpoints(this, 0, 3, template, '0');
-    Ships.createShipAndHardpoints(this, 17, 17, template, '1');
+    // Ships.createShipAndHardpoints(this, 17, 17, template, '1');
 
     const island1coordinates = [
       [1, 1],
@@ -68,10 +75,6 @@ export default class GameMap {
     ];
     Islands.createIsland(this, island3coordinates);
     Islands.createIsland(this, island4coordinates);
-
-
-    this.width = MAP_WIDTH;
-    this.height = MAP_HEIGHT;
   }
 
   getInitialState() {
@@ -124,9 +127,9 @@ export default class GameMap {
   render(context, images, selectionState) {
     if (this.mode === 'tactical') {
       context.scale(SCALE, SCALE);
-      this.renderMap(context, images, selectionState);
+      return this.renderMap(context, images, selectionState);
     } else {
-      this.renderMap(context, images, selectionState);
+      return this.renderMap(context, images, selectionState);
     }
   }
 
@@ -183,12 +186,15 @@ export default class GameMap {
       context.textBaseline = 'top';
       context.font = '24px sans-serif';
       context.fillText("Red Team Wins", 100, 50);
+      return 'end';
     } else if (player1.numItems == 0) {
       context.fillStyle = 'royalblue';
       context.textBaseline = 'top';
       context.font = '24px sans-serif';
       context.fillText("Blue Team Wins", 100, 50);
+      return 'end';
     }
+    return 'game';
   }
 
   /**

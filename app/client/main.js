@@ -5,6 +5,7 @@ const MILLISECONDS_PER_RENDER_UPDATE = 15;
 
 import Game from './game';
 import StartScreen from './startscreen';
+import EndScreen from './endscreen';
 
 /**
  * The central game object for most of the logic.
@@ -32,6 +33,7 @@ class Main {
 
     this.game = new Game(images);
     this.startscreen = new StartScreen(images);
+    this.endscreen = new EndScreen(images, this.game);
 
     document.addEventListener('keydown', (event) => {
       if (this.mode === 'game') {
@@ -55,6 +57,8 @@ class Main {
         this.game.mousedown(event, this.sendMessage.bind(this));
       } else if (this.mode == 'start') {
         this.startscreen.mousedown(event, this.sendMessage.bind(this));
+      } else if (this.mode == 'end') {
+        this.mode = this.endscreen.mousedown(event, this.sendMessage.bind(this));
       }
     });
 
@@ -142,9 +146,11 @@ class Main {
     this.update(time);
 
     if (this.mode === 'game') {
-      this.game.render();
-    } else {
+      this.mode = this.game.render();
+    } else if (this.mode === 'start') {
       this.startscreen.render();
+    } else if (this.mode === 'end') {
+      this.endscreen.render();
     }
   }
 }
