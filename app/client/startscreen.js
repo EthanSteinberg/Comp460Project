@@ -1,5 +1,5 @@
 export default class StartScreen {
-  constructor(images) {
+  constructor(images, map) {
     this.canvas = document.getElementById('canvas');
     this.context = this.canvas.getContext('2d');
 
@@ -8,6 +8,8 @@ export default class StartScreen {
 
     this.images = images;
     this.team = null;
+
+    this.map = map;
   }
 
   render() {
@@ -15,6 +17,12 @@ export default class StartScreen {
 
     this.context.fillStyle = 'cyan';
     this.context.fillRect(0, 0, this.width, this.height);
+
+    this.context.translate(this.width - 250, 50);
+    this.context.scale(0.25, 0.25);
+    this.map.renderMiniMap(this.context, this.images, 0, 0, this.width, this.height);
+    this.context.scale(4, 4);
+    this.context.translate(-this.width + 250, -50);
 
     if (this.team == null) {
       this.renderLoading();
@@ -29,12 +37,12 @@ export default class StartScreen {
       for (const team of Object.keys(this.readyStates)) {
         if (team === this.team) {
           this.context.fillStyle = (this.readyStates[team] ? 'green' : 'red');
-          this.context.fillRect(175, startingY - 30, 150, 40);
+          this.context.fillRect(175, startingY, 150, 40);
 
           this.context.strokeStyle = 'black';
           this.context.save();
           this.context.lineWidth = '4';
-          this.context.strokeRect(175, startingY - 30, 150, 40);
+          this.context.strokeRect(175, startingY, 150, 40);
           this.context.restore();
         }
 
@@ -84,7 +92,7 @@ export default class StartScreen {
     const boxStartX = 175;
     const boxEndX = boxStartX + 150;
 
-    const boxStartY = 200 + 50 * teamOffset - 30;
+    const boxStartY = 200 + 50 * teamOffset;
     const boxEndY = boxStartY + 40;
 
     if (rawX >= boxStartX && rawX <= boxEndX && rawY >= boxStartY && rawY <= boxEndY) {

@@ -54,7 +54,7 @@ export default class GameMap {
     };
 
     Ships.createShipAndHardpoints(this, 0, 3, template, '0');
-    // Ships.createShipAndHardpoints(this, 17, 17, template, '1');
+    Ships.createShipAndHardpoints(this, 17, 17, template, '1');
 
     const island1coordinates = [
       [1, 1],
@@ -181,17 +181,13 @@ export default class GameMap {
       }
     }
 
+    context.fillStyle = 'black';
+    context.textBaseline = 'top';
+    context.font = '50px sans-serif';
+    context.fillText("Mini Map", -25, -100);
     if (player0.numItems == 0) {
-      context.fillStyle = 'firebrick';
-      context.textBaseline = 'top';
-      context.font = '24px sans-serif';
-      context.fillText("Red Team Wins", 100, 50);
       return 'end';
     } else if (player1.numItems == 0) {
-      context.fillStyle = 'royalblue';
-      context.textBaseline = 'top';
-      context.font = '24px sans-serif';
-      context.fillText("Blue Team Wins", 100, 50);
       return 'end';
     }
     return 'game';
