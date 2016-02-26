@@ -29,8 +29,6 @@ class Main {
 
     this.images = images;
 
-    this.templates = [];
-
     this.game = new Game(images);
     this.startscreen = new StartScreen(images, this.game.miniMap);
     this.endscreen = new EndScreen(images, this.game);

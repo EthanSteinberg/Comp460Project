@@ -48,6 +48,14 @@ export default class Game {
   init(initialState, team) {
     this.map.init(initialState);
 
+    if (team === '0') {
+      this.x = 0;
+      this.y = 0;
+    } else {
+      this.x = MAP_WIDTH * 50 - this.width + GUI_WIDTH;
+      this.y = MAP_HEIGHT * 50 - this.height;
+    }
+
     this.team = team;
     this.map.team = team;
   }

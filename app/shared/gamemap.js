@@ -1,10 +1,9 @@
 import * as Ships from './ship';
-import * as Projectiles from './projectile';
 import * as Mines from './mine';
 import * as Shipyards from './shipyard';
 import * as Hardpoints from './hardpoint';
 import * as Islands from './island';
-import * as BuildingTemplates from './buildingtemplate';
+import Types from './types';
 import MiniView from './miniview';
 
 export const MAP_WIDTH = 20;
@@ -255,32 +254,32 @@ export default class GameMap {
       }
     }
 
-    var player0 = this.getEntity('0');
-    var player1 = this.getEntity('1');
+    let player0 = this.getEntity('0');
+    let player1 = this.getEntity('1');
     player0.numItems = 0;
     player1.numItems = 0;
 
     for (const entity of this.entities.values()) {
-      if (entity.team == '0') {
+      if (entity.team === '0') {
         player0.numItems += 1;
-      } else if (entity.team == '1') {
+      } else if (entity.team === '1') {
         player1.numItems += 1;
       }
 
       const isSelected = selectionState.map.indexOf(entity.id) !== -1;
 
-      if (entity.type === 'ship') {
-        Ships.render(entity, this, context, images, isSelected, selectionState.gui);
-      } else if (entity.type === 'projectile') {
-        Projectiles.render(entity, this, context, images, isSelected);
-      } else if (entity.type === 'shipyard') {
-        Shipyards.render(entity, this, context, images, isSelected);
-      } else if (entity.type === 'mine') {
-        Mines.render(entity, this, context, images, isSelected);
-      } else if (entity.type === 'island') {
-        Islands.render(entity, this, context, images);
-      } else if (entity.type === 'buildingTemplate') {
-        BuildingTemplates.render(entity, this, context, images);
+      const type = Types[entity.type];
+      if (type.render != null) {
+        type.render(entity, this, context, images, isSelected);
+      }
+    }
+
+    for (const entity of this.entities.values()) {
+      const isSelected = selectionState.map.indexOf(entity.id) !== -1;
+
+      const type = Types[entity.type];
+      if (type.renderOverlay != null) {
+        type.renderOverlay(entity, this, context, images, isSelected);
       }
     }
 
@@ -406,9 +405,9 @@ export default class GameMap {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         if (this.isNextToIsland(islandID, x, y)) {
-          var flag = true;
+          let flag = true;
           for (const entity of this.entities.values()) {
-            if (entity.x == x && entity.y == y) {
+            if (entity.x === x && entity.y === y) {
               flag = false;
             }
           }
@@ -449,18 +448,10 @@ export default class GameMap {
    */
   processUpdate() {
     for (const entity of this.entities.values()) {
-      if (entity.type === 'ship') {
-        Ships.processUpdate(entity, this);
-      } else if (entity.type === 'projectile') {
-        Projectiles.processUpdate(entity, this);
-      } else if (entity.type === 'shipyard') {
-        Shipyards.processUpdate(entity, this);
-      } else if (entity.type === 'mine') {
-        Mines.processUpdate(entity, this);
-      } else if (entity.type === 'island') {
-        Islands.processUpdate(entity, this);
-      } else if (entity.type === 'buildingTemplate') {
-        BuildingTemplates.processUpdate(entity, this);
+      const type = Types[entity.type];
+      if (type == null) { console.log(entity.type); }
+      if (type.processUpdate != null) {
+        type.processUpdate(entity, this);
       }
     }
   }

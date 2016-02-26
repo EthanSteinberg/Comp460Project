@@ -29,6 +29,8 @@ const map = new GameMap();
 
 const playerSockets = {};
 
+const debug = false;
+
 let pendingUpdates = [];
 
 function serializeMapEntities() {
@@ -185,8 +187,6 @@ const teamReadyMap = {
   '0': false,
   '1': false,
 };
-
-const debug = false;
 
 function updateReadyState({ readyState }, playerTeam) {
   teamReadyMap[playerTeam] = readyState;

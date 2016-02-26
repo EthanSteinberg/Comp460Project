@@ -1,4 +1,4 @@
-const shipMoveSpeed = 0.05;
+const shipMoveSpeedFactor = 0.05/20;
 
 import { hulls } from './template';
 import * as Hardpoints from './hardpoint';
@@ -57,25 +57,41 @@ export function getOrientation(ship) {
   return Math.atan2(ship.y - lastPosition.y, ship.x - lastPosition.x) + Math.PI / 2;
 }
 
-export function render(ship, map, context, images, isSelected, guiSelection) {
-  context.save();
-  context.translate(ship.x * 50, ship.y * 50);
-
-  const angle = getOrientation(ship);
-
+export function render(ship, map, context, images, isSelected) {
   if (ship.team === '1') {
     context.fillStyle = 'firebrick';
   } else {
     context.fillStyle = 'royalblue';
   }
   context.beginPath();
-  context.arc(0, 0, 25, 0, Math.PI * 2, true);
+  context.arc(ship.x * 50, ship.y * 50, 25, 0, Math.PI * 2, true);
   context.fill();
+
+  context.save();
+  context.translate(ship.x * 50, ship.y * 50);
+
+  const angle = getOrientation(ship);
 
   context.rotate(angle);
   context.drawImage(images.ship, (-0.5) * 50, (-0.5) * 50, 50, 50);
   context.restore();
 
+  for (const hardpointId of ship.hardpoints) {
+    const hardpoint = map.getEntity(hardpointId);
+    if (hardpoint != null) {
+      Hardpoints.render(hardpoint, map, context, images);
+    }
+  }
+
+  if (isSelected) {
+    context.strokeStyle = 'cyan';
+    context.beginPath();
+    context.arc(ship.x * 50, ship.y * 50, 25, 0, Math.PI * 2, true);
+    context.stroke();
+  }
+}
+
+export function renderOverlay(ship, map, context) {
   context.fillStyle = 'red';
   context.fillRect(ship.x * 50 - 20, ship.y * 50 + 30, 40, 5);
 
@@ -86,27 +102,6 @@ export function render(ship, map, context, images, isSelected, guiSelection) {
 
   context.strokeStyle = 'black';
   context.strokeRect(ship.x * 50 - 20, ship.y * 50 + 30, 40, 5);
-
-  if (isSelected) {
-    context.strokeStyle = 'cyan';
-    context.beginPath();
-    context.arc(ship.x * 50, ship.y * 50, 25, 0, Math.PI * 2, true);
-    context.stroke();
-  }
-
-  if (guiSelection != null && guiSelection.type === 'roundshot' && ship.hardpoints.indexOf(guiSelection.templateNum) !== -1) {
-    context.strokeStyle = 'black';
-    context.beginPath();
-    context.arc(ship.x * 50, ship.y * 50, 2 * 50, 0, 2 * Math.PI);
-    context.stroke();
-  }
-
-  for (const hardpointId of ship.hardpoints) {
-    const hardpoint = map.getEntity(hardpointId);
-    if (hardpoint != null) {
-      Hardpoints.render(hardpoint, map, context, images);
-    }
-  }
 }
 
 function setPosition(ship, x, y) {
@@ -204,6 +199,7 @@ function getDistanceToTarget(ship, target) {
 function performMove(ship, map) {
   const currentMove = ship.mode.targetLocation;
 
+  const shipMoveSpeed = shipMoveSpeedFactor * hulls[ship.template.hull].speed;
   const scale = Math.min(shipMoveSpeed, getDistanceToTarget(ship, currentMove));
 
   const delta = {
@@ -355,10 +351,6 @@ export function processUpdate(ship, map) {
     default:
       console.error('Unexcepted type ' + ship.mode.type);
   }
-}
-
-export function getPosition(ship) {
-  return { x: ship.x, y: ship.y };
 }
 
 export function getHealth(ship) {
