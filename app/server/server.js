@@ -173,6 +173,14 @@ function startNewGame({}, playerTeam) {
   map.initialSetup();
 }
 
+function updateMap({ mapNum }, playerTeam) {
+  map.initialSetup(mapNum);
+
+  for (const team of Object.keys(playerSockets)) {
+    playerSockets[team].send(JSON.stringify({ type: 'UpdateMap', mapNum: mapNum, initialState: map.getInitialState(), team }));
+  }
+}
+
 const teamReadyMap = {
   '0': false,
   '1': false,
@@ -206,6 +214,7 @@ const messageHandlers = {
   'UpdateMode': updateModeHandler,
   'SetReadyState': updateReadyState,
   'StartNewGame': startNewGame,
+  'UpdateMap': updateMap,
 };
 
 let nextTeam = 0;

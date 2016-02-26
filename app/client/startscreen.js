@@ -1,3 +1,5 @@
+import MapSelect from '../shared/guibuttons/mapselect';
+
 export default class StartScreen {
   constructor(images, map) {
     this.canvas = document.getElementById('canvas');
@@ -10,6 +12,13 @@ export default class StartScreen {
     this.team = null;
 
     this.map = map;
+
+    this.buttons = [];
+    this.buttons.push(new MapSelect('mapselect', 700, 100, 100, 50, 0))
+    this.buttons.push(new MapSelect('mapselect', 700, 200, 100, 50, 1))
+    this.buttons.push(new MapSelect('mapselect', 700, 300, 100, 50, 2))
+
+    this.buttons[0].selected = true;
   }
 
   render() {
@@ -23,6 +32,10 @@ export default class StartScreen {
     this.map.renderMiniMap(this.context, this.images, 0, 0, this.width, this.height);
     this.context.scale(4, 4);
     this.context.translate(-this.width + 250, -50);
+
+    for (const button of this.buttons) {
+      button.render(this.context, this.images);
+    }
 
     if (this.team == null) {
       this.renderLoading();
@@ -69,6 +82,16 @@ export default class StartScreen {
     this.readyStates = readyStates;
   }
 
+  selectMap(mapNum) {
+    for (const button of this.buttons) {
+      if (button.getSlotNum() === mapNum) {
+        button.selected = true;
+      } else {
+        button.selected = false;
+      }
+    }
+  }
+
   getTeam() {
     return this.team;
   }
@@ -98,6 +121,12 @@ export default class StartScreen {
     if (rawX >= boxStartX && rawX <= boxEndX && rawY >= boxStartY && rawY <= boxEndY) {
       console.log('send it');
       sendMessage({ type: 'SetReadyState', readyState: !this.readyStates[this.team] });
+    }
+
+    for (const button of this.buttons) {
+      if (button.isOver(rawX, rawY)) {
+        sendMessage({ type: 'UpdateMap', mapNum: button.getSlotNum() });
+      }
     }
   }
 }

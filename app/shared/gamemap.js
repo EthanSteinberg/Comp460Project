@@ -17,18 +17,18 @@ const SCALE = 3;
  */
 export default class GameMap {
 
-  constructor() {
+  constructor(mapNum) {
     this.miniview = new MiniView('miniview');
 
     this.team = null;
 
-    this.initialSetup();
+    this.initialSetup(mapNum);
 
     this.width = MAP_WIDTH;
     this.height = MAP_HEIGHT;
   }
 
-  initialSetup() {
+  initialSetup(mapNum) {
     this.entities = new Map();
     this.nextEntityId = 2;
 
@@ -48,13 +48,30 @@ export default class GameMap {
       numItems: 0,
     });
 
-    const template = {
+    this.template = {
       hull: 'gunboat',
       hardpoints: [],
     };
 
-    Ships.createShipAndHardpoints(this, 0, 3, template, '0');
-    Ships.createShipAndHardpoints(this, 17, 17, template, '1');
+    switch (mapNum) {
+      case 0:
+        this.setupMapZero();
+        break;
+      case 1:
+        this.setupMapOne();
+        break;
+      case 2:
+        this.setupMapTwo();
+        break;
+      default:
+        this.setupMapZero();
+        break;
+    }
+  }
+
+  setupMapZero() {
+    Ships.createShipAndHardpoints(this, 0, 3, this.template, '0');
+    Ships.createShipAndHardpoints(this, 17, 17, this.template, '1');
 
     const island1coordinates = [
       [1, 1],
@@ -76,6 +93,92 @@ export default class GameMap {
     Islands.createIsland(this, island3coordinates);
     Islands.createIsland(this, island4coordinates);
   }
+
+  setupMapOne() {
+    Ships.createShipAndHardpoints(this, 0, 3, this.template, '0');
+    Ships.createShipAndHardpoints(this, 16, 17, this.template, '1');
+
+    const island1coordinates = [
+      [1, 1],
+      [1, 2],
+      [2, 1],
+      [2, 2],
+    ];
+    Islands.createIsland(this, island1coordinates);
+
+    const island2coordinates = [
+      [17, 17],
+      [17, 18],
+      [18, 17],
+      [18, 18],
+    ];
+    Islands.createIsland(this, island2coordinates);
+
+    const island3coordinates = [
+      [17, 3],
+    ];
+    const island4coordinates = [
+      [3, 17],
+    ];
+    Islands.createIsland(this, island3coordinates);
+    Islands.createIsland(this, island4coordinates);
+
+    const island5coordinates = [
+      [10, 10],
+      [10, 11],
+      [11, 10],
+      [11, 11],
+    ];
+    Islands.createIsland(this, island5coordinates);
+  }
+
+  setupMapTwo() {
+    Ships.createShipAndHardpoints(this, 0, 3, this.template, '0');
+    Ships.createShipAndHardpoints(this, 16, 17, this.template, '1');
+
+    const island1coordinates = [
+      [1, 1],
+      [1, 2],
+      [2, 1],
+      [2, 2],
+    ];
+    Islands.createIsland(this, island1coordinates);
+
+    const island2coordinates = [
+      [17, 17],
+      [17, 18],
+      [18, 17],
+      [18, 18],
+    ];
+    Islands.createIsland(this, island2coordinates);
+
+    const island3coordinates = [
+      [17, 3],
+    ];
+    const island4coordinates = [
+      [3, 17],
+    ];
+    Islands.createIsland(this, island3coordinates);
+    Islands.createIsland(this, island4coordinates);
+
+    const island5coordinates = [
+      [9, 9],
+      [9, 10],
+      [10, 9],
+      [10, 10],
+    ];
+    Islands.createIsland(this, island5coordinates);
+
+    const island6coordinates = [
+      [5, 5],
+    ];
+    const island7coordinates = [
+      [13, 13],
+    ];
+    Islands.createIsland(this, island6coordinates);
+    Islands.createIsland(this, island7coordinates);
+  }
+
 
   getInitialState() {
     return [...this.entities];

@@ -80,6 +80,7 @@ class Main {
       'StartGame': this._startGame.bind(this),
       'AssignTeam': this.startscreen._assignTeam.bind(this.startscreen),
       'UpdateReadyStates': this.startscreen._updateReadyStates.bind(this.startscreen),
+      'UpdateMap': this._updateMap.bind(this),
     };
 
     this._startRenderLoop();
@@ -106,6 +107,11 @@ class Main {
   _startGame({ initialState, team }) {
     this.game.init(initialState, team);
     this.mode = 'game';
+  }
+
+  _updateMap({ mapNum, initialState, team }) {
+    this.game.init(initialState, team);
+    this.startscreen.selectMap(mapNum);
   }
 
   _onMessage(event) {
