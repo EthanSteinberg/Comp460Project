@@ -135,7 +135,7 @@ function getAvoidencVector(sourceVector, targetVector, factor) {
   const distanceSquared = xDistance * xDistance + yDistance * yDistance;
   const distance = Math.sqrt(distanceSquared);
 
-  const magnitude = factor / (distance * distance);
+  const magnitude = factor / (distance * distance * distance * distance);
 
   return {
     x: xDistance * magnitude / distance,
