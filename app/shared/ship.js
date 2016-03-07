@@ -257,12 +257,11 @@ function getActualTarget(ship, map, target) {
           minHardpoint = hardpoint;
         }
       }
-
-      return minHardpoint;
     }
-  } else {
-    return target;
+    return minHardpoint;
   }
+
+  return target;
 }
 
 function shootAt(ship, map, target) {
