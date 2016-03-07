@@ -2,11 +2,8 @@ import GameMap from '../shared/gamemap';
 import buildingConstants from '../shared/buildingconstants';
 
 import * as Ships from '../shared/ship';
-import * as Hardpoints from '../shared/hardpoint';
 import * as BuildingTemplates from '../shared/buildingtemplate';
 import * as Shipyards from '../shared/shipyard';
-import Types from '../shared/types';
-import * as Vectors from '../shared/vector';
 import { getStats } from '../shared/template';
 
 const http = require('http');
@@ -102,17 +99,24 @@ function moveShipHandler({ shipId, targetLocation }, playerTeam) {
 
 function makeBuildingHandler({ building, x, y }, playerTeam) {
   const island = map.getIsland(x, y);
-  if (island != null && island.team === playerTeam) {
-    const buildingStats = buildingConstants[building];
-    if (buildingStats.coinCost > map.getEntity(playerTeam).coins) {
-      console.error('Trying to build a buildng you cant afford');
-      return;
-    }
-    map.getEntity(playerTeam).coins -= buildingStats.coinCost;
-    BuildingTemplates.createBuildingTemplate(map, x, y, playerTeam, island.id, building);
-  } else {
-    console.error('Wrong team for island', island, playerTeam);
+
+  if (map.getItem(x, y) != null) {
+    console.error('Something blocking the space');
+    return;
   }
+
+  if (island == null || island.team !== playerTeam) {
+    console.error('Wrong team for island', island, playerTeam);
+    return;
+  }
+
+  const buildingStats = buildingConstants[building];
+  if (buildingStats.coinCost > map.getEntity(playerTeam).coins) {
+    console.error('Trying to build a buildng you cant afford');
+    return;
+  }
+  map.getEntity(playerTeam).coins -= buildingStats.coinCost;
+  BuildingTemplates.createBuildingTemplate(map, x, y, playerTeam, island.id, building);
 }
 
 function makeShipHandler({ shipyardId, template, templateNumber }, playerTeam) {
@@ -163,7 +167,12 @@ function updateModeHandler({ targetMode }, playerTeam) {
   map.getEntity(playerTeam).targetMode = targetMode;
 }
 
-function startNewGame({}, playerTeam) {
+const teamReadyMap = {
+  '0': false,
+  '1': false,
+};
+
+function startNewGame({}) {
   for (const team of Object.keys(teamReadyMap)) {
     teamReadyMap[team] = false;
   }
@@ -175,18 +184,13 @@ function startNewGame({}, playerTeam) {
   map.initialSetup();
 }
 
-function updateMap({ mapNum }, playerTeam) {
+function updateMap({ mapNum }) {
   map.initialSetup(mapNum);
 
   for (const team of Object.keys(playerSockets)) {
     playerSockets[team].send(JSON.stringify({ type: 'UpdateMap', mapNum: mapNum, initialState: map.getInitialState(), team }));
   }
 }
-
-const teamReadyMap = {
-  '0': false,
-  '1': false,
-};
 
 function updateReadyState({ readyState }, playerTeam) {
   teamReadyMap[playerTeam] = readyState;

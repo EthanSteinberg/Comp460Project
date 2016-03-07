@@ -297,9 +297,6 @@ export default class GameMap {
 
   /**
    * Get an item on the map at a given x y position.
-   * If forAttack is provided, it gets items for attacking.
-   * In particular, this allows you to target ship hardpoints while you
-   * cannot select hardpoints yourself.
    */
   getItem(x, y) {
     for (const entity of this.entities.values()) {
