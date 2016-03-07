@@ -1,6 +1,6 @@
 import buildingConstants from './buildingconstants';
 import { roundshot, grapeshot, chainshot, shell,
-  gunboat, frigate, galleon, hardpoints, getStats } from './template';
+  gunboat, frigate, galleon, getStats } from './template';
 
 import Shipyard from './guibuttons/shipyard';
 import Mine from './guibuttons/mine';
@@ -8,7 +8,6 @@ import Shiptemplate from './guibuttons/shiptemplate';
 import Shipbuilder from './guibuttons/shipbuilder';
 import Roundshot from './guibuttons/roundshot';
 import Grapeshot from './guibuttons/grapeshot';
-import Chainshot from './guibuttons/chainshot';
 import Shell from './guibuttons/shell';
 import Cancelshot from './guibuttons/cancelshot';
 import TargetToggle from './guibuttons/targettoggle';
@@ -98,8 +97,8 @@ export default class Gui {
     context.font = '14px sans-serif';
     context.fillText(this.workingTemplate.hull.toUpperCase(), this.x + 10, this.height - 50);
     context.fillText(this.workingTemplate.hardpoints, this.x + 20, this.height - 35);
-    context.fillText('Cost: ' + getStats(this.workingTemplate).cost + ' coin, ' 
-      + getStats(this.workingTemplate).tcost + ' sec', 
+    context.fillText('Cost: ' + getStats(this.workingTemplate).cost + ' coin, '
+      + getStats(this.workingTemplate).tcost + ' sec',
       this.x + 20, this.height - 20);
 
 
@@ -111,8 +110,8 @@ export default class Gui {
       const item = this.getItem(roundedX, roundedY);
 
       if (item != null) {
-        var details = null;
-        var type = item.getType();
+        let details = null;
+        let type = item.getType();
 
         if (type == 'gunslot' && item.rendertype != 'gunslot') {
           type = item.rendertype;
@@ -143,6 +142,8 @@ export default class Gui {
           case 'shell':
             details = shell;
             break;
+          default:
+            details = null;
         }
 
 
@@ -150,9 +151,9 @@ export default class Gui {
           // Display a tooltip
           context.fillStyle = 'white';
           context.strokeStyle = 'black';
-          var modifier = 0;
-          if ((roundedX - 2) > this.x + this.width/2 - 100) {
-            modifier = this.width/2 * -1
+          let modifier = 0;
+          if ((roundedX - 2) > this.x + this.width / 2 - 100) {
+            modifier = this.width / 2 * -1;
           }
 
           context.strokeRect((roundedX - 2) + modifier, (roundedY + 1), 200, 50);
@@ -206,9 +207,9 @@ export default class Gui {
       const roundedX = hoverCoords.x;
       const roundedY = hoverCoords.y;
 
-      var modifier = 0;
-      if ((roundedX - 2) > this.x + this.width/2 - 100) {
-        modifier = this.width/2 * -1
+      let modifier = 0;
+      if ((roundedX - 2) > this.x + this.width / 2 - 100) {
+        modifier = this.width / 2 * -1;
       }
 
       const item = this.getItem(roundedX, roundedY);
@@ -245,8 +246,8 @@ export default class Gui {
         context.font = '14px sans-serif';
         context.fillText(template.hull.toUpperCase(), (roundedX - 2) + modifier, (roundedY + 1));
         context.fillText(template.hardpoints, (roundedX - 2) + modifier, (roundedY + 1) + 20);
-        context.fillText('Cost: ' + getStats(template).cost + ' coin, ' 
-          + getStats(template).tcost + ' sec', 
+        context.fillText('Cost: ' + getStats(template).cost + ' coin, '
+          + getStats(template).tcost + ' sec',
           (roundedX - 2) + modifier, (roundedY + 1) + 34);
       }
     }
@@ -255,11 +256,11 @@ export default class Gui {
   getUnitButtons() {
     const result = [];
     if (this.getSelectedMapItems().length !== 0 && this.getSelectedMapItems().every(entity => entity.type === 'shipyard')) {
-      result.push(new Shiptemplate('shiptemplate', this.x + 20, 250, 50, 50, 0, 
+      result.push(new Shiptemplate('shiptemplate', this.x + 20, 250, 50, 50, 0,
         this.getSelectedMapItems()[0], this.templates[0]));
-      result.push(new Shiptemplate('shiptemplate', this.x + 75, 250, 50, 50, 1, 
+      result.push(new Shiptemplate('shiptemplate', this.x + 75, 250, 50, 50, 1,
         this.getSelectedMapItems()[0], this.templates[1]));
-      result.push(new Shiptemplate('shiptemplate', this.x + 130, 250, 50, 50, 2, 
+      result.push(new Shiptemplate('shiptemplate', this.x + 130, 250, 50, 50, 2,
         this.getSelectedMapItems()[0], this.templates[2]));
     } else {
       result.push(new Shiptemplate('shiptemplateGrayed', this.x + 20, 250, 50, 50, 0, null, this.templates[0]));
@@ -270,7 +271,7 @@ export default class Gui {
     result.push(new Shipyard('shipyard', this.x + 25, this.y + 175, 50, 50));
     result.push(new Mine('mine', this.x + 75, this.y + 175, 50, 50));
 
-    result.push(new TargetToggle(this.map.getEntity(this.map.team).targetMode, this.x+35, this.height - 75, 128, 26));
+    result.push(new TargetToggle(this.map.getEntity(this.map.team).targetMode, this.x + 35, this.height - 75, 128, 26));
     result.push(new Shipbuilder('shipbuilder', this.x + 50, 350, 102, 26));
     return result;
   }
@@ -289,13 +290,12 @@ export default class Gui {
     result.push(new Hullslot('hullslot', this.x + 75, this.y + 280, 40, 40, 1));
 
     if (this.selectedSlot != null) {
-      if (this.selectedSlot.getType() == 'gunslot') {
+      if (this.selectedSlot.getType() === 'gunslot') {
         result.push(new Roundshot('roundshot', this.selectedSlot.x - 60, this.selectedSlot.y + 5, 40, 40));
-        result.push(new Chainshot('chainshot', this.selectedSlot.x - 30, this.selectedSlot.y - 45, 40, 40));
-        result.push(new Grapeshot('grapeshot', this.selectedSlot.x + 30, this.selectedSlot.y - 45, 40, 40));
+        result.push(new Grapeshot('grapeshot', this.selectedSlot.x + 6, this.selectedSlot.y - 50, 40, 40));
         result.push(new Shell('shell', this.selectedSlot.x + 60, this.selectedSlot.y + 5, 40, 40));
-        result.push(new Cancelshot('cancelshot', this.selectedSlot.x + 5, this.selectedSlot.y + 50, 40, 40));
-      } else if (this.selectedSlot.getType() == 'hullslot') {
+        result.push(new Cancelshot('cancelshot', this.selectedSlot.x + 6, this.selectedSlot.y + 60, 40, 40));
+      } else if (this.selectedSlot.getType() === 'hullslot') {
         result.push(new Gunboat('gunboat', this.selectedSlot.x - 60, this.selectedSlot.y + 5, 40, 40));
         result.push(new Frigate('frigate', this.selectedSlot.x + 5, this.selectedSlot.y - 45, 40, 40));
         result.push(new Galleon('galleon', this.selectedSlot.x + 60, this.selectedSlot.y + 5, 40, 40));
@@ -326,7 +326,7 @@ export default class Gui {
         if (this.changing) {
           button.placeItem(this.workingTemplate.hardpoints[button.getSlotNum()] || 'gunslot');
         } else {
-          button.placeItem(this.workingTemplate.hardpoints[button.getSlotNum()] 
+          button.placeItem(this.workingTemplate.hardpoints[button.getSlotNum()]
             || ship.hardpoints[button.getSlotNum()] || 'gunslot');
         }
       }
@@ -337,8 +337,8 @@ export default class Gui {
 
   designerSelection(item) {
     if (item == null) {
-        this.selectedSlot = null;
-        return;
+      this.selectedSlot = null;
+      return;
     }
 
     const withItem = JSON.parse(JSON.stringify(this.workingTemplate));

@@ -47,5 +47,5 @@ export function processUpdate(projectile, map) {
 
 export function render(projectile, map, context, images) {
   const radius = 10;
-  context.drawImage(images.roundshot, projectile.position.x * 50 - radius / 2, projectile.position.y * 50 - radius / 2, radius, radius);
+  context.drawImage(images[projectile.projectileType], projectile.position.x * 50 - radius / 2, projectile.position.y * 50 - radius / 2, radius, radius);
 }

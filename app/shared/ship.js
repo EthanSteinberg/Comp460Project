@@ -1,6 +1,6 @@
-const shipMoveSpeedFactor = 0.05/20;
+const shipMoveSpeedFactor = 0.05 / 20;
 
-import { hulls } from './template';
+import { hulls, hardpoints } from './template';
 import * as Hardpoints from './hardpoint';
 import Types from './types';
 import { getDistance } from './vector';
@@ -12,7 +12,7 @@ import { getDistance } from './vector';
 export function createShipAndHardpoints(map, x, y, template, team) {
   const shipId = map.getNextEntityId();
 
-  const hardpoints = template.hardpoints.map((hardpoint, index) => {
+  const myHardpoints = template.hardpoints.map((hardpoint, index) => {
     if (hardpoint == null) {
       return null;
     }
@@ -28,7 +28,7 @@ export function createShipAndHardpoints(map, x, y, template, team) {
     type: 'ship',
     template: template,
     health: JSON.parse(JSON.stringify(hulls[template.hull])).health,
-    hardpoints,
+    hardpoints: myHardpoints,
     targetMode: 'hardpoints',
 
     lastPositions: [],
@@ -264,15 +264,28 @@ function getActualTarget(ship, map, target) {
   return target;
 }
 
-function shootAt(ship, map, target) {
+/**
+ * Tries to shoot at the target (entity is the parent entity).
+ * If there are cannons which can fire, but need to be closer, returns true.
+ * Returns false if there is no point moving closer.
+ */
+function shootAt(ship, map, entity, target, rangePenalty) {
+  let shouldMoveCloser = false;
+
+  const targetLocation = getPosition(entity, map);
+  const distance = getDistanceToTarget(ship, targetLocation);
   for (const hardpointId of ship.hardpoints) {
     const hardpoint = map.getEntity(hardpointId);
-    if (hardpoint != null) {
-      if (hardpoint.timeTillNextFire === 0) {
+    if (hardpoint != null && hardpoint.timeTillNextFire === 0) {
+      if (distance < hardpoints[hardpoint.gunType].range - rangePenalty) {
         Hardpoints.fire(hardpoint, map, target);
+      } else {
+        shouldMoveCloser = true;
       }
     }
   }
+
+  return shouldMoveCloser;
 }
 
 /**
@@ -281,12 +294,9 @@ function shootAt(ship, map, target) {
 function processIdleAttack(ship, map) {
   for (const entity of map.entities.values()) {
     if (entity.type === 'ship' && entity.team !== ship.team) {
-      const targetLocation = getPosition(entity, map);
-      if (getDistanceToTarget(ship, targetLocation) < 1.5) {
-        const actualTarget = getActualTarget(ship, map, entity);
-        if (actualTarget != null) {
-          shootAt(ship, map, actualTarget);
-        }
+      const actualTarget = getActualTarget(ship, map, entity);
+      if (actualTarget != null) {
+        shootAt(ship, map, entity, actualTarget, 0.5);
       }
     }
   }
@@ -309,9 +319,9 @@ function processAttack(ship, map) {
 
   const targetLocation = Types[pseudoTarget.type].getPosition(pseudoTarget, map);
 
-  if (getDistanceToTarget(ship, targetLocation) < 2) {
-    shootAt(ship, map, target);
-  } else {
+  const shouldMoveCloser = shootAt(ship, map, pseudoTarget, target, 0);
+
+  if (shouldMoveCloser) {
     ship.mode.targetLocation = targetLocation;
 
     if (closeEnoughToTarget(ship)) {

@@ -5,13 +5,14 @@ let nextId = 0;
 
 export const roundshot = {
   name: 'Roundshot',
-  description: 'Standard range. Deals 10 dmg.',
+  description: 'Standard range. Deals 25 dmg.',
   health: 100,
   damage: 25,
   speed: 0,
   weight: -10,
   cost: 30,
   tcost: 10,
+  range: 2,
 };
 
 export const chainshot = {
@@ -27,24 +28,26 @@ export const chainshot = {
 
 export const grapeshot = {
   name: 'Grapeshot',
-  description: 'Short range. Deals 20 dmg.',
+  description: 'Short range. Deals 50 dmg.',
   health: 100,
-  damage: 20,
+  damage: 50,
   speed: 0,
   weight: -5,
   cost: 50,
   tcost: 20,
+  range: 1,
 };
 
 export const shell = {
   name: 'Shell',
-  description: 'Long range. Deals 5 dmg.',
+  description: 'Long range. Deals 10 dmg.',
   health: 100,
-  damage: 5,
+  damage: 10,
   speed: 0,
   weight: -20,
   cost: 50,
   tcost: 20,
+  range: 3,
 };
 
 export const gunboat = {
