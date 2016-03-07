@@ -10,6 +10,7 @@ export function createBuildingTemplate(map, x, y, team, islandID, buildingType) 
     type: 'buildingTemplate',
     team,
     islandID,
+    health: 100,
   };
 
   map.addEntity(template);
@@ -64,6 +65,18 @@ export function render(template, map, context, images) {
   context.stroke();
 
   context.restore();
+
+
+  context.fillStyle = 'red';
+  context.fillRect(template.x * 50 - 20, template.y * 50 + 30, 40, 5);
+
+  const healthpercent = template.health / 100;
+
+  context.fillStyle = 'green';
+  context.fillRect(template.x * 50 - 20, template.y * 50 + 30, 40 * healthpercent, 5);
+
+  context.strokeStyle = 'black';
+  context.strokeRect(template.x * 50 - 20, template.y * 50 + 30, 40, 5);
 }
 
 export function processUpdate(template, map) {
@@ -78,4 +91,8 @@ export function processUpdate(template, map) {
     );
     map.removeEntity(template.id);
   }
+}
+
+export function remove(template, map) {
+  map.removeEntity(template.id);
 }

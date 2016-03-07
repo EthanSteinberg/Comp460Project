@@ -181,7 +181,7 @@ export default class Game {
         this.getSelectedMapItems().forEach(ship => sendMessage({ type: 'MoveShip', shipId: ship.id, targetLocation }));
       }
     } else {
-      if ((item.type === 'ship' || item.type === 'shipyard' || item.type === 'mine') && this.getSelectedMapItems().every(entity => entity.type === 'ship')
+      if ((item.type === 'ship' || item.type === 'shipyard' || item.type === 'mine' || item.type === 'buildingTemplate') && this.getSelectedMapItems().every(entity => entity.type === 'ship')
         && item.team !== this.map.team) {
         // Trying to attack something
         this.getSelectedMapItems().forEach(ship => sendMessage({ type: 'AttackShip', id: ship.id, targetId: item.id }));
