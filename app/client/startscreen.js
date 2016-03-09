@@ -1,10 +1,6 @@
 import MapSelect from '../shared/guibuttons/mapselect';
-<<<<<<< HEAD
 import Ready from '../shared/guibuttons/ready';
-
-=======
 import { createMap } from '../shared/maps';
->>>>>>> origin/ethan
 
 export default class StartScreen {
   constructor(images) {
@@ -20,18 +16,12 @@ export default class StartScreen {
     this.mapNum = 0;
 
     this.buttons = [];
-<<<<<<< HEAD
     this.buttons.push(new MapSelect('mapselect', 700, 350, 102, 26, 0))
     this.buttons.push(new MapSelect('mapselect', 850, 350, 102, 26, 1))
     this.buttons.push(new MapSelect('mapselect', 1000, 350, 102, 26, 2))
     this.buttons[0].rendertype = 'westindies'
     this.buttons[1].rendertype = 'tropics'
     this.buttons[2].rendertype = 'greatlakes'
-=======
-    this.buttons.push(new MapSelect('mapselect', 700, 100, 100, 50, 0));
-    this.buttons.push(new MapSelect('mapselect', 700, 200, 100, 50, 1));
-    this.buttons.push(new MapSelect('mapselect', 700, 300, 100, 50, 2));
->>>>>>> origin/ethan
 
     this.buttons[0].selected = true;
 

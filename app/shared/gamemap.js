@@ -23,95 +23,6 @@ export default class GameMap {
     this.height = height;
   }
 
-<<<<<<< HEAD
-  setupMapOne() {
-    Ships.createShipAndHardpoints(this, 0, 3, this.template, '0');
-    Ships.createShipAndHardpoints(this, 16, 17, this.template, '1');
-
-    const island1coordinates = [
-      [1, 1],
-      [1, 2],
-      [2, 1],
-      [2, 2],
-    ];
-    Islands.createIsland(this, island1coordinates);
-
-    const island2coordinates = [
-      [17, 17],
-      [17, 18],
-      [18, 17],
-      [18, 18],
-    ];
-    Islands.createIsland(this, island2coordinates);
-
-    const island3coordinates = [
-      [16, 2],
-    ];
-    const island4coordinates = [
-      [3, 17],
-    ];
-    Islands.createIsland(this, island3coordinates);
-    Islands.createIsland(this, island4coordinates);
-
-    const island5coordinates = [
-      [9, 9],
-      [9, 10],
-      [10, 9],
-      [10, 10],
-    ];
-    Islands.createIsland(this, island5coordinates);
-  }
-
-  setupMapTwo() {
-    Ships.createShipAndHardpoints(this, 0, 3, this.template, '0');
-    Ships.createShipAndHardpoints(this, 16, 17, this.template, '1');
-
-    const island1coordinates = [
-      [1, 1],
-      [1, 2],
-      [2, 1],
-      [2, 2],
-    ];
-    Islands.createIsland(this, island1coordinates);
-
-    const island2coordinates = [
-      [17, 17],
-      [17, 18],
-      [18, 17],
-      [18, 18],
-    ];
-    Islands.createIsland(this, island2coordinates);
-
-    const island3coordinates = [
-      [16, 2],
-    ];
-    const island4coordinates = [
-      [3, 17],
-    ];
-    Islands.createIsland(this, island3coordinates);
-    Islands.createIsland(this, island4coordinates);
-
-    const island5coordinates = [
-      [9, 9],
-      [9, 10],
-      [10, 9],
-      [10, 10],
-    ];
-    Islands.createIsland(this, island5coordinates);
-
-    const island6coordinates = [
-      [6, 6],
-    ];
-    const island7coordinates = [
-      [13, 13],
-    ];
-    Islands.createIsland(this, island6coordinates);
-    Islands.createIsland(this, island7coordinates);
-  }
-
-
-=======
->>>>>>> origin/ethan
   getInitialState() {
     return {
       entries: [...this.entities.values()],
@@ -209,19 +120,8 @@ export default class GameMap {
 
     context.fillStyle = 'black';
     context.textBaseline = 'top';
-<<<<<<< HEAD
     context.font = '1px sans-serif';
     context.fillText("Mini Map", -25, -100);
-    if (player0.numItems == 0) {
-      return 'end';
-    } else if (player1.numItems == 0) {
-      return 'end';
-    }
-    return 'game';
-=======
-    context.font = '50px sans-serif';
-    context.fillText('Mini Map', -25, -100);
->>>>>>> origin/ethan
   }
 
   /**
