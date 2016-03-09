@@ -1,4 +1,6 @@
 import MapSelect from '../shared/guibuttons/mapselect';
+import Ready from '../shared/guibuttons/ready';
+
 
 export default class StartScreen {
   constructor(images, map) {
@@ -14,24 +16,41 @@ export default class StartScreen {
     this.map = map;
 
     this.buttons = [];
-    this.buttons.push(new MapSelect('mapselect', 700, 100, 100, 50, 0))
-    this.buttons.push(new MapSelect('mapselect', 700, 200, 100, 50, 1))
-    this.buttons.push(new MapSelect('mapselect', 700, 300, 100, 50, 2))
+    this.buttons.push(new MapSelect('mapselect', 700, 350, 102, 26, 0))
+    this.buttons.push(new MapSelect('mapselect', 850, 350, 102, 26, 1))
+    this.buttons.push(new MapSelect('mapselect', 1000, 350, 102, 26, 2))
+    this.buttons[0].rendertype = 'westindies'
+    this.buttons[1].rendertype = 'tropics'
+    this.buttons[2].rendertype = 'greatlakes'
 
     this.buttons[0].selected = true;
+
+    this.mode = 'splash';
   }
 
   render() {
+    if (this.mode == 'splash') {
+      this.renderSplash();
+    } else if (this.mode == 'setup') {
+      this.renderSetup();
+    }
+  }
+
+  renderSplash() {
+    this.context.drawImage(this.images.splashscreen, 0, 0);
+  }
+
+  renderSetup() {
     this.context.clearRect(0, 0, this.width, this.height);
 
-    this.context.fillStyle = 'cyan';
+    this.context.fillStyle = 'papayawhip';
     this.context.fillRect(0, 0, this.width, this.height);
 
-    this.context.translate(this.width - 250, 50);
+    this.context.translate(this.width - 420, 50);
     this.context.scale(0.25, 0.25);
     this.map.renderMiniMap(this.context, this.images, 0, 0, this.width, this.height);
     this.context.scale(4, 4);
-    this.context.translate(-this.width + 250, -50);
+    this.context.translate(-this.width + 420, -50);
 
     for (const button of this.buttons) {
       button.render(this.context, this.images);
@@ -40,27 +59,24 @@ export default class StartScreen {
     if (this.team == null) {
       this.renderLoading();
     } else {
-      this.context.font = '30px sans-serif';
       this.context.fillStyle = 'black';
-      this.context.fillText('You are currently on team: ' + this.team, 50, 50);
+      if (this.team == '0') {
+        this.context.drawImage(this.images.piratesTag, 0, 0);
+      } else if (this.team == '1') {
+        this.context.drawImage(this.images.imperialsTag, 0, 0);
+      }
 
-      this.context.fillText('Status:', 50, 150);
+      this.context.font = '50px Perpetua';
+      this.context.fillText('Status:', 40, 200);
 
-      let startingY = 200;
+      this.context.font = '30px Perpetua';
+      let startingY = 250;
       for (const team of Object.keys(this.readyStates)) {
-        if (team === this.team) {
-          this.context.fillStyle = (this.readyStates[team] ? 'green' : 'red');
-          this.context.fillRect(175, startingY, 150, 40);
-
-          this.context.strokeStyle = 'black';
-          this.context.save();
-          this.context.lineWidth = '4';
-          this.context.strokeRect(175, startingY, 150, 40);
-          this.context.restore();
+        if (team != this.team) {
+          this.context.fillText((team == '0' ? 'Pirates      ' : 'Imperials  ') + (this.readyStates[team] ? 'Ready' : 'Not Ready'), 50, startingY);
+        } else {
+          this.context.fillText((team == '0' ? 'Pirates      ' : 'Imperials  '), 50, startingY);
         }
-
-        this.context.fillStyle = 'black';
-        this.context.fillText('Player ' + team + ':  ' + (this.readyStates[team] ? 'Ready' : 'Not ready'), 50, startingY);
 
         startingY += 50;
       }
@@ -68,7 +84,7 @@ export default class StartScreen {
   }
 
   renderLoading() {
-    this.context.font = '30px sans-serif';
+    this.context.font = '30px Brush Script MT';
     this.context.fillStyle = 'black';
     this.context.fillText('Loading ...', 50, 50);
   }
@@ -76,6 +92,12 @@ export default class StartScreen {
   _assignTeam({ team, readyStates }) {
     this.team = team;
     this.readyStates = readyStates;
+
+    if (this.team === '0') {
+      this.buttons.push(new Ready('notready', 160, 255, 128, 26))
+    } else {
+      this.buttons.push(new Ready('notready', 160, 305, 128, 26))
+    }
   }
 
   _updateReadyStates({ readyStates }) {
@@ -105,27 +127,32 @@ export default class StartScreen {
   }
 
   mousedown(event, sendMessage) {
+    if (this.mode == 'splash') {
+      this.mousedownSplash(event, sendMessage);
+    } else if (this.mode == 'setup') {
+      this.mousedownSetup(event, sendMessage);
+    }
+  }
+
+  mousedownSplash(event, sendMessage) {
+    this.mode = 'setup';
+  }
+
+  mousedownSetup(event, sendMessage) {
     if (this.team == null) {
       return;
     }
 
     const { rawX, rawY } = this.getRawMouseCords(event);
-    const teamOffset = parseInt(this.team, 10);
-
-    const boxStartX = 175;
-    const boxEndX = boxStartX + 150;
-
-    const boxStartY = 200 + 50 * teamOffset;
-    const boxEndY = boxStartY + 40;
-
-    if (rawX >= boxStartX && rawX <= boxEndX && rawY >= boxStartY && rawY <= boxEndY) {
-      console.log('send it');
-      sendMessage({ type: 'SetReadyState', readyState: !this.readyStates[this.team] });
-    }
 
     for (const button of this.buttons) {
       if (button.isOver(rawX, rawY)) {
-        sendMessage({ type: 'UpdateMap', mapNum: button.getSlotNum() });
+        if (button.getType() === 'mapselect') {
+          sendMessage({ type: 'UpdateMap', mapNum: button.getSlotNum() });
+        } else {
+          button.setType((!this.readyStates[this.team] ? 'ready' : 'notready'));
+          sendMessage({ type: 'SetReadyState', readyState: !this.readyStates[this.team] });
+        }
       }
     }
   }

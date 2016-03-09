@@ -26,6 +26,14 @@ const sources = {
   redFlag: 'redFlag.png',
   save: 'save.png',
   grayBack: 'grayBack.png',
+  splashscreen: 'splashscreen.png',
+  notready: 'notready.png',
+  ready: 'ready.png',
+  piratesTag: 'piratesTag.png',
+  imperialsTag: 'imperialsTag.png',
+  westindies: 'westindies.png',
+  tropics: 'tropics.png',
+  greatlakes: 'greatlakes.png',
 };
 
 /**

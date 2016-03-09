@@ -9,12 +9,17 @@ export default class MapSelect extends GuiButton {
       context.strokeRect(this.x, this.y, this.width, this.height);
     }
 
-    context.fillStyle = 'cornsilk';
-    context.fillRect(this.x, this.y, this.width, this.height);
-    context.fillStyle = 'black';
-    context.textBaseline = 'top';
-    context.font = '25px sans-serif';
-    context.fillText('Map ' + this.slotNum, this.x+10, this.y+10);
+    switch (this.rendertype) {
+      case 'westindies':
+        context.drawImage(images.westindies, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+        break;
+      case 'tropics':
+        context.drawImage(images.tropics, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+        break;
+      case 'greatlakes':
+        context.drawImage(images.greatlakes, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+        break;
+    }
   }
 
 }

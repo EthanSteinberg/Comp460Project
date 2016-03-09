@@ -114,7 +114,7 @@ export default class GameMap {
     Islands.createIsland(this, island2coordinates);
 
     const island3coordinates = [
-      [17, 3],
+      [16, 2],
     ];
     const island4coordinates = [
       [3, 17],
@@ -123,10 +123,10 @@ export default class GameMap {
     Islands.createIsland(this, island4coordinates);
 
     const island5coordinates = [
+      [9, 9],
+      [9, 10],
+      [10, 9],
       [10, 10],
-      [10, 11],
-      [11, 10],
-      [11, 11],
     ];
     Islands.createIsland(this, island5coordinates);
   }
@@ -152,7 +152,7 @@ export default class GameMap {
     Islands.createIsland(this, island2coordinates);
 
     const island3coordinates = [
-      [17, 3],
+      [16, 2],
     ];
     const island4coordinates = [
       [3, 17],
@@ -169,7 +169,7 @@ export default class GameMap {
     Islands.createIsland(this, island5coordinates);
 
     const island6coordinates = [
-      [5, 5],
+      [6, 6],
     ];
     const island7coordinates = [
       [13, 13],
@@ -285,7 +285,7 @@ export default class GameMap {
 
     context.fillStyle = 'black';
     context.textBaseline = 'top';
-    context.font = '50px sans-serif';
+    context.font = '1px sans-serif';
     context.fillText("Mini Map", -25, -100);
     if (player0.numItems == 0) {
       return 'end';
