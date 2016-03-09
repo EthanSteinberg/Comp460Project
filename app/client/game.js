@@ -330,9 +330,10 @@ export default class Game {
 
     if (this.gui.displayMode === 'main') {
       this.context.translate(this.width - 150, 50);
-      this.context.scale(0.10, 0.10);
-      this.map.renderMiniMap(this.context, this.images, this.x, this.y, this.width, this.height);
-      this.context.scale(10, 10);
+      const scale = this.map.width / 2;
+      this.context.scale(1 / scale, 1 / scale);
+      this.map.renderMiniMap(this.context, this.images, this.x, this.y, this.width - GUI_WIDTH, this.height);
+      this.context.scale(scale, scale);
       this.context.translate(-this.width + 150, -50);
     }
   }

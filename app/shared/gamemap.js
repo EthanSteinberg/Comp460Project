@@ -70,8 +70,22 @@ export default class GameMap {
     this.renderMap(context, images, selectionState);
   }
 
-  renderMiniMap(context, images) {
+  renderMiniMap(context, images, x, y, width, height) {
     this.renderMap(context, images, { gui: null, map: [] });
+
+    if (x != null) {
+      context.globalCompositeOperation = 'multiply';
+      context.fillStyle = 'rgba(0,0,0,.5)';
+      context.fillRect(-25, -25, this.width * 50, y);
+
+      context.fillRect(-25, y - 25, x, height);
+
+      context.fillRect(-25 + x + width, y - 25, this.width * 50 - x - width, height);
+
+      context.fillRect(-25, -25 + y + height, this.width * 50, this.height * 50 - y - height);
+
+      context.globalCompositeOperation = 'source-over';
+    }
   }
 
   countPlayerItems() {
@@ -117,11 +131,6 @@ export default class GameMap {
         type.renderOverlay(entity, this, context, images, isSelected);
       }
     }
-
-    context.fillStyle = 'black';
-    context.textBaseline = 'top';
-    context.font = '1px sans-serif';
-    context.fillText("Mini Map", -25, -100);
   }
 
   /**
@@ -207,10 +216,6 @@ export default class GameMap {
     }
 
     return null;
-  }
-
-  setView(mouseX, mouseY) {
-    return this.miniview.setView(mouseX, mouseY, this.width * 50, this.height * 50);
   }
 
   isNextToIsland(islandID, x, y) {

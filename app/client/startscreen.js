@@ -47,10 +47,13 @@ export default class StartScreen {
     this.context.fillRect(0, 0, this.width, this.height);
 
     this.context.translate(this.width - 420, 50);
-    this.context.scale(0.25, 0.25);
     const map = createMap(this.mapNum);
-    map.renderMiniMap(this.context, this.images, 0, 0, this.width, this.height);
-    this.context.scale(4, 4);
+    const scale = map.width / 5;
+    this.context.scale(1 / scale, 1 / scale);
+    this.context.translate(25, 25);
+    map.renderMiniMap(this.context, this.images);
+    this.context.translate(-25, -25);
+    this.context.scale(scale, scale);
     this.context.translate(-this.width + 420, -50);
 
     for (const button of this.buttons) {
