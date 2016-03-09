@@ -1,5 +1,3 @@
-import GameMap from '../shared/gamemap';
-import { MAP_HEIGHT, MAP_WIDTH } from '../shared/gamemap';
 import Gui from '../shared/gui';
 import { GUI_WIDTH } from '../shared/gui';
 
@@ -12,7 +10,7 @@ export default class Game {
    * Contruct the game.
    * Takes as input the images object as produced by images.js
    */
-  constructor(images) {
+  constructor(images, map, team) {
     this.canvas = document.getElementById('canvas');
     this.context = this.canvas.getContext('2d');
 
@@ -25,13 +23,17 @@ export default class Game {
     };
 
     this.images = images;
-    this.map = new GameMap();
-    this.miniMap = this.map;
-    this.team = '0';
-    this.gui = new Gui(this.width, this.height, templates, this.selectionState, this.map);
+    this.map = map;
+    this.gui = new Gui(this.width, this.height, templates, this.selectionState, this.map, team);
 
-    this.x = 0;
-    this.y = 0;
+    if (team === '0') {
+      this.x = 0;
+      this.y = 0;
+    } else {
+      this.x = map.width * 50 - this.width + GUI_WIDTH;
+      this.y = map.height * 50 - this.height;
+    }
+    this.team = team;
 
     this.startingDownPosition = null;
 
@@ -43,21 +45,6 @@ export default class Game {
     };
 
     this.pressedKeys = new Set();
-  }
-
-  init(initialState, team) {
-    this.map.init(initialState);
-
-    if (team === '0') {
-      this.x = 0;
-      this.y = 0;
-    } else {
-      this.x = MAP_WIDTH * 50 - this.width + GUI_WIDTH;
-      this.y = MAP_HEIGHT * 50 - this.height;
-    }
-
-    this.team = team;
-    this.map.team = team;
   }
 
   tick() {
@@ -76,11 +63,11 @@ export default class Game {
       return;
     }
 
-    if (newY + this.height > MAP_HEIGHT * 50) {
+    if (newY + this.height > this.map.height * 50) {
       return;
     }
 
-    if (newX + this.width - GUI_WIDTH > MAP_WIDTH * 50) {
+    if (newX + this.width - GUI_WIDTH > this.map.width * 50) {
       return;
     }
 
@@ -182,7 +169,7 @@ export default class Game {
       }
     } else {
       if ((item.type === 'ship' || item.type === 'shipyard' || item.type === 'mine' || item.type === 'buildingTemplate') && this.getSelectedMapItems().every(entity => entity.type === 'ship')
-        && item.team !== this.map.team) {
+        && item.team !== this.team) {
         // Trying to attack something
         this.getSelectedMapItems().forEach(ship => sendMessage({ type: 'AttackShip', id: ship.id, targetId: item.id }));
       }
@@ -317,7 +304,7 @@ export default class Game {
     this.context.translate(-this.x, -this.y);
 
     // Render the map and everything on it.
-    var mode = this.map.render(this.context, this.images, this.selectionState);
+    this.map.render(this.context, this.images, this.selectionState);
 
     if (this.hoveredCoords && this.hoveredCoords.x < this.width - GUI_WIDTH && this.selectionState.gui == null) {
       if (this.mouseDownGamePosition != null) {
@@ -344,12 +331,10 @@ export default class Game {
     if (this.gui.displayMode === 'main') {
       this.context.translate(this.width - 150, 50);
       this.context.scale(0.10, 0.10);
-      this.miniMap.renderMiniMap(this.context, this.images, this.x, this.y, this.width, this.height);
+      this.map.renderMiniMap(this.context, this.images, this.x, this.y, this.width, this.height);
       this.context.scale(10, 10);
       this.context.translate(-this.width + 150, -50);
     }
-
-    return mode;
   }
 
   keydown(event) {

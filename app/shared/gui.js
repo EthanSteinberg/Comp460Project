@@ -28,7 +28,7 @@ export const GUI_WIDTH = 200;
  */
 export default class Gui {
 
-  constructor(canvasWidth, canvasHeight, templates, selectionState, map) {
+  constructor(canvasWidth, canvasHeight, templates, selectionState, map, team) {
     this.width = GUI_WIDTH;
     this.height = canvasHeight;
 
@@ -50,6 +50,8 @@ export default class Gui {
     this.selectedSlot = null;
     this.chosenIndex = 0;
     this.workingTemplate = JSON.parse(JSON.stringify(this.templates[this.chosenIndex]));
+
+    this.team = team;
   }
 
   setSelectionState(newSelectionState) {
@@ -175,7 +177,7 @@ export default class Gui {
     context.fillStyle = 'gray';
     context.fillRect(this.x, this.y, this.width, this.height);
 
-    const moneyText = Math.floor(map.getEntity(this.map.team).coins).toString();
+    const moneyText = Math.floor(map.getEntity(this.team).coins).toString();
 
     context.fillStyle = 'black';
     context.textBaseline = 'top';
@@ -189,7 +191,7 @@ export default class Gui {
     context.drawImage(images.money, (this.x), (this.y) + 5, 25, 25);
 
     context.fillText('Team: ', (this.x) + 100, (this.y) + 5);
-    if (this.map.team === '1') {
+    if (this.team === '1') {
       context.fillStyle = 'firebrick';
     } else {
       context.fillStyle = 'royalblue';
@@ -271,7 +273,7 @@ export default class Gui {
     result.push(new Shipyard('shipyard', this.x + 25, this.y + 175, 50, 50));
     result.push(new Mine('mine', this.x + 75, this.y + 175, 50, 50));
 
-    result.push(new TargetToggle(this.map.getEntity(this.map.team).targetMode, this.x + 35, this.height - 75, 128, 26));
+    result.push(new TargetToggle(this.map.getEntity(this.team).targetMode, this.x + 35, this.height - 75, 128, 26));
     result.push(new Shipbuilder('shipbuilder', this.x + 50, 350, 102, 26));
     return result;
   }

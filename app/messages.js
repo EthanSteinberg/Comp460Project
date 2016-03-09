@@ -61,4 +61,9 @@ RemoveEntity: {
 	data: The new data for the entity
 }
 
+
+GameOver: {
+	winningTeam: The winning team for the game
+}
+
 */

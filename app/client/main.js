@@ -6,6 +6,7 @@ const MILLISECONDS_PER_RENDER_UPDATE = 15;
 import Game from './game';
 import StartScreen from './startscreen';
 import EndScreen from './endscreen';
+import GameMap from '../shared/gamemap';
 
 /**
  * The central game object for most of the logic.
@@ -29,9 +30,9 @@ class Main {
 
     this.images = images;
 
-    this.game = new Game(images);
-    this.startscreen = new StartScreen(images, this.game.miniMap);
-    this.endscreen = new EndScreen(images, this.game);
+    this.game = null;
+    this.startscreen = new StartScreen(images);
+    this.endscreen = null;
 
     document.addEventListener('keydown', (event) => {
       if (this.mode === 'game') {
@@ -53,9 +54,9 @@ class Main {
     this.canvas.addEventListener('mousedown', (event) => {
       if (this.mode === 'game') {
         this.game.mousedown(event, this.sendMessage.bind(this));
-      } else if (this.mode == 'start') {
+      } else if (this.mode === 'start') {
         this.startscreen.mousedown(event, this.sendMessage.bind(this));
-      } else if (this.mode == 'end') {
+      } else if (this.mode === 'end') {
         this.mode = this.endscreen.mousedown(event, this.sendMessage.bind(this));
       }
     });
@@ -73,12 +74,13 @@ class Main {
     });
 
     this.messageHandlerMap = {
-      'UpdateEntity': this.game._updateEntity.bind(this.game),
-      'RemoveEntity': this.game._removeEntity.bind(this.game),
-      'StartGame': this._startGame.bind(this),
-      'AssignTeam': this.startscreen._assignTeam.bind(this.startscreen),
-      'UpdateReadyStates': this.startscreen._updateReadyStates.bind(this.startscreen),
-      'UpdateMap': this._updateMap.bind(this),
+      'UpdateEntity': m => this.game._updateEntity(m),
+      'RemoveEntity': m => this.game._removeEntity(m),
+      'StartGame': m => this._startGame(m),
+      'AssignTeam': m => this.startscreen._assignTeam(m),
+      'UpdateReadyStates': m => this.startscreen._updateReadyStates(m),
+      'UpdateMap': m => this._updateMap(m),
+      'GameOver': m => this._gameOverHandler(m),
     };
 
     this._startRenderLoop();
@@ -103,12 +105,19 @@ class Main {
   }
 
   _startGame({ initialState, team }) {
-    this.game.init(initialState, team);
+    this.game = new Game(this.images, new GameMap(initialState), team);
+    this.team = team;
     this.mode = 'game';
   }
 
-  _updateMap({ mapNum, initialState, team }) {
-    this.game.init(initialState, team);
+  _gameOverHandler({ winningTeam }) {
+    this.mode = 'end';
+    this.game = null;
+    this.endscreen = new EndScreen(this.images, winningTeam, this.team);
+    this.startscreen = new StartScreen(this.images);
+  }
+
+  _updateMap({ mapNum }) {
     this.startscreen.selectMap(mapNum);
   }
 
@@ -119,7 +128,7 @@ class Main {
     } else {
       console.error('Unknown type: ', messageData.type);
     }
-    // console.log('Got' + event.data);
+    console.log('Got' + event.data);
   }
 
   /**
@@ -150,7 +159,7 @@ class Main {
     this.update(time);
 
     if (this.mode === 'game') {
-      this.mode = this.game.render();
+      this.game.render();
     } else if (this.mode === 'start') {
       this.startscreen.render();
     } else if (this.mode === 'end') {

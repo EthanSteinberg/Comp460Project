@@ -1,7 +1,8 @@
 import MapSelect from '../shared/guibuttons/mapselect';
+import { createMap } from '../shared/maps';
 
 export default class StartScreen {
-  constructor(images, map) {
+  constructor(images) {
     this.canvas = document.getElementById('canvas');
     this.context = this.canvas.getContext('2d');
 
@@ -11,12 +12,12 @@ export default class StartScreen {
     this.images = images;
     this.team = null;
 
-    this.map = map;
+    this.mapNum = 0;
 
     this.buttons = [];
-    this.buttons.push(new MapSelect('mapselect', 700, 100, 100, 50, 0))
-    this.buttons.push(new MapSelect('mapselect', 700, 200, 100, 50, 1))
-    this.buttons.push(new MapSelect('mapselect', 700, 300, 100, 50, 2))
+    this.buttons.push(new MapSelect('mapselect', 700, 100, 100, 50, 0));
+    this.buttons.push(new MapSelect('mapselect', 700, 200, 100, 50, 1));
+    this.buttons.push(new MapSelect('mapselect', 700, 300, 100, 50, 2));
 
     this.buttons[0].selected = true;
   }
@@ -29,7 +30,8 @@ export default class StartScreen {
 
     this.context.translate(this.width - 250, 50);
     this.context.scale(0.25, 0.25);
-    this.map.renderMiniMap(this.context, this.images, 0, 0, this.width, this.height);
+    const map = createMap(this.mapNum);
+    map.renderMiniMap(this.context, this.images, 0, 0, this.width, this.height);
     this.context.scale(4, 4);
     this.context.translate(-this.width + 250, -50);
 
@@ -90,6 +92,8 @@ export default class StartScreen {
         button.selected = false;
       }
     }
+
+    this.mapNum = mapNum;
   }
 
   getTeam() {

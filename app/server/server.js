@@ -1,10 +1,11 @@
-import GameMap from '../shared/gamemap';
 import buildingConstants from '../shared/buildingconstants';
 
 import * as Ships from '../shared/ship';
 import * as BuildingTemplates from '../shared/buildingtemplate';
 import * as Shipyards from '../shared/shipyard';
 import { getStats } from '../shared/template';
+
+import { createMap } from '../shared/maps';
 
 const http = require('http');
 const ws = require('ws');
@@ -22,7 +23,9 @@ const appDir = path.dirname(require.main.filename);
 
 const MILLISECONDS_PER_LOGIC_UPDATE = 30;
 
-const map = new GameMap();
+let map = null;
+
+let currentMapNum = 0;
 
 const playerSockets = {};
 
@@ -38,12 +41,47 @@ function serializeMapEntities() {
   return result;
 }
 
-let lastEntityState = serializeMapEntities();
+let lastEntityState = null;
+
+function setNewMap(newMap) {
+  map = newMap;
+  lastEntityState = serializeMapEntities();
+}
+
+const teamReadyMap = {
+  '0': false,
+  '1': false,
+};
+
+function gameOver(winningTeam) {
+  for (const team of Object.keys(teamReadyMap)) {
+    teamReadyMap[team] = false;
+  }
+
+  for (const team of Object.keys(playerSockets)) {
+    playerSockets[team].send(JSON.stringify({ type: 'GameOver', winningTeam }));
+    playerSockets[team].send(JSON.stringify({ type: 'AssignTeam', team, readyStates: teamReadyMap }));
+  }
+
+  currentMapNum = 0;
+  map = null;
+}
 
 function updateGameState() {
+  if (map == null) return;
+
   const updateMessages = pendingUpdates;
 
   map.processUpdate();
+
+  const teamCounts = map.countPlayerItems();
+  if (teamCounts['0'] === 0) {
+    gameOver('1');
+    return;
+  } else if (teamCounts['1'] === 0) {
+    gameOver('0');
+    return;
+  }
 
   const currentEntityState = serializeMapEntities();
 
@@ -167,28 +205,10 @@ function updateModeHandler({ targetMode }, playerTeam) {
   map.getEntity(playerTeam).targetMode = targetMode;
 }
 
-const teamReadyMap = {
-  '0': false,
-  '1': false,
-};
-
-function startNewGame({}) {
-  for (const team of Object.keys(teamReadyMap)) {
-    teamReadyMap[team] = false;
-  }
-
-  for (const team of Object.keys(playerSockets)) {
-    playerSockets[team].send(JSON.stringify({ type: 'UpdateReadyStates', readyStates: teamReadyMap }));
-  }
-
-  map.initialSetup();
-}
-
 function updateMap({ mapNum }) {
-  map.initialSetup(mapNum);
-
+  currentMapNum = mapNum;
   for (const team of Object.keys(playerSockets)) {
-    playerSockets[team].send(JSON.stringify({ type: 'UpdateMap', mapNum: mapNum, initialState: map.getInitialState(), team }));
+    playerSockets[team].send(JSON.stringify({ type: 'UpdateMap', mapNum }));
   }
 }
 
@@ -205,6 +225,10 @@ function updateReadyState({ readyState }, playerTeam) {
     }
   }
 
+  // Start the game!
+
+  setNewMap(createMap(currentMapNum));
+
   for (const team of Object.keys(playerSockets)) {
     playerSockets[team].send(JSON.stringify({ type: 'StartGame', initialState: map.getInitialState(), team }));
   }
@@ -217,7 +241,6 @@ const messageHandlers = {
   'AttackShip': attackShipHandler,
   'UpdateMode': updateModeHandler,
   'SetReadyState': updateReadyState,
-  'StartNewGame': startNewGame,
   'UpdateMap': updateMap,
 };
 
