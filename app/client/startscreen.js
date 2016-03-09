@@ -1,9 +1,13 @@
 import MapSelect from '../shared/guibuttons/mapselect';
+<<<<<<< HEAD
 import Ready from '../shared/guibuttons/ready';
 
+=======
+import { createMap } from '../shared/maps';
+>>>>>>> origin/ethan
 
 export default class StartScreen {
-  constructor(images, map) {
+  constructor(images) {
     this.canvas = document.getElementById('canvas');
     this.context = this.canvas.getContext('2d');
 
@@ -13,15 +17,21 @@ export default class StartScreen {
     this.images = images;
     this.team = null;
 
-    this.map = map;
+    this.mapNum = 0;
 
     this.buttons = [];
+<<<<<<< HEAD
     this.buttons.push(new MapSelect('mapselect', 700, 350, 102, 26, 0))
     this.buttons.push(new MapSelect('mapselect', 850, 350, 102, 26, 1))
     this.buttons.push(new MapSelect('mapselect', 1000, 350, 102, 26, 2))
     this.buttons[0].rendertype = 'westindies'
     this.buttons[1].rendertype = 'tropics'
     this.buttons[2].rendertype = 'greatlakes'
+=======
+    this.buttons.push(new MapSelect('mapselect', 700, 100, 100, 50, 0));
+    this.buttons.push(new MapSelect('mapselect', 700, 200, 100, 50, 1));
+    this.buttons.push(new MapSelect('mapselect', 700, 300, 100, 50, 2));
+>>>>>>> origin/ethan
 
     this.buttons[0].selected = true;
 
@@ -48,7 +58,8 @@ export default class StartScreen {
 
     this.context.translate(this.width - 420, 50);
     this.context.scale(0.25, 0.25);
-    this.map.renderMiniMap(this.context, this.images, 0, 0, this.width, this.height);
+    const map = createMap(this.mapNum);
+    map.renderMiniMap(this.context, this.images, 0, 0, this.width, this.height);
     this.context.scale(4, 4);
     this.context.translate(-this.width + 420, -50);
 
@@ -112,6 +123,8 @@ export default class StartScreen {
         button.selected = false;
       }
     }
+
+    this.mapNum = mapNum;
   }
 
   getTeam() {

@@ -1,98 +1,29 @@
-import * as Ships from './ship';
 import * as Mines from './mine';
 import * as Shipyards from './shipyard';
 import * as Hardpoints from './hardpoint';
 import * as Islands from './island';
 import Types from './types';
-import MiniView from './miniview';
-
-export const MAP_WIDTH = 20;
-export const MAP_HEIGHT = 20;
-
-const SCALE = 3;
 
 /**
  * A map of the game containing islands and all current ships.
  */
 export default class GameMap {
 
-  constructor(mapNum) {
-    this.miniview = new MiniView('miniview');
+  constructor(initialState) {
+    const { entries, width, height } = initialState;
 
-    this.team = null;
-
-    this.initialSetup(mapNum);
-
-    this.width = MAP_WIDTH;
-    this.height = MAP_HEIGHT;
-  }
-
-  initialSetup(mapNum) {
     this.entities = new Map();
     this.nextEntityId = 2;
 
-    this.entities.set('0', {
-      id: '0',
-      type: 'playerstate',
-      coins: 50,
-      targetMode: 'hull',
-      numItems: 0,
-    });
-
-    this.entities.set('1', {
-      id: '1',
-      type: 'playerstate',
-      coins: 50,
-      targetMode: 'hull',
-      numItems: 0,
-    });
-
-    this.template = {
-      hull: 'gunboat',
-      hardpoints: [],
-    };
-
-    switch (mapNum) {
-      case 0:
-        this.setupMapZero();
-        break;
-      case 1:
-        this.setupMapOne();
-        break;
-      case 2:
-        this.setupMapTwo();
-        break;
-      default:
-        this.setupMapZero();
-        break;
+    for (const value of entries) {
+      this.addEntity(value);
     }
+
+    this.width = width;
+    this.height = height;
   }
 
-  setupMapZero() {
-    Ships.createShipAndHardpoints(this, 0, 3, this.template, '0');
-    Ships.createShipAndHardpoints(this, 17, 17, this.template, '1');
-
-    const island1coordinates = [
-      [1, 1],
-      [1, 2],
-    ];
-    Islands.createIsland(this, island1coordinates);
-    const island2coordinates = [
-      [18, 17],
-      [18, 18],
-    ];
-    Islands.createIsland(this, island2coordinates);
-
-    const island3coordinates = [
-      [17, 3],
-    ];
-    const island4coordinates = [
-      [3, 17],
-    ];
-    Islands.createIsland(this, island3coordinates);
-    Islands.createIsland(this, island4coordinates);
-  }
-
+<<<<<<< HEAD
   setupMapOne() {
     Ships.createShipAndHardpoints(this, 0, 3, this.template, '0');
     Ships.createShipAndHardpoints(this, 16, 17, this.template, '1');
@@ -179,16 +110,14 @@ export default class GameMap {
   }
 
 
+=======
+>>>>>>> origin/ethan
   getInitialState() {
-    return [...this.entities];
-  }
-
-  init(initialState) {
-    this.entities = new Map();
-
-    for (const [key, value] of initialState) {
-      this.entities.set(key, value);
-    }
+    return {
+      entries: [...this.entities.values()],
+      width: this.width,
+      height: this.height,
+    };
   }
 
   addEntity(entity) {
@@ -227,20 +156,26 @@ export default class GameMap {
    * Render both the map and all ships on it.
    */
   render(context, images, selectionState) {
-    if (this.mode === 'tactical') {
-      context.scale(SCALE, SCALE);
-      return this.renderMap(context, images, selectionState);
-    } else {
-      return this.renderMap(context, images, selectionState);
-    }
+    this.renderMap(context, images, selectionState);
   }
 
-  renderMiniMap(context, images, x, y, width, height) {
+  renderMiniMap(context, images) {
     this.renderMap(context, images, { gui: null, map: [] });
+  }
 
-    if (this.mode === 'tactical') {
-      this.miniview.render(context, images, x, y, width, height, SCALE);
+  countPlayerItems() {
+    const result = {
+      '0': 0,
+      '1': 0,
+    };
+
+    for (const entity of this.entities.values()) {
+      if (entity.team != null) {
+        result[entity.team] += 1;
+      }
     }
+
+    return result;
   }
 
   renderMap(context, images, selectionState) {
@@ -254,18 +189,7 @@ export default class GameMap {
       }
     }
 
-    let player0 = this.getEntity('0');
-    let player1 = this.getEntity('1');
-    player0.numItems = 0;
-    player1.numItems = 0;
-
     for (const entity of this.entities.values()) {
-      if (entity.team === '0') {
-        player0.numItems += 1;
-      } else if (entity.team === '1') {
-        player1.numItems += 1;
-      }
-
       const isSelected = selectionState.map.indexOf(entity.id) !== -1;
 
       const type = Types[entity.type];
@@ -285,6 +209,7 @@ export default class GameMap {
 
     context.fillStyle = 'black';
     context.textBaseline = 'top';
+<<<<<<< HEAD
     context.font = '1px sans-serif';
     context.fillText("Mini Map", -25, -100);
     if (player0.numItems == 0) {
@@ -293,6 +218,10 @@ export default class GameMap {
       return 'end';
     }
     return 'game';
+=======
+    context.font = '50px sans-serif';
+    context.fillText('Mini Map', -25, -100);
+>>>>>>> origin/ethan
   }
 
   /**
@@ -381,7 +310,7 @@ export default class GameMap {
   }
 
   setView(mouseX, mouseY) {
-    return this.miniview.setView(mouseX, mouseY, MAP_WIDTH * 50, MAP_HEIGHT * 50);
+    return this.miniview.setView(mouseX, mouseY, this.width * 50, this.height * 50);
   }
 
   isNextToIsland(islandID, x, y) {

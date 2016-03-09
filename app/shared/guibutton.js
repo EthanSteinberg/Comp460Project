@@ -1,7 +1,3 @@
-
-import {MAP_WIDTH} from './gamemap';
-import {MAP_HEIGHT} from './gamemap';
-
 let nextId = 0;
 
 /**

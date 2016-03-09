@@ -1,12 +1,9 @@
-import { MAP_WIDTH } from './gamemap';
-import { MAP_HEIGHT } from './gamemap';
-
 /**
  * An island entity.
  */
 
-function addToPerimeter(island, x, y) {
-  if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT && !isIsland(island, x, y)) {
+function addToPerimeter(island, x, y, map) {
+  if (x >= 0 && x < map.width && y >= 0 && y < map.height && !isIsland(island, x, y)) {
     for (const [oldX, oldY] of island.perimeter) {
       if (oldX === x && oldY === y) {
         return;
@@ -28,7 +25,7 @@ export function createIsland(map, coordinates) {
   for (const [iX, iY] of island.coordinates) {
     for (const dx of [-1, 0, 1]) {
       for (const dy of [-1, 0, 1]) {
-        addToPerimeter(island, iX + dx, iY + dy);
+        addToPerimeter(island, iX + dx, iY + dy, map);
       }
     }
   }
