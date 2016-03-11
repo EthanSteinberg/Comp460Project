@@ -36,8 +36,8 @@ const maps = [
     ],
   },
   {
-    width: 20,
-    height: 20,
+    width: 30,
+    height: 30,
     ships: [
       {
         team: '0',

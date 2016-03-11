@@ -14,8 +14,6 @@ export default class StartScreen {
     this.images = images;
     this.team = null;
 
-    this.mapNum = 0;
-
     this.buttons = [];
     this.buttons.push(new MapSelect('mapselect', 700, 350, 102, 26, 0));
     this.buttons.push(new MapSelect('mapselect', 850, 350, 102, 26, 1));
@@ -98,14 +96,15 @@ export default class StartScreen {
     this.context.fillText('Loading ...', 50, 50);
   }
 
-  _assignTeam({ team, readyStates }) {
+  _assignTeam({ team, readyStates, mapNum }) {
     this.team = team;
+    this.mapNum = mapNum;
     this.readyStates = readyStates;
 
     if (this.team === '0') {
-      this.buttons.push(new Ready('notready', 160, 280, 128, 26))
+      this.buttons.push(new Ready('notready', 160, 280, 128, 26));
     } else {
-      this.buttons.push(new Ready('notready', 160, 330, 128, 26))
+      this.buttons.push(new Ready('notready', 160, 330, 128, 26));
     }
   }
 

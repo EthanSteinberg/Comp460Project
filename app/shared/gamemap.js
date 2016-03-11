@@ -83,7 +83,7 @@ export default class GameMap {
   }
 
   renderMiniMap(context, images, x, y, width, height) {
-    this.renderMap(context, images, { gui: null, map: [] });
+    this.renderMap(context, images, { gui: null, map: [] }, 5, this.width / 3);
 
     if (x != null) {
       context.globalCompositeOperation = 'multiply';
@@ -115,19 +115,22 @@ export default class GameMap {
     return result;
   }
 
-  renderMap(context, images, selectionState) {
+  renderMap(context, images, selectionState, gridSize = 1, gridWidth = 1) {
     context.fillStyle = 'black';
-    context.fillRect(-50, -50, this.width*50 + 50, this.height*50 + 50);
+    context.fillRect(-50, -50, this.width * 50 + 50, this.height * 50 + 50);
 
-    for (let x = 0; x < this.width; x++) {
-      for (let y = 0; y < this.height; y++) {
-        context.fillStyle = 'antiquewhite';
+    context.fillStyle = 'antiquewhite';
+    context.fillRect(-25, -25, this.width * 50, this.height * 50);
+
+    for (let x = 0; x < this.width; x += gridSize) {
+      for (let y = 0; y < this.height; y += gridSize) {
         context.strokeStyle = 'lightgray';
-        context.fillRect((x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
-        // Show grid
-        context.strokeRect((x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
+        context.lineWidth = gridWidth;
+        context.strokeRect((x - 0.5) * 50, (y - 0.5) * 50, gridSize * 50, gridSize * 50);
       }
     }
+
+    context.lineWidth = 1.0;
 
     for (const entity of this.entities.values()) {
       const isSelected = selectionState.map.indexOf(entity.id) !== -1;

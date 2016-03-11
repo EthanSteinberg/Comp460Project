@@ -273,7 +273,7 @@ wss.on('connection', function connection(socket) {
   if (debug) {
     socket.send(JSON.stringify({ type: 'StartGame', initialState: map.getInitialState(), team: playerTeam }));
   } else {
-    socket.send(JSON.stringify({ type: 'AssignTeam', team: playerTeam, readyStates: teamReadyMap }));
+    socket.send(JSON.stringify({ type: 'AssignTeam', team: playerTeam, readyStates: teamReadyMap, mapNum: currentMapNum }));
   }
 
   socket.on('message', function incoming(message) {
