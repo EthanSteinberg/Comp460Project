@@ -116,13 +116,16 @@ export default class GameMap {
   }
 
   renderMap(context, images, selectionState) {
+    context.fillStyle = 'black';
+    context.fillRect(-50, -50, this.width*50 + 50, this.height*50 + 50);
+
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
-        context.fillStyle = 'blue';
-        context.strokeStyle = 'black';
+        context.fillStyle = 'antiquewhite';
+        context.strokeStyle = 'lightgray';
         context.fillRect((x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
         // Show grid
-        // context.strokeRect((x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
+        context.strokeRect((x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
       }
     }
 

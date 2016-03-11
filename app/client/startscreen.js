@@ -48,7 +48,7 @@ export default class StartScreen {
   renderSetup() {
     this.context.clearRect(0, 0, this.width, this.height);
 
-    this.context.fillStyle = 'papayawhip';
+    this.context.fillStyle = 'linen';
     this.context.fillRect(0, 0, this.width, this.height);
 
     this.context.translate(this.width - 420, 50);
@@ -76,10 +76,10 @@ export default class StartScreen {
       }
 
       this.context.font = '50px Perpetua';
-      this.context.fillText('Status:', 40, 200);
+      this.context.fillText('Status:', 40, 250);
 
       this.context.font = '30px Perpetua';
-      let startingY = 250;
+      let startingY = 300;
       for (const team of Object.keys(this.readyStates)) {
         if (team != this.team) {
           this.context.fillText((team == '0' ? 'Pirates      ' : 'Imperials  ') + (this.readyStates[team] ? 'Ready' : 'Not Ready'), 50, startingY);
@@ -103,9 +103,9 @@ export default class StartScreen {
     this.readyStates = readyStates;
 
     if (this.team === '0') {
-      this.buttons.push(new Ready('notready', 160, 255, 128, 26))
+      this.buttons.push(new Ready('notready', 160, 280, 128, 26))
     } else {
-      this.buttons.push(new Ready('notready', 160, 305, 128, 26))
+      this.buttons.push(new Ready('notready', 160, 330, 128, 26))
     }
   }
 
