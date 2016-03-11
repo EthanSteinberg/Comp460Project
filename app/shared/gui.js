@@ -181,22 +181,23 @@ export default class Gui {
 
     context.fillStyle = 'black';
     context.textBaseline = 'top';
-    context.font = '24px sans-serif';
-    context.fillText(moneyText, this.x + 30, this.y + 5);
+    context.font = '24px Perpetua';
+    context.fillText(moneyText, this.x + 33, this.y + 5);
 
     const width = context.measureText(moneyText).width;
 
     context.strokeStyle = 'black';
-    context.strokeRect(this.x, this.y, width + 40, 35);
-    context.drawImage(images.money, (this.x), (this.y) + 5, 25, 25);
+    context.strokeRect(this.x + 3, this.y, width + 40, 35);
+    context.drawImage(images.money, (this.x) + 3, (this.y) + 5, 25, 25);
 
-    context.fillText('Team: ', (this.x) + 100, (this.y) + 5);
     if (this.team === '1') {
       context.fillStyle = 'firebrick';
+      context.fillText('Pirates', (this.x) + 110, (this.y) + 5);
+
     } else {
-      context.fillStyle = 'royalblue';
+      context.fillStyle = 'darkblue';
+      context.fillText('Imperials', (this.x) + 100, (this.y) + 5);
     }
-    context.fillRect(this.x + 175, this.y + 5, 25, 25);
 
     for (const button of this.getButtons()) {
       const isSelected = this.selectionState.gui != null && this.selectionState.gui.type === button.type &&
@@ -229,7 +230,7 @@ export default class Gui {
 
         context.fillStyle = 'black';
         context.textBaseline = 'top';
-        context.font = '14px sans-serif';
+        context.font = '14px Perpetua';
         context.fillText(details.name, (roundedX - 2) + modifier, (roundedY + 1));
         context.fillText(details.description, (roundedX - 2) + modifier, (roundedY + 1) + 20);
         context.fillText('Cost: ' + details.coinCost + ' coin, ' + details.buildTime + ' seconds', (roundedX - 2) + modifier, (roundedY + 1) + 34);

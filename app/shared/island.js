@@ -36,9 +36,22 @@ export function createIsland(map, coordinates) {
 }
 
 export function render(island, map, context, images) {
-  for (const [x, y] of island.coordinates) {
-    context.fillStyle = 'green';
-    context.fillRect((x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
+  // for (const [x, y] of island.coordinates) {
+  //   // context.fillStyle = 'green';
+  //   // context.fillRect((x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
+  //   context.drawImage(images.island, (x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
+  // }
+
+  var coords = island.coordinates[0]
+  var x = coords[0]
+  var y = coords[1]
+
+  if (island.coordinates.length == 1) {
+    context.drawImage(images.island, (x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
+  } else if (island.coordinates.length == 2) {
+    context.drawImage(images.island, (x - 0.5) * 50, (y - 0.5) * 50, 50, 100);
+  } else if (island.coordinates.length == 4) {
+    context.drawImage(images.island, (x - 0.5) * 50, (y - 0.5) * 50, 100, 100);
   }
 
   const [mainX, mainY] = island.coordinates[0];

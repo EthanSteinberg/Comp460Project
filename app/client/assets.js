@@ -3,9 +3,9 @@ import { loadBuffer } from './audio';
 // A mapping of image name to image source location.
 const sources = {
   ship: 'ship.png',
-  mine: 'mine.png',
-  shipyard: 'shipyard.png',
-  money: 'money.png',
+  mine: 'mine2.png',
+  shipyard: 'shipyard2.png',
+  money: 'coin2.png',
   shipskeleton: 'shipskeleton.png',
   roundshot: 'roundshot.png',
   chainshot: 'chainshot.png',
@@ -36,6 +36,7 @@ const sources = {
   westindies: 'westindies.png',
   tropics: 'tropics.png',
   greatlakes: 'greatlakes.png',
+  island: '1x1islandDot.png',
 
   test: 'test.mp3',
   'bensound-epic': 'bensound-epic.mp3',
