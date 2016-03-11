@@ -116,8 +116,9 @@ export default class GameMap {
   }
 
   renderMap(context, images, selectionState, gridSize = 1, gridWidth = 1) {
-    context.fillStyle = 'black';
-    context.fillRect(-50, -50, this.width * 50 + 50, this.height * 50 + 50);
+    context.lineWidth = gridWidth * 5;
+    context.strokeStyle = 'black';
+    context.strokeRect(-25, -25, this.width * 50, this.height * 50);
 
     context.fillStyle = 'antiquewhite';
     context.fillRect(-25, -25, this.width * 50, this.height * 50);
