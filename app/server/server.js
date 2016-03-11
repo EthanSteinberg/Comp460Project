@@ -65,7 +65,7 @@ function gameOver(winningTeam) {
 
   for (const team of Object.keys(playerSockets)) {
     playerSockets[team].send(JSON.stringify({ type: 'GameOver', winningTeam }));
-    playerSockets[team].send(JSON.stringify({ type: 'AssignTeam', team, readyStates: teamReadyMap }));
+    playerSockets[team].send(JSON.stringify({ type: 'AssignTeam', team, readyStates: teamReadyMap, mapNum: 0 }));
   }
 
   currentMapNum = 0;
