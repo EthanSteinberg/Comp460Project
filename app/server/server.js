@@ -89,7 +89,11 @@ function updateGameState() {
   // TODO: Need a faster way to scan for changes
   for (const id of Object.keys(currentEntityState)) {
     if (lastEntityState[id] !== currentEntityState[id]) {
-      updateMessages.push({ type: 'UpdateEntity', id, data: JSON.parse(currentEntityState[id]) });
+      if (lastEntityState[id] != null) {
+        updateMessages.push({ type: 'UpdateEntity', id, data: JSON.parse(currentEntityState[id]) });
+      } else {
+        updateMessages.push({ type: 'AddEntity', id, data: JSON.parse(currentEntityState[id]) });
+      }
     }
   }
 

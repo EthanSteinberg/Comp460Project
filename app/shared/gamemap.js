@@ -31,7 +31,19 @@ export default class GameMap {
     };
   }
 
+  updateEntity(entity) {
+    if (!this.entities.has(entity.id)) {
+      console.error('Updating an entity which does not exist: ', entity);
+    }
+
+    this.entities.set(entity.id, entity);
+  }
+
   addEntity(entity) {
+    if (this.entities.has(entity.id)) {
+      console.error('Adding an entity which already exists: ', entity);
+    }
+
     this.entities.set(entity.id, entity);
   }
 

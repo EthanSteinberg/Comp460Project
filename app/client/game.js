@@ -1,5 +1,6 @@
 import Gui from '../shared/gui';
 import { GUI_WIDTH } from '../shared/gui';
+import { createSource } from './audio';
 
 import { defaultTemplate } from '../shared/template';
 
@@ -76,7 +77,19 @@ export default class Game {
   }
 
   _updateEntity({ data }) {
-    // console.log(data)
+    this.map.updateEntity(data);
+  }
+
+  _addEntity({ data }) {
+    if (data.type === 'projectile') {
+      createSource(this.images['cannon-sound']).start(0);
+    } else if (data.type === 'ship' && this.team === data.team) {
+      if (data.team === '1') {
+        createSource(this.images.pirateCommand).start(0);
+      } else {
+        createSource(this.images.empireCommand).start(0);
+      }
+    }
     this.map.addEntity(data);
   }
 

@@ -1,6 +1,7 @@
 import MapSelect from '../shared/guibuttons/mapselect';
 import Ready from '../shared/guibuttons/ready';
 import { createMap } from '../shared/maps';
+import { createSource } from './audio';
 
 export default class StartScreen {
   constructor(images) {
@@ -16,22 +17,26 @@ export default class StartScreen {
     this.mapNum = 0;
 
     this.buttons = [];
-    this.buttons.push(new MapSelect('mapselect', 700, 350, 102, 26, 0))
-    this.buttons.push(new MapSelect('mapselect', 850, 350, 102, 26, 1))
-    this.buttons.push(new MapSelect('mapselect', 1000, 350, 102, 26, 2))
-    this.buttons[0].rendertype = 'westindies'
-    this.buttons[1].rendertype = 'tropics'
-    this.buttons[2].rendertype = 'greatlakes'
+    this.buttons.push(new MapSelect('mapselect', 700, 350, 102, 26, 0));
+    this.buttons.push(new MapSelect('mapselect', 850, 350, 102, 26, 1));
+    this.buttons.push(new MapSelect('mapselect', 1000, 350, 102, 26, 2));
+    this.buttons[0].rendertype = 'westindies';
+    this.buttons[1].rendertype = 'tropics';
+    this.buttons[2].rendertype = 'greatlakes';
 
     this.buttons[0].selected = true;
 
     this.mode = 'splash';
+
+    this.epicSound = createSource(images['bensound-epic']);
+    this.epicSound.loop = true;
+    this.epicSound.start(0);
   }
 
   render() {
-    if (this.mode == 'splash') {
+    if (this.mode === 'splash') {
       this.renderSplash();
-    } else if (this.mode == 'setup') {
+    } else if (this.mode === 'setup') {
       this.renderSetup();
     }
   }
@@ -133,14 +138,15 @@ export default class StartScreen {
   }
 
   mousedown(event, sendMessage) {
-    if (this.mode == 'splash') {
+    if (this.mode === 'splash') {
       this.mousedownSplash(event, sendMessage);
-    } else if (this.mode == 'setup') {
+    } else if (this.mode === 'setup') {
       this.mousedownSetup(event, sendMessage);
     }
   }
 
-  mousedownSplash(event, sendMessage) {
+  mousedownSplash() {
+    this.epicSound.stop(0);
     this.mode = 'setup';
   }
 

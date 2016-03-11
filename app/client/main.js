@@ -1,4 +1,4 @@
-import loadImages from './images';
+import loadAssets from './assets';
 
 const MILLISECONDS_PER_LOGIC_UPDATE = 5;
 const MILLISECONDS_PER_RENDER_UPDATE = 15;
@@ -74,6 +74,7 @@ class Main {
     });
 
     this.messageHandlerMap = {
+      'AddEntity': m => this.game._addEntity(m),
       'UpdateEntity': m => this.game._updateEntity(m),
       'RemoveEntity': m => this.game._removeEntity(m),
       'StartGame': m => this._startGame(m),
@@ -169,7 +170,7 @@ class Main {
 }
 
 document.addEventListener('DOMContentLoaded', function startCanvas() {
-  loadImages().then((images) => {
+  loadAssets().then((images) => {
     const main = new Main(images);
     main.start();
   });

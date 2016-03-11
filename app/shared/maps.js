@@ -129,7 +129,7 @@ const maps = [
 
 const template = {
   hull: 'gunboat',
-  hardpoints: [],
+  hardpoints: ['roundshot'],
 };
 
 export function createMap(mapNum) {
