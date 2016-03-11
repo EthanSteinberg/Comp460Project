@@ -44,6 +44,9 @@ const sources = {
 
   'pirateCommand': 'pirateCommandVoice.mp3',
   'empireCommand': 'empireCommandVoice.mp3',
+
+  'pirateMoreGold': 'pirateMoreGold.mp3',
+  'empireMoreGold': 'empireMoreGold.mp3',
 };
 
 /**

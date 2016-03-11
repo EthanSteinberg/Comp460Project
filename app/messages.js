@@ -14,6 +14,10 @@ AssignTeam: {
 	readyStates: The inial ready states
 }
 
+PlaySound: {
+	soundId: the asset id for the sound
+}
+
 SetReadyState: {
 	readyState: A boolean indicating whether the player is ready or not
 }

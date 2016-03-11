@@ -1,4 +1,5 @@
 import loadAssets from './assets';
+import { createSource } from './audio';
 
 const MILLISECONDS_PER_LOGIC_UPDATE = 5;
 const MILLISECONDS_PER_RENDER_UPDATE = 15;
@@ -82,6 +83,7 @@ class Main {
       'UpdateReadyStates': m => this.startscreen._updateReadyStates(m),
       'UpdateMap': m => this._updateMap(m),
       'GameOver': m => this._gameOverHandler(m),
+      'PlaySound': m => this._playSound(m),
     };
 
     this._startRenderLoop();
@@ -103,6 +105,13 @@ class Main {
   _startRenderLoop() {
     setInterval(this.render.bind(this), MILLISECONDS_PER_RENDER_UPDATE);
     this.lastUpdate = performance.now();
+  }
+
+  _playSound({ soundId }) {
+    if (!(soundId in this.images)) {
+      console.error(soundId, ' not in this.images');
+    }
+    createSource(this.images[soundId]).start(0);
   }
 
   _startGame({ initialState, team }) {

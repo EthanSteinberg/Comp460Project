@@ -31,7 +31,12 @@ const playerSockets = {};
 
 const debug = false;
 
+function sendMessageToPlayer(team, message) {
+  playerSockets[team].send(JSON.stringify(message));
+}
+
 let pendingUpdates = [];
+
 
 function serializeMapEntities() {
   const result = [];
@@ -155,6 +160,8 @@ function makeBuildingHandler({ building, x, y }, playerTeam) {
   const buildingStats = buildingConstants[building];
   if (buildingStats.coinCost > map.getEntity(playerTeam).coins) {
     console.error('Trying to build a buildng you cant afford');
+    const soundId = playerTeam === '0' ? 'empireMoreGold' : 'pirateMoreGold';
+    sendMessageToPlayer(playerTeam, { type: 'PlaySound', soundId });
     return;
   }
   map.getEntity(playerTeam).coins -= buildingStats.coinCost;
@@ -176,6 +183,9 @@ function makeShipHandler({ shipyardId, template, templateNumber }, playerTeam) {
 
   if (stats.cost > map.getEntity(playerTeam).coins) {
     console.error('Trying to build a ship you cant afford');
+
+    const soundId = playerTeam === '0' ? 'empireMoreGold' : 'pirateMoreGold';
+    sendMessageToPlayer(playerTeam, { type: 'PlaySound', soundId });
     return;
   }
 
