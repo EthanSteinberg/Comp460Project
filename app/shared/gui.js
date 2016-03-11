@@ -182,13 +182,13 @@ export default class Gui {
     context.fillStyle = 'black';
     context.textBaseline = 'top';
     context.font = '24px Perpetua';
-    context.fillText(moneyText, this.x + 33, this.y + 5);
+    context.fillText(moneyText, this.x + 32, this.y + 5);
 
     const width = context.measureText(moneyText).width;
 
     context.strokeStyle = 'black';
-    context.strokeRect(this.x + 3, this.y, width + 40, 35);
-    context.drawImage(images.money, (this.x) + 3, (this.y) + 5, 25, 25);
+    context.strokeRect(this.x + 2, this.y, width + 40, 35);
+    context.drawImage(images.money, (this.x) + 2, (this.y) + 5, 25, 25);
 
     if (this.team === '1') {
       context.fillStyle = 'firebrick';
