@@ -11,10 +11,10 @@ export default class TargetToggle extends GuiButton {
 
     switch (this.type) {
       case 'hull':
-        context.drawImage(images.targettoggleCannon, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+        context.drawImage(images.targettoggleCannon, this.x, this.y, this.width, this.height);
         break;
       case 'hardpoints':
-        context.drawImage(images.targettoggleHull, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+        context.drawImage(images.targettoggleHull, this.x, this.y, this.width, this.height);
         break;
     }
   }

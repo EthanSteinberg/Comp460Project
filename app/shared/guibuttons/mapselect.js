@@ -11,13 +11,13 @@ export default class MapSelect extends GuiButton {
 
     switch (this.rendertype) {
       case 'westindies':
-        context.drawImage(images.westindies, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+        context.drawImage(images.westindies, this.x, this.y, this.width, this.height);
         break;
       case 'tropics':
-        context.drawImage(images.tropics, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+        context.drawImage(images.tropics, this.x, this.y, this.width, this.height);
         break;
       case 'greatlakes':
-        context.drawImage(images.greatlakes, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+        context.drawImage(images.greatlakes, this.x, this.y, this.width, this.height);
         break;
     }
   }

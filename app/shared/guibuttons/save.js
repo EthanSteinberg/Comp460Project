@@ -9,7 +9,7 @@ export default class Save extends GuiButton {
       context.strokeRect(this.x, this.y, this.width, this.height);
     }
 
-    context.drawImage(images.save, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+    context.drawImage(images.save, this.x, this.y, this.width, this.height);
  
   }
 

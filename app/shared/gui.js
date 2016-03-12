@@ -80,7 +80,7 @@ export default class Gui {
     // titles
     context.fillStyle = 'black';
     context.textBaseline = 'top';
-    context.font = '14px sans-serif';
+    context.font = '14px Perpetua';
     context.fillText("SAVE SLOTS", this.x + 20, this.y + 10);
 
     const skeleton = new ShipSkeleton('shipskeleton', this.x + 50, this.y + 110, 100, 340);
@@ -96,7 +96,7 @@ export default class Gui {
     // Display stats at the bottom of the gui
     context.fillStyle = 'black';
     context.textBaseline = 'top';
-    context.font = '14px sans-serif';
+    context.font = '14px Perpetua';
     context.fillText(this.workingTemplate.hull.toUpperCase(), this.x + 10, this.height - 50);
     context.fillText(this.workingTemplate.hardpoints, this.x + 20, this.height - 35);
     context.fillText('Cost: ' + getStats(this.workingTemplate).cost + ' coin, '
@@ -163,7 +163,7 @@ export default class Gui {
 
           context.fillStyle = 'black';
           context.textBaseline = 'top';
-          context.font = '14px sans-serif';
+          context.font = '14px Perpetua';
 
           context.fillText(details.name, (roundedX - 2) + modifier, (roundedY + 1));
           context.fillText(details.description, (roundedX - 2) + modifier, (roundedY + 1) + 20);
@@ -246,7 +246,7 @@ export default class Gui {
 
         context.fillStyle = 'black';
         context.textBaseline = 'top';
-        context.font = '14px sans-serif';
+        context.font = '14px Perpetua';
         context.fillText(template.hull.toUpperCase(), (roundedX - 2) + modifier, (roundedY + 1));
         context.fillText(template.hardpoints, (roundedX - 2) + modifier, (roundedY + 1) + 20);
         context.fillText('Cost: ' + getStats(template).cost + ' coin, '
