@@ -12,7 +12,7 @@ export const roundshot = {
   weight: -10,
   cost: 30,
   tcost: 10,
-  range: 2,
+  range: 2.2,
 };
 
 export const chainshot = {
@@ -35,19 +35,19 @@ export const grapeshot = {
   weight: -5,
   cost: 50,
   tcost: 20,
-  range: 1,
+  range: 1.15,
 };
 
 export const shell = {
   name: 'Shell',
   description: 'Long range. Deals 10 dmg.',
   health: 100,
-  damage: 10,
+  damage: 17,
   speed: 0,
   weight: -20,
   cost: 50,
   tcost: 20,
-  range: 3,
+  range: 3.2,
 };
 
 export const gunboat = {
