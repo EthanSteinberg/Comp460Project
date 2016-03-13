@@ -17,7 +17,7 @@ export function createIsland(map, topLeft, size) {
   const coordinates = [];
 
   for (let x = 0; x < size[0]; x++) {
-    for (let y = 0; y < size[0]; y++) {
+    for (let y = 0; y < size[1]; y++) {
       coordinates.push([topLeft[0] + x, topLeft[1] + y]);
     }
   }

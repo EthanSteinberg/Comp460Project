@@ -67,9 +67,9 @@ export default class StartScreen {
       this.renderLoading();
     } else {
       this.context.fillStyle = 'black';
-      if (this.team == '0') {
+      if (this.team === '1') {
         this.context.drawImage(this.images.piratesTag, 0, 0);
-      } else if (this.team == '1') {
+      } else if (this.team === '0') {
         this.context.drawImage(this.images.imperialsTag, 0, 0);
       }
 
@@ -81,9 +81,9 @@ export default class StartScreen {
       let startingY = 300;
       for (const team of Object.keys(this.readyStates)) {
         if (team != this.team) {
-          this.context.fillText((team == '0' ? 'Pirates      ' : 'Imperials  ') + (this.readyStates[team] ? 'Ready' : 'Not Ready'), 50, startingY);
+          this.context.fillText((team === '1' ? 'Pirates      ' : 'Imperials  ') + (this.readyStates[team] ? 'Ready' : 'Not Ready'), 50, startingY);
         } else {
-          this.context.fillText((team == '0' ? 'Pirates      ' : 'Imperials  '), 50, startingY);
+          this.context.fillText((team === '1' ? 'Pirates      ' : 'Imperials  '), 50, startingY);
         }
 
         startingY += 50;
@@ -102,10 +102,10 @@ export default class StartScreen {
     this.mapNum = mapNum;
     this.readyStates = readyStates;
 
-    if (this.team === '0') {
-      this.buttons.push(new Ready('notready', 160, 305, 128, 26));
-    } else {
+    if (this.team === '1') {
       this.buttons.push(new Ready('notready', 160, 355, 128, 26));
+    } else {
+      this.buttons.push(new Ready('notready', 160, 305, 128, 26));
     }
   }
 
