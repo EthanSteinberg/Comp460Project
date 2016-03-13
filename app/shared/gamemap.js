@@ -2,6 +2,7 @@ import * as Mines from './mine';
 import * as Shipyards from './shipyard';
 import * as Hardpoints from './hardpoint';
 import * as Islands from './island';
+import * as Ships from './ship';
 import Types from './types';
 
 /**
@@ -29,6 +30,17 @@ export default class GameMap {
       width: this.width,
       height: this.height,
     };
+  }
+
+  getStartingCoords(team) {
+    for (const entity of this.entities.values()) {
+      if (entity.type === 'ship' && entity.team === team) {
+        const pos = Ships.getPosition(entity);
+        pos.x *= 50;
+        pos.y *= 50;
+        return pos;
+      }
+    }
   }
 
   updateEntity(entity) {

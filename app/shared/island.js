@@ -13,9 +13,19 @@ function addToPerimeter(island, x, y, map) {
   }
 }
 
-export function createIsland(map, coordinates) {
+export function createIsland(map, topLeft, size) {
+  const coordinates = [];
+
+  for (let x = 0; x < size[0]; x++) {
+    for (let y = 0; y < size[0]; y++) {
+      coordinates.push([topLeft[0] + x, topLeft[1] + y]);
+    }
+  }
+
   const island = {
     coordinates,
+    topLeft,
+    size,
     id: map.getNextEntityId(),
     team: null,
     perimeter: [],
@@ -36,31 +46,16 @@ export function createIsland(map, coordinates) {
 }
 
 export function render(island, map, context, images) {
-  // for (const [x, y] of island.coordinates) {
-  //   // context.fillStyle = 'green';
-  //   // context.fillRect((x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
-  //   context.drawImage(images.island, (x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
-  // }
+  const [x, y] = island.topLeft;
+  const [width, height] = island.size;
 
-  var coords = island.coordinates[0]
-  var x = coords[0]
-  var y = coords[1]
-
-  if (island.coordinates.length == 1) {
-    context.drawImage(images.island, (x - 0.5) * 50, (y - 0.5) * 50, 50, 50);
-  } else if (island.coordinates.length == 2) {
-    context.drawImage(images.island, (x - 0.5) * 50, (y - 0.5) * 50, 50, 100);
-  } else if (island.coordinates.length == 4) {
-    context.drawImage(images.island, (x - 0.5) * 50, (y - 0.5) * 50, 100, 100);
-  }
-
-  const [mainX, mainY] = island.coordinates[0];
+  context.drawImage(images.island, (x - 0.5) * 50, (y - 0.5) * 50, width * 50, height * 50);
 
   if (island.team != null) {
     const flag = (island.team === '0') ? images.blueFlag : images.redFlag;
 
     const scale = 20;
-    context.drawImage(flag, (mainX + 0.3) * 50, (mainY - 0.9) * 50, 480 / scale, 670 / scale);
+    context.drawImage(flag, (x + 0.3) * 50, (y - 0.9) * 50, 480 / scale, 670 / scale);
   }
 }
 

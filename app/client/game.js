@@ -27,13 +27,10 @@ export default class Game {
     this.map = map;
     this.gui = new Gui(this.width, this.height, templates, this.selectionState, this.map, team);
 
-    if (team === '0') {
-      this.x = 0;
-      this.y = 0;
-    } else {
-      this.x = map.width * 50 - this.width + GUI_WIDTH;
-      this.y = map.height * 50 - this.height;
-    }
+    const startingCoords = map.getStartingCoords(team);
+    this.x = Math.min(Math.max(0, startingCoords.x - (this.width - GUI_WIDTH) / 2), this.map.width * 50 - this.width + GUI_WIDTH);
+    this.y = Math.min(Math.max(0, startingCoords.y - this.height / 2), this.map.height * 50 - this.height);
+
     this.team = team;
 
     this.startingDownPosition = null;
