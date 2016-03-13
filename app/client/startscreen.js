@@ -73,6 +73,7 @@ export default class StartScreen {
         this.context.drawImage(this.images.imperialsTag, 0, 0);
       }
 
+      this.context.textBaseline = 'top';
       this.context.font = '50px Perpetua';
       this.context.fillText('Status:', 40, 250);
 
@@ -102,9 +103,9 @@ export default class StartScreen {
     this.readyStates = readyStates;
 
     if (this.team === '0') {
-      this.buttons.push(new Ready('notready', 160, 280, 128, 26));
+      this.buttons.push(new Ready('notready', 160, 305, 128, 26));
     } else {
-      this.buttons.push(new Ready('notready', 160, 330, 128, 26));
+      this.buttons.push(new Ready('notready', 160, 355, 128, 26));
     }
   }
 

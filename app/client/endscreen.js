@@ -1,3 +1,6 @@
+import Restart from '../shared/guibuttons/restart';
+
+
 export default class EndScreen {
   constructor(images, winningTeam, team) {
     this.canvas = document.getElementById('canvas');
@@ -10,45 +13,35 @@ export default class EndScreen {
 
     this.winningTeam = winningTeam;
     this.team = team;
+
+    this.buttons = [];
+    this.buttons.push(new Restart('restart', 530, 300, 102, 26, 0));
   }
 
   render() {
     this.context.clearRect(0, 0, this.width, this.height);
 
-    this.context.fillStyle = 'cyan';
+    this.context.fillStyle = 'linen';
     this.context.fillRect(0, 0, this.width, this.height);
 
     if (this.winningTeam === '1') {
-      this.context.fillStyle = 'firebrick';
-      this.context.textBaseline = 'top';
-      this.context.font = '24px sans-serif';
-      this.context.fillText('Red Team Wins', 100, 25);
+      this.context.drawImage(this.images.piratesWinTag, 0, 0);
     } else if (this.winningTeam === '0') {
-      this.context.fillStyle = 'royalblue';
-      this.context.textBaseline = 'top';
-      this.context.font = '24px sans-serif';
-      this.context.fillText('Blue Team Wins', 100, 25);
+      this.context.drawImage(this.images.imperialsWinTag, 0, 0);
     }
 
+    this.context.font = '50px Perpetua';
     this.context.fillStyle = 'black';
     if (this.team === this.winningTeam) {
-      this.context.fillText('You Win!', 100, 50);
+      this.context.fillText('You Win!', 500, 200);
     } else {
-      this.context.fillText('You Lose!', 100, 50);
+      this.context.fillText('You Lose!', 500, 200);
     }
 
-    const startingY = 200;
-    this.context.fillStyle = 'gray';
-    this.context.fillRect(175, startingY - 30, 150, 40);
+    for (const button of this.buttons) {
+      button.render(this.context, this.images);
+    }
 
-    this.context.strokeStyle = 'black';
-    this.context.save();
-    this.context.lineWidth = '4';
-    this.context.strokeRect(175, startingY - 30, 150, 40);
-    this.context.restore();
-
-    this.context.fillStyle = 'black';
-    this.context.fillText('Restart', 200, startingY - 25);
   }
 
   getRawMouseCords(event) {
@@ -61,16 +54,13 @@ export default class EndScreen {
 
   mousedown(event) {
     const { rawX, rawY } = this.getRawMouseCords(event);
-    const teamOffset = parseInt('0', 10);
 
-    const boxStartX = 175;
-    const boxEndX = boxStartX + 150;
-
-    const boxStartY = 200 + 50 * teamOffset - 30;
-    const boxEndY = boxStartY + 40;
-
-    if (rawX >= boxStartX && rawX <= boxEndX && rawY >= boxStartY && rawY <= boxEndY) {
-      return 'start';
+    for (const button of this.buttons) {
+      if (button.isOver(rawX, rawY)) {
+        if (button.getType() === 'restart') {
+          return 'start'
+        }
+      }
     }
 
     return 'end';
