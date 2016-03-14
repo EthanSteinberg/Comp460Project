@@ -84,13 +84,14 @@ class Main {
       'UpdateMap': m => this._updateMap(m),
       'GameOver': m => this._gameOverHandler(m),
       'PlaySound': m => this._playSound(m),
+      'MultiMessage': m => this._handleMulti(m),
     };
 
     this._startRenderLoop();
   }
 
   sendMessage(message) {
-    console.log('Sending', message);
+    // console.log('Sending', message);
     this.ws.send(JSON.stringify(message));
   }
 
@@ -98,8 +99,14 @@ class Main {
    * Start the game by setting up the render intervals.
    */
   start() {
-    this.ws = new WebSocket('ws://10.122.77.199:3000');
+    this.ws = new WebSocket('ws://localhost:3000');
     this.ws.onmessage = this._onMessage.bind(this);
+  }
+
+  _handleMulti({ messages }) {
+    for (const message of messages) {
+      this._handleMessage(message);
+    }
   }
 
   _startRenderLoop() {
@@ -133,12 +140,15 @@ class Main {
 
   _onMessage(event) {
     const messageData = JSON.parse(event.data);
+    this._handleMessage(messageData);
+  }
+
+  _handleMessage(messageData) {
     if (messageData.type in this.messageHandlerMap) {
       this.messageHandlerMap[messageData.type](messageData);
     } else {
       console.error('Unknown type: ', messageData.type);
     }
-    console.log('Got' + event.data);
   }
 
   /**
@@ -181,6 +191,7 @@ class Main {
 document.addEventListener('DOMContentLoaded', function startCanvas() {
   loadAssets().then((images) => {
     const main = new Main(images);
+    window.main = main;
     main.start();
   });
 });

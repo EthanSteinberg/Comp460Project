@@ -114,11 +114,14 @@ function updateGameState() {
   // Clear the pending updates list.
   pendingUpdates = [];
 
-  for (const updateMessage of updateMessages) {
-    for (const team of Object.keys(playerSockets)) {
-      const playerSocket = playerSockets[team];
-      playerSocket.send(JSON.stringify(updateMessage));
-    }
+  const message = {
+    type: 'MultiMessage',
+    messages: updateMessages,
+  };
+
+  for (const team of Object.keys(playerSockets)) {
+    const playerSocket = playerSockets[team];
+    playerSocket.send(JSON.stringify(message));
   }
 }
 
@@ -277,7 +280,7 @@ wss.on('connection', function connection(socket) {
   }
 
   socket.on('message', function incoming(message) {
-    console.error('received: "%s"', message);
+    // console.error('received: "%s"', message);
     const actualMessage = JSON.parse(message);
     if (actualMessage.type in messageHandlers) {
       messageHandlers[actualMessage.type](actualMessage, playerTeam);

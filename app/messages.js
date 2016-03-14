@@ -9,6 +9,10 @@ The basic message wrapper is simply:
 
 The various data types are:
 
+MultiMessage: {
+	messages: []
+}
+
 AssignTeam: {
 	team: The team for the player,
 	readyStates: The inial ready states

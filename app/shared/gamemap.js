@@ -146,6 +146,7 @@ export default class GameMap {
     context.lineWidth = 1.0;
 
     for (const entity of this.entities.values()) {
+      if (entity == null) continue;
       const isSelected = selectionState.map.indexOf(entity.id) !== -1;
 
       const type = Types[entity.type];
@@ -155,6 +156,7 @@ export default class GameMap {
     }
 
     for (const entity of this.entities.values()) {
+      if (entity == null) continue;
       const isSelected = selectionState.map.indexOf(entity.id) !== -1;
 
       const type = Types[entity.type];

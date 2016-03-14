@@ -243,6 +243,10 @@ export default class Game {
   }
 
   isDragAction(mouseX, mouseY) {
+    if (this.hoveredCoords == null) {
+      return false;
+    }
+
     if (this.hoveredCoords.x >= this.width - GUI_WIDTH) {
       return false;
     }
