@@ -90,26 +90,33 @@ export default class GameMap {
   /**
    * Render both the map and all ships on it.
    */
-  render(context, images, selectionState) {
-    this.renderMap(context, images, selectionState);
+  render(context, images, selectionState, fogContext, visibleContext, team) {
+    this.renderMap(context, images, selectionState, fogContext, visibleContext, team);
   }
 
-  renderMiniMap(context, images, x, y, width, height) {
-    this.renderMap(context, images, { gui: null, map: [] }, 5, this.width / 3);
+  renderMiniMap(context, images, x, y, width, height, fogContext, visibleContext, team) {
+    this.renderMap(context, images, { gui: null, map: [] }, fogContext, visibleContext, team, 5, this.width / 3);
 
-    if (x != null) {
-      context.globalCompositeOperation = 'multiply';
-      context.fillStyle = 'rgba(0,0,0,.5)';
-      context.fillRect(-25, -25, this.width * 50, y);
+    context.globalCompositeOperation = 'multiply';
+    context.fillStyle = 'rgba(0,0,0,.5)';
+    context.fillRect(-25, -25, this.width * 50, y);
 
-      context.fillRect(-25, y - 25, x, height);
+    context.fillRect(-25, y - 25, x, height);
 
-      context.fillRect(-25 + x + width, y - 25, this.width * 50 - x - width, height);
+    context.fillRect(-25 + x + width, y - 25, this.width * 50 - x - width, height);
 
-      context.fillRect(-25, -25 + y + height, this.width * 50, this.height * 50 - y - height);
+    context.fillRect(-25, -25 + y + height, this.width * 50, this.height * 50 - y - height);
 
-      context.globalCompositeOperation = 'source-over';
-    }
+    context.globalCompositeOperation = 'source-over';
+    context.strokeStyle = 'black';
+
+    context.lineWidth = 20;
+    context.strokeRect(-25, -25, this.width * 50, this.height * 50);
+    context.lineWidth = 1;
+  }
+
+  renderStartScreenMiniMap(context, images) {
+    this.renderMainMap(context, images, { gui: null, map: [] }, 5, this.width / 3);
   }
 
   countPlayerItems() {
@@ -127,11 +134,85 @@ export default class GameMap {
     return result;
   }
 
-  renderMap(context, images, selectionState, gridSize = 1, gridWidth = 1) {
-    context.lineWidth = gridWidth * 5;
-    context.strokeStyle = 'black';
-    context.strokeRect(-25, -25, this.width * 50, this.height * 50);
+  renderMap(context, images, selectionState, fogContext, visibleContext, team, gridSize = 1, gridWidth = 1) {
+    this.renderFoggedArea(context, images, selectionState, fogContext, visibleContext, team, gridSize, gridWidth);
+    this.renderNormalArea(context, images, selectionState, fogContext, visibleContext, team, gridSize, gridWidth);
+    context.globalCompositeOperation = 'source-over';
+  }
 
+  renderFoggedArea(context, images, selectionState, fogContext, visibleContext, team, gridSize, gridWidth) {
+    this.updateFogContext(fogContext, team);
+
+    visibleContext.clearRect(0, 0, this.width * 50, this.height * 50);
+    visibleContext.translate(25, 25);
+
+    visibleContext.globalCompositeOperation = 'source-over';
+    visibleContext.drawImage(fogContext.canvas, -25, -25);
+
+    visibleContext.globalCompositeOperation = 'source-atop';
+
+    visibleContext.fillStyle = 'antiquewhite';
+    visibleContext.fillRect(-25, -25, this.width * 50, this.height * 50);
+
+    visibleContext.lineWidth = gridWidth;
+
+    for (let x = 0; x < this.width; x += gridSize) {
+      for (let y = 0; y < this.height; y += gridSize) {
+        visibleContext.strokeStyle = 'lightgray';
+        visibleContext.strokeRect((x - 0.5) * 50, (y - 0.5) * 50, gridSize * 50, gridSize * 50);
+      }
+    }
+
+    visibleContext.lineWidth = 1.0;
+
+
+    for (const entity of this.entities.values()) {
+      const type = Types[entity.type];
+      if (type.render != null && entity.type === 'island') {
+        type.render(entity, this, visibleContext, images, false, true);
+      }
+    }
+
+    visibleContext.globalCompositeOperation = 'multiply';
+    visibleContext.fillStyle = 'grey';
+    visibleContext.fillRect(-25, -25, this.width * 50, this.height * 50);
+
+    visibleContext.translate(-25, -25);
+
+    context.globalCompositeOperation = 'source-over';
+    context.drawImage(visibleContext.canvas, -25, -25);
+  }
+
+  renderNormalArea(context, images, selectionState, fogContext, visibleContext, team, gridSize, gridWidth) {
+    visibleContext.clearRect(0, 0, this.width * 50, this.height * 50);
+    visibleContext.translate(25, 25);
+
+    visibleContext.globalCompositeOperation = 'source-over';
+
+    this.renderVisibleMask(visibleContext, team);
+
+    visibleContext.globalCompositeOperation = 'source-atop';
+
+    this.renderMainMap(visibleContext, images, selectionState, gridSize, gridWidth);
+
+    visibleContext.translate(-25, -25);
+
+    context.globalCompositeOperation = 'source-over';
+    context.drawImage(visibleContext.canvas, -25, -25);
+  }
+
+  renderVisibleMask(context, team) {
+    context.fillStyle = 'red';
+    for (const entity of this.entities.values()) {
+      if (entity.team === team) {
+        context.beginPath();
+        context.arc(entity.x * 50, entity.y * 50, 25 * 4, 0, Math.PI * 2, true);
+        context.fill();
+      }
+    }
+  }
+
+  renderMainMap(context, images, selectionState, gridSize, gridWidth) {
     context.fillStyle = 'antiquewhite';
     context.fillRect(-25, -25, this.width * 50, this.height * 50);
 
@@ -146,7 +227,6 @@ export default class GameMap {
     context.lineWidth = 1.0;
 
     for (const entity of this.entities.values()) {
-      if (entity == null) continue;
       const isSelected = selectionState.map.indexOf(entity.id) !== -1;
 
       const type = Types[entity.type];
@@ -156,7 +236,6 @@ export default class GameMap {
     }
 
     for (const entity of this.entities.values()) {
-      if (entity == null) continue;
       const isSelected = selectionState.map.indexOf(entity.id) !== -1;
 
       const type = Types[entity.type];
@@ -164,6 +243,12 @@ export default class GameMap {
         type.renderOverlay(entity, this, context, images, isSelected);
       }
     }
+  }
+
+  updateFogContext(fogContext, team) {
+    fogContext.translate(25, 25);
+    this.renderVisibleMask(fogContext, team);
+    fogContext.translate(-25, -25);
   }
 
   /**

@@ -54,7 +54,7 @@ export default class StartScreen {
     const scale = map.width / 5;
     this.context.scale(1 / scale, 1 / scale);
     this.context.translate(25, 25);
-    map.renderMiniMap(this.context, this.images);
+    map.renderStartScreenMiniMap(this.context, this.images);
     this.context.translate(-25, -25);
     this.context.scale(scale, scale);
     this.context.translate(-this.width + 420, -50);

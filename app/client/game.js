@@ -43,6 +43,19 @@ export default class Game {
     };
 
     this.pressedKeys = new Set();
+
+
+    const fogCanvas = document.createElement('canvas');
+    fogCanvas.width = map.width * 50;
+    fogCanvas.height = map.height * 50;
+
+    const visibleCanvas = document.createElement('canvas');
+    visibleCanvas.width = map.width * 50;
+    visibleCanvas.height = map.height * 50;
+
+    // Get the drawing context
+    this.fogContext = fogCanvas.getContext('2d');
+    this.visibleContext = visibleCanvas.getContext('2d');
   }
 
   tick() {
@@ -318,7 +331,7 @@ export default class Game {
     this.context.translate(-this.x, -this.y);
 
     // Render the map and everything on it.
-    this.map.render(this.context, this.images, this.selectionState);
+    this.map.render(this.context, this.images, this.selectionState, this.fogContext, this.visibleContext, this.team);
 
     if (this.hoveredCoords && this.hoveredCoords.x < this.width - GUI_WIDTH && this.selectionState.gui == null) {
       if (this.mouseDownGamePosition != null) {
@@ -346,7 +359,7 @@ export default class Game {
       this.context.translate(this.width - 150, 50);
       const scale = this.map.width / 2;
       this.context.scale(1 / scale, 1 / scale);
-      this.map.renderMiniMap(this.context, this.images, this.x, this.y, this.width - GUI_WIDTH, this.height);
+      this.map.renderMiniMap(this.context, this.images, this.x, this.y, this.width - GUI_WIDTH, this.height, this.fogContext, this.visibleContext, this.team);
       this.context.scale(scale, scale);
       this.context.translate(-this.width + 150, -50);
     }

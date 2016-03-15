@@ -45,13 +45,13 @@ export function createIsland(map, topLeft, size) {
   return island.id;
 }
 
-export function render(island, map, context, images) {
+export function render(island, map, context, images, isSelected, noFlag = false) {
   const [x, y] = island.topLeft;
   const [width, height] = island.size;
 
   context.drawImage(images.island, (x - 0.5) * 50, (y - 0.5) * 50, width * 50, height * 50);
 
-  if (island.team != null) {
+  if (island.team != null && !noFlag) {
     const flag = (island.team === '0') ? images.blueFlag : images.redFlag;
 
     const scale = 20;

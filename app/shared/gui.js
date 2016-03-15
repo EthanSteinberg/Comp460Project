@@ -66,6 +66,14 @@ export default class Gui {
    * Render the gui
    */
   render(context, images, map, hoverCoords) {
+    context.strokeStyle = 'black';
+    context.lineWidth = 5;
+    context.beginPath();
+    context.moveTo(this.x, this.y);
+    context.lineTo(this.x, this.y + this.height);
+    context.stroke();
+    context.lineWidth = 1;
+
     if (this.displayMode === 'main') {
       this.renderMain(context, images, map, hoverCoords);
     } else if (this.displayMode === 'designer') {
@@ -74,7 +82,7 @@ export default class Gui {
   }
 
   renderDesigner(context, images, map, hoverCoords) {
-    context.fillStyle = 'gray';
+    context.fillStyle = 'grey';
     context.fillRect(this.x, this.y, this.width, this.height);
 
     // titles

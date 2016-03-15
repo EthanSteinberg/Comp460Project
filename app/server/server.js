@@ -263,6 +263,10 @@ const messageHandlers = {
 
 let nextTeam = 0;
 
+if (debug) {
+  setNewMap(createMap(0));
+}
+
 wss.on('connection', function connection(socket) {
   let playerTeam = String(nextTeam);
   if (debug) {
@@ -290,7 +294,7 @@ wss.on('connection', function connection(socket) {
   });
 
   socket.on('close', function close() {
-    // TODO: Need to implement this properly!
+    delete playerSockets[playerTeam];
   });
 });
 
