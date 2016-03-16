@@ -77,6 +77,7 @@ class Main {
       } else if (this.mode === 'start') {
         this.startscreen.mousemove(event);
       }
+      this.render();
     });
 
     this.messageHandlerMap = {
