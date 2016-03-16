@@ -4,13 +4,13 @@ import { roundshot, grapeshot, chainshot, shell,
 
 import Shipyard from './guibuttons/shipyard';
 import Mine from './guibuttons/mine';
+import Fort from './guibuttons/fort';
 import Shiptemplate from './guibuttons/shiptemplate';
 import Shipbuilder from './guibuttons/shipbuilder';
 import Roundshot from './guibuttons/roundshot';
 import Grapeshot from './guibuttons/grapeshot';
 import Shell from './guibuttons/shell';
 import Cancelshot from './guibuttons/cancelshot';
-import TargetToggle from './guibuttons/targettoggle';
 import Exit from './guibuttons/exit';
 import Template from './guibuttons/template';
 import Gunboat from './guibuttons/gunboat';
@@ -281,8 +281,8 @@ export default class Gui {
 
     result.push(new Shipyard('shipyard', this.x + 25, this.y + 175, 50, 50));
     result.push(new Mine('mine', this.x + 75, this.y + 175, 50, 50));
+    result.push(new Fort('fort', this.x + 130, this.y + 175, 50, 50));
 
-    result.push(new TargetToggle(this.map.getEntity(this.team).targetMode, this.x + 35, this.height - 75, 128, 26));
     result.push(new Shipbuilder('shipbuilder', this.x + 50, 350, 102, 26));
     return result;
   }

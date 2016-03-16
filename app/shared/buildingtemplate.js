@@ -36,6 +36,9 @@ export function render(template, map, context, images) {
     case 'mine':
       context.drawImage(images.mine, (template.x - 0.5) * 50, (template.y - 0.5) * 50, 50, 50);
       break;
+    case 'fort':
+      context.drawImage(images.fort, (template.x - 0.5) * 50, (template.y - 0.5) * 50, 50, 50);
+      break;
 
     default:
       console.error('No support for building type', template.buildingType);

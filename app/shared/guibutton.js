@@ -97,6 +97,7 @@ export default class GuiButton {
   isBuilding() {
     switch (this.type) {
       case 'mine':
+      case 'fort':
       case 'shipyard':
         return true;
       default:
@@ -110,6 +111,8 @@ export default class GuiButton {
         return 'mine';
       case 'shipyard':
         return 'shipyard';
+      case 'fort':
+        return 'fort';
       default:
         console.error('unknown building type');
         return null;

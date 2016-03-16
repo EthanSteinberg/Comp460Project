@@ -1,4 +1,5 @@
 import * as Mines from './mine';
+import * as Forts from './fort';
 import * as Shipyards from './shipyard';
 import * as Hardpoints from './hardpoint';
 import * as Islands from './island';
@@ -265,7 +266,7 @@ export default class GameMap {
         if (distance <= 0.5) {
           return entity;
         }
-      } else if (entity.type === 'shipyard' || entity.type === 'mine') {
+      } else if (entity.type === 'shipyard' || entity.type === 'mine' || entity.type === 'fort') {
         if (Math.round(x) === entity.x && Math.round(y) === entity.y) {
           return entity;
         }
@@ -378,6 +379,9 @@ export default class GameMap {
     switch (type) {
       case 'mine':
         Mines.createMine(this, x, y, islandID, team);
+        break;
+      case 'fort':
+        Forts.createFort(this, x, y, islandID, team);
         break;
       case 'shipyard':
         Shipyards.createShipyard(this, x, y, islandID, team);

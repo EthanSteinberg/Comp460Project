@@ -80,7 +80,7 @@ export function isNextToIsland(island, x, y) {
 function getOwningTeam(island, map) {
   // First scan for buildings on this island
   for (const entity of map.entities.values()) {
-    if (entity.type === 'shipyard' || entity.type === 'mine') {
+    if (entity.type === 'shipyard' || entity.type === 'mine' || entity.type === 'fort') {
       for (const [iX, iY] of island.coordinates) {
         if (entity.x === iX && entity.y === iY) {
           return entity.team;

@@ -20,6 +20,8 @@ export function createShipAndHardpoints(map, x, y, template, team) {
     return Hardpoints.createHardpoint(map, shipId, index, hardpoint, team);
   });
 
+  console.log(myHardpoints)
+
   const ship = {
     x,
     y,
@@ -29,7 +31,6 @@ export function createShipAndHardpoints(map, x, y, template, team) {
     template: template,
     health: JSON.parse(JSON.stringify(hulls[template.hull])).health,
     hardpoints: myHardpoints,
-    targetMode: 'hardpoints',
 
     lastPositions: [],
 
@@ -48,6 +49,10 @@ export function getPosition(ship) {
 }
 
 export function getOrientation(ship) {
+  if (ship.type === 'fort') {
+    return 0
+  }
+
   const lastPosition = ship.lastPositions[0] || null;
 
   if (lastPosition == null) {
@@ -248,19 +253,6 @@ function getActualTarget(ship, map, target) {
     return null;
   }
 
-  if (target.type === 'ship' && map.getEntity(ship.team).targetMode === 'hardpoints') {
-    let minHardpoint = null;
-    for (const hardpointId of target.hardpoints) {
-      const hardpoint = map.getEntity(hardpointId);
-      if (hardpoint != null) {
-        if (minHardpoint == null || hardpoint.health < minHardpoint.health) {
-          minHardpoint = hardpoint;
-        }
-      }
-    }
-    return minHardpoint;
-  }
-
   return target;
 }
 
@@ -371,8 +363,4 @@ export function remove(ship, map) {
   for (const hardpointId of ship.hardpoints) {
     map.removeEntity(hardpointId);
   }
-}
-
-export function updateMode(ship, targetMode) {
-  ship.targetMode = targetMode;
 }

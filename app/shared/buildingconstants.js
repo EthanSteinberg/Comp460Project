@@ -12,6 +12,13 @@ const buildingConstants = {
     coinCost: 100,
     buildTime: 100, // In ticks
   },
+
+  fort: {
+    name: 'Fort',
+    description: 'A building to protect our lands.',
+    coinCost: 100,
+    buildTime: 100, // In ticks
+  },
 };
 
 export default buildingConstants;

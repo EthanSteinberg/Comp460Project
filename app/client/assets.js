@@ -5,6 +5,7 @@ const sources = {
   ship: 'ship.png',
   mine: 'mine2.png',
   shipyard: 'shipyard2.png',
+  fort: 'fort.png',
   money: 'coin2.png',
   shipskeleton: 'shipskeleton.png',
   roundshot: 'roundshot.png',

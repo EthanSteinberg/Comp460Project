@@ -22,7 +22,6 @@ export function createHardpoint(map, shipId, index, gunType, team) {
     id: map.getNextEntityId(),
     type: 'hardpoint',
     gunType,
-    health: hardpoints[gunType].health,
     timeTillNextFire: 0,
     shipId,
     offset: gunPositions[index],
@@ -41,17 +40,6 @@ export function render(hardpoint, map, context, images) {
   const { x, y } = getPosition(hardpoint, map);
 
   context.drawImage(images.cannon, x * 50 - 20 / 4, y * 50 - 25 / 4, 10, 10);
-
-  context.fillStyle = 'red';
-  context.fillRect(x * 50 - 10, y * 50 + 5, 20, 5);
-
-  const healthpercent = hardpoint.health / hardpoints[hardpoint.gunType].health;
-
-  context.fillStyle = 'green';
-  context.fillRect(x * 50 - 10, y * 50 + 5, 20 * healthpercent, 5);
-
-  context.strokeStyle = 'black';
-  context.strokeRect(x * 50 - 10, y * 50 + 5, 20, 5);
 }
 
 export function renderTemplate(hardpoint, slotnum, x, y, context, images) {

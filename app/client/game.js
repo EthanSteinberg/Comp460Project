@@ -194,7 +194,7 @@ export default class Game {
         this.getSelectedMapItems().forEach(ship => sendMessage({ type: 'MoveShip', shipId: ship.id, targetLocation }));
       }
     } else {
-      if ((item.type === 'ship' || item.type === 'shipyard' || item.type === 'mine' || item.type === 'buildingTemplate') && this.getSelectedMapItems().every(entity => entity.type === 'ship')
+      if ((item.type === 'ship' || item.type === 'shipyard' || item.type === 'mine' || item.type === 'fort' || item.type === 'buildingTemplate') && this.getSelectedMapItems().every(entity => entity.type === 'ship')
         && item.team !== this.team) {
         // Trying to attack something
         this.getSelectedMapItems().forEach(ship => sendMessage({ type: 'AttackShip', id: ship.id, targetId: item.id }));
@@ -243,17 +243,17 @@ export default class Game {
     // In the gui
     const item = this.gui.getItem(rawX, rawY);
 
-    if (rawX >= this.width - 150 && rawX < this.width - 50 && rawY >= 50 && rawY < 150) {
-      // You are in the mini map;
-      const x = (rawX - (this.width - 150)) * this.map.width * 50 / 100;
-      const y = (rawY - 50) * this.map.height * 50 / 100;
-      this.centerAround(x, y);
-      return;
-    }
-
     if (this.gui.displayMode === 'designer') {
       this.gui.designerSelection(item);
     } else {
+      if (rawX >= this.width - 150 && rawX < this.width - 50 && rawY >= 50 && rawY < 150) {
+        // You are in the mini map;
+        const x = (rawX - (this.width - 150)) * this.map.width * 50 / 100;
+        const y = (rawY - 50) * this.map.height * 50 / 100;
+        this.centerAround(x, y);
+        return;
+      }
+      
       if (item == null) {
         return;
       }
@@ -276,6 +276,7 @@ export default class Game {
           break;
 
         case 'mine':
+        case 'fort':
         case 'shipyard':
           this.updateSelectionState({ ...this.selectionState, gui: { type: item.getType(), templateNum: item.getTemplateNum() } });
           break;
@@ -332,7 +333,7 @@ export default class Game {
     if (this.selectionState.gui != null) {
       // The gui stuff always has priority.
       // If an empty tile on an island is selected then add a building
-      if (this.selectionState.gui.type === 'mine' || this.selectionState.gui.type === 'shipyard') {
+      if (this.selectionState.gui.type === 'mine' || this.selectionState.gui.type === 'shipyard' || this.selectionState.gui.type === 'fort') {
         const buildingType = this.selectionState.gui.type;
         sendMessage({ type: 'MakeBuilding', building: buildingType, x: mouseRoundedX, y: mouseRoundedY });
         this.updateSelectionState({ ...this.selectionState, gui: null });
