@@ -20,8 +20,6 @@ export function createShipAndHardpoints(map, x, y, template, team) {
     return Hardpoints.createHardpoint(map, shipId, index, hardpoint, team);
   });
 
-  console.log(myHardpoints)
-
   const ship = {
     x,
     y,

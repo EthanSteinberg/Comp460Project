@@ -77,7 +77,7 @@ export function getPosition(fort) {
 
 export function remove(fort, map) {
   map.removeEntity(fort.id);
-  for (const hardpointId of ship.hardpoints) {
+  for (const hardpointId of fort.hardpoints) {
     map.removeEntity(hardpointId);
   }
 }
