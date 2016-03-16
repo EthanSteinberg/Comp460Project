@@ -28,9 +28,7 @@ export default class Game {
     this.gui = new Gui(this.width, this.height, templates, this.selectionState, this.map, team);
 
     const startingCoords = map.getStartingCoords(team);
-    this.x = Math.min(Math.max(0, startingCoords.x - (this.width - GUI_WIDTH) / 2), this.map.width * 50 - this.width + GUI_WIDTH);
-    this.y = Math.min(Math.max(0, startingCoords.y - this.height / 2), this.map.height * 50 - this.height);
-
+    this.centerAround(startingCoords.x, startingCoords.y);
     this.team = team;
 
     this.startingDownPosition = null;
@@ -56,6 +54,11 @@ export default class Game {
     // Get the drawing context
     this.fogContext = fogCanvas.getContext('2d');
     this.visibleContext = visibleCanvas.getContext('2d');
+  }
+
+  centerAround(x, y) {
+    this.x = Math.min(Math.max(0, x - (this.width - GUI_WIDTH) / 2), this.map.width * 50 - this.width + GUI_WIDTH);
+    this.y = Math.min(Math.max(0, y - this.height / 2), this.map.height * 50 - this.height);
   }
 
   tick() {
@@ -239,6 +242,14 @@ export default class Game {
   processGuiLeftMouseClick(rawX, rawY, sendMessage) {
     // In the gui
     const item = this.gui.getItem(rawX, rawY);
+
+    if (rawX >= this.width - 150 && rawX < this.width - 50 && rawY >= 50 && rawY < 150) {
+      // You are in the mini map;
+      const x = (rawX - (this.width - 150)) * this.map.width * 50 / 100;
+      const y = (rawY - 50) * this.map.height * 50 / 100;
+      this.centerAround(x, y);
+      return;
+    }
 
     if (this.gui.displayMode === 'designer') {
       this.gui.designerSelection(item);
