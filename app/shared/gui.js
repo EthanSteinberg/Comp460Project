@@ -45,6 +45,7 @@ export default class Gui {
     this.map = map;
 
     this.displayMode = 'main';
+    this.displayContext = 'game';
 
     this.changing = false;
     this.selectedSlot = null;
@@ -290,7 +291,9 @@ export default class Gui {
   getDesignerButtons() {
     const result = [];
 
-    result.push(new Exit('exit', this.x + this.width - 20, this.y, 20, 20));
+    if (this.displayContext === 'game') {
+      result.push(new Exit('exit', this.x + this.width - 20, this.y, 20, 20));
+    }
 
     result.push(new Template('template', this.x + 20, this.y + 25, 50, 50, 0, null, this.templates[0]));
     result.push(new Template('template', this.x + 75, this.y + 25, 50, 50, 1, null, this.templates[1]));

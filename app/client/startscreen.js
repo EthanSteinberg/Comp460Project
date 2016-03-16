@@ -3,10 +3,17 @@ import Ready from '../shared/guibuttons/ready';
 import { createMap } from '../shared/maps';
 import { createSource } from './audio';
 
+export const GUI_WIDTH = 200;
+
+
 export default class StartScreen {
-  constructor(images) {
+  constructor(images, game) {
     this.canvas = document.getElementById('canvas');
     this.context = this.canvas.getContext('2d');
+
+    this.game = game;
+    this.game.gui.displayMode = 'designer';
+    this.game.gui.displayContext = 'startscreen';
 
     this.width = this.canvas.width;
     this.height = this.canvas.height;
@@ -15,9 +22,9 @@ export default class StartScreen {
     this.team = null;
 
     this.buttons = [];
-    this.buttons.push(new MapSelect('mapselect', 700, 350, 102, 26, 0));
-    this.buttons.push(new MapSelect('mapselect', 850, 350, 102, 26, 1));
-    this.buttons.push(new MapSelect('mapselect', 1000, 350, 102, 26, 2));
+    this.buttons.push(new MapSelect('mapselect', 675, 325, 102, 26, 0));
+    this.buttons.push(new MapSelect('mapselect', 825, 325, 102, 26, 1));
+    this.buttons.push(new MapSelect('mapselect', 750, 375, 102, 26, 2));
     this.buttons[0].rendertype = 'westindies';
     this.buttons[1].rendertype = 'tropics';
     this.buttons[2].rendertype = 'greatlakes';
@@ -49,7 +56,7 @@ export default class StartScreen {
     this.context.fillStyle = 'linen';
     this.context.fillRect(0, 0, this.width, this.height);
 
-    this.context.translate(this.width - 420, 50);
+    this.context.translate(this.width - 520, 50);
     const map = createMap(this.mapNum);
     const scale = map.width / 5;
     this.context.scale(1 / scale, 1 / scale);
@@ -57,7 +64,7 @@ export default class StartScreen {
     map.renderStartScreenMiniMap(this.context, this.images);
     this.context.translate(-25, -25);
     this.context.scale(scale, scale);
-    this.context.translate(-this.width + 420, -50);
+    this.context.translate(-this.width + 520, -50);
 
     for (const button of this.buttons) {
       button.render(this.context, this.images);
@@ -89,6 +96,12 @@ export default class StartScreen {
         startingY += 50;
       }
     }
+
+    if (this.hoveredCoords && this.hoveredCoords.x >= this.width - GUI_WIDTH) {
+      this.game.gui.render(this.context, this.images, this.map, this.hoveredCoords);
+    } else {
+      this.game.gui.render(this.context, this.images, this.map, null);
+    }
   }
 
   renderLoading() {
@@ -99,6 +112,7 @@ export default class StartScreen {
 
   _assignTeam({ team, readyStates, mapNum }) {
     this.team = team;
+    this.game.team = team;
     this.mapNum = mapNum;
     this.readyStates = readyStates;
 
@@ -129,6 +143,11 @@ export default class StartScreen {
     return this.team;
   }
 
+  mousemove(event) {
+    const { rawX, rawY } = this.getRawMouseCords(event);
+    this.hoveredCoords = { x: rawX, y: rawY };
+  }
+
   getRawMouseCords(event) {
     const rect = this.canvas.getBoundingClientRect();
     return {
@@ -156,6 +175,10 @@ export default class StartScreen {
     }
 
     const { rawX, rawY } = this.getRawMouseCords(event);
+
+    const item = this.game.gui.getItem(rawX, rawY);
+    this.game.gui.designerSelection(item);
+    this.game.gui.displayMode = 'designer';
 
     for (const button of this.buttons) {
       if (button.isOver(rawX, rawY)) {

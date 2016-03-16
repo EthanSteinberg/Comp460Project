@@ -9,6 +9,9 @@ import StartScreen from './startscreen';
 import EndScreen from './endscreen';
 import GameMap from '../shared/gamemap';
 
+import { createMap } from '../shared/maps';
+
+
 /**
  * The central game object for most of the logic.
  */
@@ -31,8 +34,8 @@ class Main {
 
     this.images = images;
 
-    this.game = null;
-    this.startscreen = new StartScreen(images);
+    this.game = new Game(this.images, createMap(0), "0");
+    this.startscreen = new StartScreen(images, this.game);
     this.endscreen = null;
 
     document.addEventListener('keydown', (event) => {
@@ -71,6 +74,8 @@ class Main {
     this.canvas.addEventListener('mousemove', (event) => {
       if (this.mode === 'game') {
         this.game.mousemove(event);
+      } else if (this.mode === 'start') {
+        this.startscreen.mousemove(event);
       }
     });
 

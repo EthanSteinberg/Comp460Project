@@ -5,6 +5,9 @@ import * as Islands from './island';
 import * as Ships from './ship';
 import Types from './types';
 
+export const GUI_WIDTH = 200;
+
+
 /**
  * A map of the game containing islands and all current ships.
  */
