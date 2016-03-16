@@ -90,7 +90,7 @@ export default class Gui {
     context.fillStyle = 'black';
     context.textBaseline = 'top';
     context.font = '14px Perpetua';
-    context.fillText("SAVE SLOTS", this.x + 20, this.y + 10);
+    context.fillText('SAVE SLOTS', this.x + 20, this.y + 10);
 
     const skeleton = new ShipSkeleton('shipskeleton', this.x + 50, this.y + 110, 100, 340);
     skeleton.render(context, images);
@@ -124,7 +124,7 @@ export default class Gui {
         let details = null;
         let type = item.getType();
 
-        if (type == 'gunslot' && item.rendertype != 'gunslot') {
+        if (type === 'gunslot' && item.rendertype !== 'gunslot') {
           type = item.rendertype;
         }
 
@@ -202,7 +202,6 @@ export default class Gui {
     if (this.team === '1') {
       context.fillStyle = 'firebrick';
       context.fillText('Pirates', (this.x) + 110, (this.y) + 5);
-
     } else {
       context.fillStyle = 'darkblue';
       context.fillText('Imperials', (this.x) + 100, (this.y) + 5);
@@ -243,7 +242,7 @@ export default class Gui {
         context.fillText(details.name, (roundedX - 2) + modifier, (roundedY + 1));
         context.fillText(details.description, (roundedX - 2) + modifier, (roundedY + 1) + 20);
         context.fillText('Cost: ' + details.coinCost + ' coin, ' + details.buildTime + ' seconds', (roundedX - 2) + modifier, (roundedY + 1) + 34);
-      } else if (item != null && (item.getType() === "shiptemplate" || item.getType() === "shiptemplateGrayed")) {
+      } else if (item != null && (item.getType() === 'shiptemplate' || item.getType() === 'shiptemplateGrayed')) {
         const template = this.templates[item.slotNum];
         context.strokeStyle = 'cyan';
         context.strokeRect(item.x, item.y, item.width, item.height);

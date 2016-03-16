@@ -105,3 +105,26 @@ export function addTemplateToQueue(shipyard, templateNumber, template) {
   shipyard.counters[templateNumber]++;
   shipyard.buildingQueue.push({ template, templateNumber });
 }
+
+export function removeTemplateFromQueue(shipyard, map, templateNumber) {
+  if (shipyard.counters[templateNumber] === 0) {
+    return;
+  }
+
+  shipyard.counters[templateNumber]--;
+  let optionIndex = null;
+  for (let i = 0; i < shipyard.buildingQueue.length; i++) {
+    if (shipyard.buildingQueue[i].templateNumber === templateNumber) {
+      optionIndex = i;
+    }
+  }
+
+  if (optionIndex == null) {
+    console.error('Trying to remove non-existant item from the queue? What?');
+  }
+
+  const [removed] = shipyard.buildingQueue.splice(optionIndex, 1);
+
+  const stats = getStats(removed.template);
+  map.getEntity(shipyard.team).coins += stats.cost;
+}

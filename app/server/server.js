@@ -171,6 +171,20 @@ function makeBuildingHandler({ building, x, y }, playerTeam) {
   BuildingTemplates.createBuildingTemplate(map, x, y, playerTeam, island.id, building);
 }
 
+function cancelShipHandler({ shipyardId, templateNumber }, playerTeam) {
+  const shipyard = map.getEntity(shipyardId);
+  if (shipyard == null) {
+    return;
+  }
+
+  if (shipyard.team !== playerTeam) {
+    console.error('Not allowed to use enemy shipyard');
+    return;
+  }
+
+  Shipyards.removeTemplateFromQueue(shipyard, map, templateNumber);
+}
+
 function makeShipHandler({ shipyardId, template, templateNumber }, playerTeam) {
   const shipyard = map.getEntity(shipyardId);
   if (shipyard == null) {
@@ -255,6 +269,7 @@ const messageHandlers = {
   'MoveShip': moveShipHandler,
   'MakeBuilding': makeBuildingHandler,
   'MakeShip': makeShipHandler,
+  'CancelShip': cancelShipHandler,
   'AttackShip': attackShipHandler,
   'UpdateMode': updateModeHandler,
   'SetReadyState': updateReadyState,

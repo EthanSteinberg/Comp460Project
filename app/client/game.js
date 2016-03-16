@@ -139,7 +139,7 @@ export default class Game {
       const { rawX, rawY } = this.getRawMouseCords(event);
 
       if (rawX > this.width - GUI_WIDTH) {
-        // Ignore right clicks on the gui
+        this.procesGuiRightMouseClick(rawX, rawY, sendMessage);
         return;
       }
 
@@ -210,6 +210,30 @@ export default class Game {
       rawX: event.clientX - rect.left,
       rawY: event.clientY - rect.top,
     };
+  }
+
+  procesGuiRightMouseClick(rawX, rawY, sendMessage) {
+    // In the gui
+    const item = this.gui.getItem(rawX, rawY);
+
+    if (this.gui.displayMode === 'designer') {
+      // Right clicks in the designer do nothing.
+      return;
+    }
+
+    if (item == null) {
+      return;
+    }
+
+    switch (item.getType()) {
+      case 'shiptemplate':
+        this.getSelectedMapItems().forEach(shipyard =>
+          sendMessage({ type: 'CancelShip', templateNumber: item.templateNum, shipyardId: shipyard.id })
+        );
+        break;
+
+      default:
+    }
   }
 
   processGuiLeftMouseClick(rawX, rawY, sendMessage) {
