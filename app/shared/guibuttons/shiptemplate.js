@@ -4,98 +4,80 @@ import * as Hardpoints from '../hardpoint';
 
 export default class Shiptemplate extends GuiButton {
 
-  render(context, images) {
+  render(renderList) {
     if (this.selected) {
-      context.strokeStyle = 'cyan';
-      context.strokeRect(this.x, this.y, this.width, this.height);
+      renderList.strokeRect('cyan', 2, this.x, this.y, this.width, this.height);
     }
 
     switch (this.type) {
       case 'shiptemplate':
-        context.drawImage(images.grayBack, this.x, this.y, this.width, this.height);
-
-        const count = this.selection.counters[this.slotNum];
-        context.fillStyle = 'black';
-        context.fillText(count.toString(), this.x, this.y);
+        renderList.addImage('grayBack', this.x, this.y, this.width, this.height);
 
         switch (this.template.hull) {
           case 'gunboat':
-            context.drawImage(images.gunboat, this.x, this.y, this.width, this.height);
+            renderList.addImage('gunboat2', this.x, this.y, this.width, this.height);
             break;
           case 'frigate':
-            context.drawImage(images.frigate, this.x, this.y, this.width, this.height);
+            renderList.addImage('frigate2', this.x, this.y, this.width, this.height);
             break;
           case 'galleon':
-            context.drawImage(images.galleon, this.x, this.y, this.width, this.height);
+            renderList.addImage('galleon2', this.x, this.y, this.width, this.height);
             break;
+          default:
+            throw new Error('unhandled switch statement in shiptemplate');
         }
 
-        var i = 0;
+        let i = 0;
         for (const hardpoint of this.template.hardpoints) {
           if (hardpoint != null) {
-            Hardpoints.renderTemplate(hardpoint, i, this.x + 10, this.y + 38, context, images);
+            Hardpoints.renderTemplate(hardpoint, i, this.x + 10, this.y + 38, renderList);
           }
           i += 1;
         }
+
+        const count = this.selection.counters[this.slotNum];
+        renderList.renderText(count.toString(), this.x, this.y, 0.5);
 
         if (this.selection.buildingQueue.length > 0 &&
           this.selection.buildingQueue[0].templateNumber === this.slotNum) {
           const nextTemplate = this.selection.buildingQueue[0].template;
           const stats = getStats(nextTemplate);
 
-          context.save();
-          context.beginPath();
-          context.rect(this.x, this.y, 50, 50);
-          context.clip();
-
           const angle = this.selection.progressTowardsNextBuild / stats.tcost * Math.PI * 2;
-
-          context.globalCompositeOperation = 'multiply';
-          context.fillStyle = 'rgba(0,0,0,.5)';
-          context.beginPath();
-          context.arc(this.x + 25, this.y + 25, 50, 0, angle, true);
-          context.lineTo(this.x + 25, this.y + 25);
-          context.fill();
-          context.globalCompositeOperation = 'source-over';
-
-          context.strokeStyle = 'white';
-          context.beginPath();
-          context.moveTo(this.x + 25, this.y + 25);
-          context.lineTo(this.x + 50, this.y + 25);
-          context.arc(this.x + 25, this.y + 25, 50, 0, angle, true);
-          context.lineTo(this.x + 25, this.y + 25);
-          context.stroke();
-
-          context.restore();
+          renderList.addCircleCutout('quarterAlphaGray', angle, this.x, this.y, this.width, this.height);
         }
         break;
       case 'shiptemplateGrayed':
+
+        renderList.addImage('grayBack', this.x, this.y, this.width, this.height);
+
         switch (this.template.hull) {
           case 'gunboat':
-            context.drawImage(images.gunboat, this.x, this.y, this.width, this.height);
+            renderList.addImage('gunboat2', this.x, this.y, this.width, this.height);
             break;
           case 'frigate':
-            context.drawImage(images.frigate, this.x, this.y, this.width, this.height);
+            renderList.addImage('frigate2', this.x, this.y, this.width, this.height);
             break;
           case 'galleon':
-            context.drawImage(images.galleon, this.x, this.y, this.width, this.height);
+            renderList.addImage('galleon2', this.x, this.y, this.width, this.height);
             break;
+          default:
+            throw new Error('unhandled switch statement in shiptemplate');
         }
 
-        var i = 0;
+        i = 0;
         for (const hardpoint of this.template.hardpoints) {
           if (hardpoint != null) {
-            Hardpoints.renderTemplate(hardpoint, i, this.x + 10, this.y + 38, context, images);
+            Hardpoints.renderTemplate(hardpoint, i, this.x + 10, this.y + 38, renderList);
           }
           i += 1;
         }
 
-        context.globalAlpha = 0.25;
-        context.fillStyle = 'gray';
-        context.fillRect(this.x, this.y, this.width, this.height);
-        context.drawImage(images.grayBack, this.x, this.y, this.width, this.height);
-        context.globalAlpha = 1.0;
+        renderList.addImage('quarterAlphaGray', this.x, this.y, this.width, this.height);
+
         break;
+      default:
+        throw new Error('unhandled switch statement in shiptemplate');
     }
   }
 

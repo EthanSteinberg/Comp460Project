@@ -3,33 +3,29 @@ import GuiButton from '../guibutton';
 
 export default class Hullslot extends GuiButton {
 
-  render(context, images) {
-    if (this.visible == false) {
+  render(renderList) {
+    if (this.visible === false) {
       return;
     }
 
     if (this.selected) {
-      context.strokeStyle = 'cyan';
-      context.strokeRect(this.x, this.y, 50, 50);
+      renderList.strokeRect('cyan', 2, this.x, this.y, 50, 50);
     }
 
-    context.fillStyle = 'green';
-    context.fillRect(this.x, this.y, 50, 50);
+    renderList.addImage('green', this.x, this.y, 50, 50);
 
     switch (this.rendertype) {
       case 'gunboat':
-        context.drawImage(images.gunboat, this.x, this.y, 50, 50);
+        renderList.addImage('gunboat2', this.x, this.y, 50, 50);
         break;
       case 'frigate':
-        context.drawImage(images.frigate, this.x, this.y, 50, 50);
+        renderList.addImage('frigate2', this.x, this.y, 50, 50);
         break;
       case 'galleon':
-        context.drawImage(images.galleon, this.x, this.y, 50, 50);
+        renderList.addImage('galleon2', this.x, this.y, 50, 50);
         break;
       case 'hullslot':
-        context.globalAlpha = 0.25;
-        context.drawImage(images.ship, this.x, this.y, 50, 50);
-        context.globalAlpha = 1.0;
+        renderList.addImage('ship', this.x, this.y, 50, 50);
         break;
       default:
         console.error('Trying to render unknown button: ', this.rendertype);

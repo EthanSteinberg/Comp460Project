@@ -36,33 +36,40 @@ export function createHardpoint(map, shipId, index, gunType, team) {
   return point.id;
 }
 
-export function render(hardpoint, map, context, images) {
+export function render(hardpoint, map, renderList) {
   const { x, y } = getPosition(hardpoint, map);
 
-  context.drawImage(images.cannon, x * 50 - 20 / 4, y * 50 - 25 / 4, 10, 10);
+  renderList.addImage('cannon', x * 50 - 20 / 4, y * 50 - 25 / 4, 10, 10);
+
+  renderList.addImage('black', x * 50 - 12, y * 50 + 3, 24, 9);
+
+  renderList.addImage('red', x * 50 - 10, y * 50 + 5, 20, 5);
+
+  const healthpercent = hardpoint.health / hardpoints[hardpoint.gunType].health;
+
+  renderList.addImage('green', x * 50 - 10, y * 50 + 5, 20 * healthpercent, 5);
 }
 
-export function renderTemplate(hardpoint, slotnum, x, y, context, images) {
-  var modifier = 0;
-  if (slotnum == 1) {
+export function renderTemplate(hardpoint, slotnum, x, y, renderList) {
+  let modifier = 0;
+  if (slotnum === 1) {
     modifier = 20;
   }
 
-  context.fillStyle = 'coral';
-  context.fillRect(x + modifier, y, 10, 10);    
+  renderList.addImage('coral', x + modifier, y, 10, 10);
 
   switch (hardpoint) {
     case 'roundshot':
-      context.drawImage(images.roundshot, x + modifier, y, 10, 10);
+      renderList.addImage('roundshot', x + modifier, y, 10, 10);
       break;
     case 'grapeshot':
-      context.drawImage(images.grapeshot, x + modifier, y, 10, 10);
+      renderList.addImage('grapeshot', x + modifier, y, 10, 10);
       break;
     case 'chainshot':
-      context.drawImage(images.chainshot, x + modifier, y, 10, 10);
+      renderList.addImage('chainshot', x + modifier, y, 10, 10);
       break;
     case 'shell':
-      context.drawImage(images.shell, x + modifier, y, 10, 10);
+      renderList.addImage('shell', x + modifier, y, 10, 10);
       break;
   }
 }

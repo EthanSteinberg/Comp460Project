@@ -45,17 +45,17 @@ export function createIsland(map, topLeft, size) {
   return island.id;
 }
 
-export function render(island, map, context, images, isSelected, noFlag = false) {
+export function render(island, map, renderList, isSelected, noFlag = false) {
   const [x, y] = island.topLeft;
   const [width, height] = island.size;
 
-  context.drawImage(images.island, (x - 0.5) * 50, (y - 0.5) * 50, width * 50, height * 50);
-
+  renderList.addImage('1x1islandDot', (x - 0.5) * 50, (y - 0.5) * 50, width * 50, height * 50);
+  
   if (island.team != null && !noFlag) {
-    const flag = (island.team === '0') ? images.blueFlag : images.redFlag;
+    const flag = (island.team === '0') ? 'blueFlag' : 'redFlag';
 
     const scale = 20;
-    context.drawImage(flag, (x + 0.3) * 50, (y - 0.9) * 50, 480 / scale, 670 / scale);
+    renderList.addImage(flag, (x + 0.3) * 50, (y - 0.9) * 50, 480 / scale, 670 / scale);
   }
 }
 

@@ -35,7 +35,6 @@ export default class Gui {
     this.x = canvasWidth - this.width;
     this.y = 0;
 
-    this.buttons = [];
     this.designerButtons = [];
 
     this.templates = templates;
@@ -66,51 +65,38 @@ export default class Gui {
   /**
    * Render the gui
    */
-  render(context, images, map, hoverCoords) {
-    context.strokeStyle = 'black';
-    context.lineWidth = 5;
-    context.beginPath();
-    context.moveTo(this.x, this.y);
-    context.lineTo(this.x, this.y + this.height);
-    context.stroke();
-    context.lineWidth = 1;
+  render(renderList, map, hoverCoords) {
+    renderList.addImage('black', this.x - 2, this.y, 4, this.height);
 
     if (this.displayMode === 'main') {
-      this.renderMain(context, images, map, hoverCoords);
+      this.renderMain(renderList, map, hoverCoords);
     } else if (this.displayMode === 'designer') {
-      this.renderDesigner(context, images, map, hoverCoords);
+      this.renderDesigner(renderList, map, hoverCoords);
     }
   }
 
-  renderDesigner(context, images, map, hoverCoords) {
-    context.fillStyle = 'grey';
-    context.fillRect(this.x, this.y, this.width, this.height);
+  renderDesigner(renderList, map, hoverCoords) {
+    renderList.addImage('grey', this.x, this.y, this.width, this.height);
 
-    // titles
-    context.fillStyle = 'black';
-    context.textBaseline = 'top';
-    context.font = '14px Perpetua';
-    context.fillText('SAVE SLOTS', this.x + 20, this.y + 10);
+    // // titles
+    renderList.addImage('saveSlots', this.x + 20, this.y + 5);
 
     const skeleton = new ShipSkeleton('shipskeleton', this.x + 50, this.y + 110, 100, 340);
-    skeleton.render(context, images);
+    skeleton.render(renderList);
 
     for (const button of this.getDesignerButtons()) {
       const isSelected = this.selectionState.gui != null && this.selectionState.gui.type === button.type &&
         this.selectionState.gui.slotNum === button.slotNum;
       button.selected = isSelected;
-      button.render(context, images);
+      button.render(renderList);
     }
 
-    // Display stats at the bottom of the gui
-    context.fillStyle = 'black';
-    context.textBaseline = 'top';
-    context.font = '14px Perpetua';
-    context.fillText(this.workingTemplate.hull.toUpperCase(), this.x + 10, this.height - 50);
-    context.fillText(this.workingTemplate.hardpoints, this.x + 20, this.height - 35);
-    context.fillText('Cost: ' + getStats(this.workingTemplate).cost + ' coin, '
-      + getStats(this.workingTemplate).tcost + ' sec',
-      this.x + 20, this.height - 20);
+    // // Display stats at the bottom of the gui
+    renderList.renderText('Cost: ' + getStats(this.workingTemplate).cost + ' coin',
+      this.x + 5, this.height - 50, 0.7);
+
+    renderList.renderText('Time: ' + getStats(this.workingTemplate).tcost + ' sec',
+      this.x + 5, this.height - 30, 0.7);
 
 
     // Hovering logic
@@ -160,58 +146,46 @@ export default class Gui {
 
         if (details != null) {
           // Display a tooltip
-          context.fillStyle = 'white';
-          context.strokeStyle = 'black';
           let modifier = 0;
           if ((roundedX - 2) > this.x + this.width / 2 - 100) {
             modifier = this.width / 2 * -1;
           }
 
-          context.strokeRect((roundedX - 2) + modifier, (roundedY + 1), 200, 50);
-          context.fillRect((roundedX - 2) + modifier, (roundedY + 1), 200, 50);
+          renderList.strokeRect('black', 4, (roundedX - 2) + modifier, (roundedY + 1), 200, 65);
+          renderList.addImage('white', (roundedX - 2) + modifier, (roundedY + 1), 200, 65);
 
-          context.fillStyle = 'black';
-          context.textBaseline = 'top';
-          context.font = '14px Perpetua';
-
-          context.fillText(details.name, (roundedX - 2) + modifier, (roundedY + 1));
-          context.fillText(details.description, (roundedX - 2) + modifier, (roundedY + 1) + 20);
-          context.fillText('Cost: ' + details.cost + ' coin, ' + details.tcost + ' seconds', (roundedX - 2) + modifier, (roundedY + 1) + 34);
+          renderList.renderText(details.name, (roundedX - 2) + modifier, (roundedY + 1), 0.5);
+          renderList.renderText(details.description, (roundedX - 2) + modifier, (roundedY + 1) + 20, 0.5);
+          renderList.renderText('Cost: ' + details.cost + ' coin', (roundedX - 2) + modifier, (roundedY + 1) + 34, 0.5);
+          renderList.renderText('Time: ' + details.tcost + ' seconds', (roundedX - 2) + modifier, (roundedY + 1) + 47, 0.5);
         }
       }
     }
   }
 
-  renderMain(context, images, map, hoverCoords) {
-    context.fillStyle = 'gray';
-    context.fillRect(this.x, this.y, this.width, this.height);
+  renderMain(renderList, map, hoverCoords) {
+    renderList.addImage('grey', this.x, this.y, this.width, this.height);
 
     const moneyText = Math.floor(map.getEntity(this.team).coins).toString();
 
-    context.fillStyle = 'black';
-    context.textBaseline = 'top';
-    context.font = '24px Perpetua';
-    context.fillText(moneyText, this.x + 32, this.y + 5);
+    renderList.renderText(moneyText, this.x + 32, this.y + 5);
 
-    const width = context.measureText(moneyText).width;
+    const width = 19 * moneyText.length;
 
-    context.strokeStyle = 'black';
-    context.strokeRect(this.x + 2, this.y, width + 40, 35);
-    context.drawImage(images.money, (this.x) + 2, (this.y) + 5, 25, 25);
+    renderList.strokeRect('black', 2, this.x + 2, this.y + 4, width + 50, 40);
+    renderList.addImage('coin2', (this.x) + 2, (this.y) + 10, 25, 25);
 
     if (this.team === '1') {
-      context.fillStyle = 'firebrick';
-      context.fillText('Pirates', (this.x) + 110, (this.y) + 5);
+      renderList.renderText('Pirates', (this.x) + 110, (this.y) + 5, 0.5);
     } else {
-      context.fillStyle = 'darkblue';
-      context.fillText('Imperials', (this.x) + 100, (this.y) + 5);
+      renderList.renderText('Imperials', (this.x) + 110, (this.y) + 5, 0.5);
     }
 
     for (const button of this.getButtons()) {
       const isSelected = this.selectionState.gui != null && this.selectionState.gui.type === button.type &&
         this.selectionState.gui.slotNum === button.slotNum;
       button.selected = isSelected;
-      button.render(context, images);
+      button.render(renderList);
     }
 
     if (hoverCoords != null) {
@@ -231,35 +205,22 @@ export default class Gui {
         const details = buildingConstants[buildingType];
 
         // Display a tooltip
-        context.fillStyle = 'white';
-        context.strokeStyle = 'black';
-        context.strokeRect((roundedX - 2) + modifier, (roundedY + 1), 200, 50);
-        context.fillRect((roundedX - 2) + modifier, (roundedY + 1), 200, 50);
+        renderList.strokeRect('black', 2, (roundedX - 2) + modifier, (roundedY + 1), 200, 65);
+        renderList.addImage('white', (roundedX - 2) + modifier, (roundedY + 1), 200, 65);
 
-        context.fillStyle = 'black';
-        context.textBaseline = 'top';
-        context.font = '14px Perpetua';
-        context.fillText(details.name, (roundedX - 2) + modifier, (roundedY + 1));
-        context.fillText(details.description, (roundedX - 2) + modifier, (roundedY + 1) + 20);
-        context.fillText('Cost: ' + details.coinCost + ' coin, ' + details.buildTime + ' seconds', (roundedX - 2) + modifier, (roundedY + 1) + 34);
+        renderList.renderText(details.name, (roundedX - 2) + modifier, (roundedY + 1), 0.5);
+        renderList.renderText(details.description, (roundedX - 2) + modifier, (roundedY + 1) + 20, 0.5);
+        renderList.renderText('Cost: ' + details.coinCost + ' coin', (roundedX - 2) + modifier, (roundedY + 1) + 34, 0.5);
+        renderList.renderText('Time: ' + details.buildTime + ' seconds', (roundedX - 2) + modifier, (roundedY + 1) + 47, 0.5);
       } else if (item != null && (item.getType() === 'shiptemplate' || item.getType() === 'shiptemplateGrayed')) {
         const template = this.templates[item.slotNum];
-        context.strokeStyle = 'cyan';
-        context.strokeRect(item.x, item.y, item.width, item.height);
+        renderList.strokeRect('cyan', 2, item.x, item.y, item.width, item.height);
 
-        context.fillStyle = 'white';
-        context.strokeStyle = 'black';
-        context.strokeRect((roundedX - 2) + modifier, (roundedY + 1), 200, 50);
-        context.fillRect((roundedX - 2) + modifier, (roundedY + 1), 200, 50);
+        renderList.strokeRect('black', 2, (roundedX - 2) + modifier, (roundedY + 1), 200, 31);
+        renderList.addImage('white', (roundedX - 2) + modifier, (roundedY + 1), 200, 31);
 
-        context.fillStyle = 'black';
-        context.textBaseline = 'top';
-        context.font = '14px Perpetua';
-        context.fillText(template.hull.toUpperCase(), (roundedX - 2) + modifier, (roundedY + 1));
-        context.fillText(template.hardpoints, (roundedX - 2) + modifier, (roundedY + 1) + 20);
-        context.fillText('Cost: ' + getStats(template).cost + ' coin, '
-          + getStats(template).tcost + ' sec',
-          (roundedX - 2) + modifier, (roundedY + 1) + 34);
+        renderList.renderText('Cost: ' + getStats(template).cost + ' coin', (roundedX - 2) + modifier, (roundedY + 1), 0.5);
+        renderList.renderText('Time: ' + getStats(template).tcost + ' seconds', (roundedX - 2) + modifier, (roundedY + 1) + 13, 0.5);
       }
     }
   }
@@ -402,7 +363,7 @@ export default class Gui {
   }
 
   getButtons() {
-    return this.buttons.concat(this.getUnitButtons() || []);
+    return this.getUnitButtons();
   }
 
   getItem(x, y) {

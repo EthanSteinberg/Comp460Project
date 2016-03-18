@@ -60,51 +60,38 @@ export function getOrientation(ship) {
   return Math.atan2(ship.y - lastPosition.y, ship.x - lastPosition.x) + Math.PI / 2;
 }
 
-export function render(ship, map, context, images, isSelected) {
-  if (ship.team === '1') {
-    context.fillStyle = 'firebrick';
-  } else {
-    context.fillStyle = 'royalblue';
-  }
-  context.beginPath();
-  context.arc(ship.x * 50, ship.y * 50, 25, 0, Math.PI * 2, true);
-  context.fill();
+export function render(ship, map, renderList, isSelected) {
+  const name = (ship.team === '1' ? 'pirate' : 'empire') + 'Ship';
 
-  context.save();
-  context.translate(ship.x * 50, ship.y * 50);
+  renderList.translate(ship.x * 50, ship.y * 50);
 
   const angle = getOrientation(ship);
 
-  context.rotate(angle);
-  context.drawImage(images.ship, (-0.5) * 50, (-0.5) * 50, 50, 50);
-  context.restore();
+  renderList.rotate(angle);
+  renderList.addImage(name, (-0.5) * 50, (-0.5) * 50, 50, 50);
+  renderList.rotate(-angle);
+  renderList.translate(-ship.x * 50, -ship.y * 50);
 
   for (const hardpointId of ship.hardpoints) {
     const hardpoint = map.getEntity(hardpointId);
     if (hardpoint != null) {
-      Hardpoints.render(hardpoint, map, context, images);
+      Hardpoints.render(hardpoint, map, renderList);
     }
   }
 
   if (isSelected) {
-    context.strokeStyle = 'cyan';
-    context.beginPath();
-    context.arc(ship.x * 50, ship.y * 50, 25, 0, Math.PI * 2, true);
-    context.stroke();
+    renderList.addImage('shipSelect', (-0.5 + ship.x) * 50, (-0.5 + ship.y) * 50, 50, 50);
   }
 }
 
-export function renderOverlay(ship, map, context) {
-  context.fillStyle = 'red';
-  context.fillRect(ship.x * 50 - 20, ship.y * 50 + 30, 40, 5);
+export function renderOverlay(ship, map, renderList) {
+  renderList.addImage('black', ship.x * 50 - 22, ship.y * 50 + 28, 44, 9);
+
+  renderList.addImage('red', ship.x * 50 - 20, ship.y * 50 + 30, 40, 5);
 
   const healthpercent = ship.health / hulls[ship.template.hull].health;
 
-  context.fillStyle = 'green';
-  context.fillRect(ship.x * 50 - 20, ship.y * 50 + 30, 40 * healthpercent, 5);
-
-  context.strokeStyle = 'black';
-  context.strokeRect(ship.x * 50 - 20, ship.y * 50 + 30, 40, 5);
+  renderList.addImage('green', ship.x * 50 - 20, ship.y * 50 + 30, 40 * healthpercent, 5);
 }
 
 function setPosition(ship, x, y) {

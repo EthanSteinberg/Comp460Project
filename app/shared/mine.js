@@ -22,33 +22,23 @@ export function processUpdate(mine, map) {
   map.getEntity(mine.team).coins += 0.2;
 }
 
-export function render(mine, map, context, images, isSelected) {
-  if (mine.team === '1') {
-    context.fillStyle = 'firebrick';
-  } else {
-    context.fillStyle = 'royalblue';
-  }
+export function render(mine, map, renderList, isSelected) {
+  const name = (mine.team === '1') ? 'pirateCircle' : 'imperialCircle';
 
-  context.beginPath();
-  context.arc(mine.x * 50, mine.y * 50, 25, 0, Math.PI * 2, true);
-  context.fill();
+  renderList.addImage(name, mine.x * 50 - 25, mine.y * 50 - 25);
 
-  context.fillStyle = 'red';
-  context.fillRect(mine.x * 50 - 20, mine.y * 50 + 30, 40, 5);
+  renderList.addImage('mine2', (mine.x - 0.5) * 50, (mine.y - 0.5) * 50, 50, 50);
+
+  renderList.addImage('black', mine.x * 50 - 20, mine.y * 50 + 30, 40, 5);
+
+  renderList.addImage('red', mine.x * 50 - 20, mine.y * 50 + 30, 40, 5);
 
   const healthpercent = mine.health / 100;
 
-  context.fillStyle = 'green';
-  context.fillRect(mine.x * 50 - 20, mine.y * 50 + 30, 40 * healthpercent, 5);
-
-  context.strokeStyle = 'black';
-  context.strokeRect(mine.x * 50 - 20, mine.y * 50 + 30, 40, 5);
-
-  context.drawImage(images.mine, (mine.x - 0.5) * 50, (mine.y - 0.5) * 50, 50, 50);
+  renderList.addImage('green', mine.x * 50 - 20, mine.y * 50 + 30, 40 * healthpercent, 5);
 
   if (isSelected) {
-    context.strokeStyle = 'cyan';
-    context.strokeRect(
+    renderList.addImage('cyan',
       (this.x - 0.5) * 50,
       (this.y - 0.5) * 50,
       50,

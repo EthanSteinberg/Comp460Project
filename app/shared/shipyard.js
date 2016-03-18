@@ -26,33 +26,23 @@ export function createShipyard(map, x, y, islandID, team) {
   return shipyard.id;
 }
 
-export function render(shipyard, map, context, images, isSelected) {
-  if (shipyard.team === '1') {
-    context.fillStyle = 'firebrick';
-  } else {
-    context.fillStyle = 'royalblue';
-  }
+export function render(shipyard, map, renderList, isSelected) {
+  const name = (shipyard.team === '1') ? 'pirateCircle' : 'imperialCircle';
 
-  context.beginPath();
-  context.arc(shipyard.x * 50, shipyard.y * 50, 25, 0, Math.PI * 2, true);
-  context.fill();
+  renderList.addImage(name, shipyard.x * 50 - 25, shipyard.y * 50 - 25);
 
-  context.drawImage(images.shipyard, (shipyard.x - 0.5) * 50, (shipyard.y - 0.5) * 50, 50, 50);
+  renderList.addImage('shipyard2', (shipyard.x - 0.5) * 50, (shipyard.y - 0.5) * 50, 50, 50);
 
-  context.fillStyle = 'red';
-  context.fillRect(shipyard.x * 50 - 20, shipyard.y * 50 + 30, 40, 5);
+  renderList.addImage('black', shipyard.x * 50 - 20, shipyard.y * 50 + 30, 40, 5);
+
+  renderList.addImage('red', shipyard.x * 50 - 20, shipyard.y * 50 + 30, 40, 5);
 
   const healthpercent = shipyard.health / 100;
 
-  context.fillStyle = 'green';
-  context.fillRect(shipyard.x * 50 - 20, shipyard.y * 50 + 30, 40 * healthpercent, 5);
-
-  context.strokeStyle = 'black';
-  context.strokeRect(shipyard.x * 50 - 20, shipyard.y * 50 + 30, 40, 5);
+  renderList.addImage('green', shipyard.x * 50 - 20, shipyard.y * 50 + 30, 40 * healthpercent, 5);
 
   if (isSelected) {
-    context.strokeStyle = 'cyan';
-    context.strokeRect(
+    renderList.strokeRect('cyan', 2,
       (shipyard.x - 0.5) * 50,
       (shipyard.y - 0.5) * 50,
       50,

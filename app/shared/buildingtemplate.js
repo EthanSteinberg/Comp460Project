@@ -18,23 +18,17 @@ export function createBuildingTemplate(map, x, y, team, islandID, buildingType) 
   return template.id;
 }
 
-export function render(template, map, context, images) {
-  if (template.team === '1') {
-    context.fillStyle = 'firebrick';
-  } else {
-    context.fillStyle = 'royalblue';
-  }
+export function render(template, map, renderList) {
+  const name = (template.team === '1') ? 'pirateCircle' : 'imperialCircle';
 
-  context.beginPath();
-  context.arc(template.x * 50, template.y * 50, 25, 0, Math.PI * 2, true);
-  context.fill();
+  renderList.addImage(name, template.x * 50 - 25, template.y * 50 - 25);
 
   switch (template.buildingType) {
     case 'shipyard':
-      context.drawImage(images.shipyard, (template.x - 0.5) * 50, (template.y - 0.5) * 50, 50, 50);
+      renderList.addImage('shipyard2', (template.x - 0.5) * 50, (template.y - 0.5) * 50, 50, 50);
       break;
     case 'mine':
-      context.drawImage(images.mine, (template.x - 0.5) * 50, (template.y - 0.5) * 50, 50, 50);
+      renderList.addImage('mine2', (template.x - 0.5) * 50, (template.y - 0.5) * 50, 50, 50);
       break;
     case 'fort':
       context.drawImage(images.fort, (template.x - 0.5) * 50, (template.y - 0.5) * 50, 50, 50);
@@ -44,42 +38,16 @@ export function render(template, map, context, images) {
       console.error('No support for building type', template.buildingType);
   }
 
-  context.save();
-  context.beginPath();
-  context.rect((template.x - 0.5) * 50, (template.y - 0.5) * 50, 50, 50);
-  context.clip();
-
   const angle = (template.progressTowardsBuild) / buildingConstants[template.buildingType].buildTime * Math.PI * 2;
+  renderList.addCircleCutout('quarterAlphaGray', angle, (template.x - 0.5) * 50, (template.y - 0.5) * 50, 50, 50);
 
-  context.globalCompositeOperation = 'multiply';
-  context.fillStyle = 'rgba(0,0,0,.5)';
-  context.beginPath();
-  context.arc(template.x * 50, template.y * 50, 50, 0, angle, true);
-  context.lineTo(template.x * 50, template.y * 50);
-  context.fill();
-  context.globalCompositeOperation = 'source-over';
+  renderList.addImage('black', template.x * 50 - 20, template.y * 50 + 30, 40, 5);
 
-  context.strokeStyle = 'white';
-  context.beginPath();
-  context.moveTo(template.x * 50, template.y * 50);
-  context.lineTo(template.x * 50 + 50, template.y * 50);
-  context.arc(template.x * 50, template.y * 50, 50, 0, angle, true);
-  context.lineTo(template.x * 50, template.y * 50);
-  context.stroke();
-
-  context.restore();
-
-
-  context.fillStyle = 'red';
-  context.fillRect(template.x * 50 - 20, template.y * 50 + 30, 40, 5);
+  renderList.addImage('red', template.x * 50 - 20, template.y * 50 + 30, 40, 5);
 
   const healthpercent = template.health / 100;
 
-  context.fillStyle = 'green';
-  context.fillRect(template.x * 50 - 20, template.y * 50 + 30, 40 * healthpercent, 5);
-
-  context.strokeStyle = 'black';
-  context.strokeRect(template.x * 50 - 20, template.y * 50 + 30, 40, 5);
+  renderList.addImage('green', template.x * 50 - 20, template.y * 50 + 30, 40 * healthpercent, 5);
 }
 
 export function processUpdate(template, map) {

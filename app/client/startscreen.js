@@ -1,15 +1,15 @@
 import MapSelect from '../shared/guibuttons/mapselect';
 import Ready from '../shared/guibuttons/ready';
+import RenderList from '../shared/renderlist';
 import { createMap } from '../shared/maps';
 import { createSource } from './audio';
 
 export const GUI_WIDTH = 200;
 
-
 export default class StartScreen {
   constructor(images, game) {
     this.canvas = document.getElementById('canvas');
-    this.context = this.canvas.getContext('2d');
+    this.context = this.canvas.getContext('webgl');
 
     this.game = game;
     this.game.gui.displayMode = 'designer';
@@ -25,9 +25,9 @@ export default class StartScreen {
     this.buttons.push(new MapSelect('mapselect', 675, 325, 102, 26, 0));
     this.buttons.push(new MapSelect('mapselect', 825, 325, 102, 26, 1));
     this.buttons.push(new MapSelect('mapselect', 750, 375, 102, 26, 2));
-    this.buttons[0].rendertype = 'westindies';
-    this.buttons[1].rendertype = 'tropics';
-    this.buttons[2].rendertype = 'greatlakes';
+    this.buttons[0].rendertype = 'westindies2';
+    this.buttons[1].rendertype = 'tropics2';
+    this.buttons[2].rendertype = 'greatlakes2';
 
     this.buttons[0].selected = true;
 
@@ -36,61 +36,73 @@ export default class StartScreen {
     this.epicSound = createSource(images['bensound-epic']);
     this.epicSound.loop = true;
     this.epicSound.start(0);
+
+    this.renderList = new RenderList(this.images.pixelJson);
   }
 
   render() {
+    this.renderList.reset();
+
+    this.context.clearColor(0.0, 0.0, 0.0, 1.0);
+    this.context.clear(this.context.COLOR_BUFFER_BIT);
+
     if (this.mode === 'splash') {
       this.renderSplash();
     } else if (this.mode === 'setup') {
       this.renderSetup();
     }
+
+    this.renderList.render(this.context);
   }
 
   renderSplash() {
-    this.context.drawImage(this.images.splashscreen, 0, 0);
+    this.renderList.addImage('splashscreen', 0, 0);
   }
 
   renderSetup() {
-    this.context.clearRect(0, 0, this.width, this.height);
+    this.renderList.addImage('linen', 0, 0, this.width, this.height);
 
-    this.context.fillStyle = 'linen';
-    this.context.fillRect(0, 0, this.width, this.height);
-
-    this.context.translate(this.width - 520, 50);
+    // this.context.translate(this.width - 520, 50);
+    this.renderList.translate(this.width - 520, 50);
     const map = createMap(this.mapNum);
     const scale = map.width / 5;
-    this.context.scale(1 / scale, 1 / scale);
-    this.context.translate(25, 25);
-    map.renderStartScreenMiniMap(this.context, this.images);
-    this.context.translate(-25, -25);
-    this.context.scale(scale, scale);
-    this.context.translate(-this.width + 520, -50);
+    // this.context.scale(1 / scale, 1 / scale);
+    this.renderList.scale(1 / scale);
+    // this.context.translate(25, 25);
+    this.renderList.translate(25, 25);
+
+    map.renderStartScreenMiniMap(this.renderList);
+
+    // this.context.translate(-25, -25);
+    this.renderList.translate(-25, -25);
+    // this.context.scale(scale, scale);
+    this.renderList.scale(scale);
+
+    // this.context.translate(-this.width + 520, -50);
+    this.renderList.translate(-this.width + 520, -50);
 
     for (const button of this.buttons) {
-      button.render(this.context, this.images);
+      button.render(this.renderList);
     }
 
     if (this.team == null) {
       this.renderLoading();
     } else {
-      this.context.fillStyle = 'black';
       if (this.team === '1') {
-        this.context.drawImage(this.images.piratesTag, 0, 0);
+        this.renderList.addImage('piratesTag', 0, 0);
       } else if (this.team === '0') {
-        this.context.drawImage(this.images.imperialsTag, 0, 0);
+        this.renderList.addImage('imperialsTag', 0, 0);
       }
 
-      this.context.textBaseline = 'top';
-      this.context.font = '50px Perpetua';
-      this.context.fillText('Status:', 40, 250);
+      this.renderList.addImage('status', 40, 250);
 
       this.context.font = '30px Perpetua';
       let startingY = 300;
       for (const team of Object.keys(this.readyStates)) {
-        if (team != this.team) {
-          this.context.fillText((team === '1' ? 'Pirates      ' : 'Imperials  ') + (this.readyStates[team] ? 'Ready' : 'Not Ready'), 50, startingY);
+        if (team !== this.team) {
+          this.renderList.addImage((team === '1' ? 'pirates' : 'imperials') + (this.readyStates[team] ? 'Ready' : 'NotReady'), 50, startingY);
         } else {
-          this.context.fillText((team === '1' ? 'Pirates      ' : 'Imperials  '), 50, startingY);
+          this.renderList.addImage((team === '1' ? 'pirates' : 'imperials'), 50, startingY);
         }
 
         startingY += 50;
@@ -98,16 +110,14 @@ export default class StartScreen {
     }
 
     if (this.hoveredCoords && this.hoveredCoords.x >= this.width - GUI_WIDTH) {
-      this.game.gui.render(this.context, this.images, this.map, this.hoveredCoords);
+      this.game.gui.render(this.renderList, this.map, this.hoveredCoords);
     } else {
-      this.game.gui.render(this.context, this.images, this.map, null);
+      this.game.gui.render(this.renderList, this.map, null);
     }
   }
 
   renderLoading() {
-    this.context.font = '30px Brush Script MT';
-    this.context.fillStyle = 'black';
-    this.context.fillText('Loading ...', 50, 50);
+    // Don't render anything for now
   }
 
   _assignTeam({ team, readyStates, mapNum }) {
@@ -117,9 +127,9 @@ export default class StartScreen {
     this.readyStates = readyStates;
 
     if (this.team === '1') {
-      this.buttons.push(new Ready('notready', 160, 355, 128, 26));
+      this.buttons.push(new Ready('notready2', 240, 355, 128, 26));
     } else {
-      this.buttons.push(new Ready('notready', 160, 305, 128, 26));
+      this.buttons.push(new Ready('notready2', 240, 305, 128, 26));
     }
   }
 
@@ -185,7 +195,7 @@ export default class StartScreen {
         if (button.getType() === 'mapselect') {
           sendMessage({ type: 'UpdateMap', mapNum: button.getSlotNum() });
         } else {
-          button.setType((!this.readyStates[this.team] ? 'ready' : 'notready'));
+          button.setType((!this.readyStates[this.team] ? 'ready2' : 'notready2'));
           sendMessage({ type: 'SetReadyState', readyState: !this.readyStates[this.team] });
         }
       }

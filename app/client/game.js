@@ -4,6 +4,8 @@ import { createSource } from './audio';
 
 import { defaultTemplate } from '../shared/template';
 
+import RenderList from '../shared/renderlist';
+
 const templates = [defaultTemplate(), defaultTemplate(), defaultTemplate()];
 
 export default class Game {
@@ -13,7 +15,7 @@ export default class Game {
    */
   constructor(images, map, team) {
     this.canvas = document.getElementById('canvas');
-    this.context = this.canvas.getContext('2d');
+    this.context = this.canvas.getContext('webgl');
 
     this.width = this.canvas.width;
     this.height = this.canvas.height;
@@ -43,17 +45,19 @@ export default class Game {
     this.pressedKeys = new Set();
 
 
-    const fogCanvas = document.createElement('canvas');
-    fogCanvas.width = map.width * 50;
-    fogCanvas.height = map.height * 50;
+    // const fogCanvas = document.createElement('canvas');
+    // fogCanvas.width = map.width * 50;
+    // fogCanvas.height = map.height * 50;
 
-    const visibleCanvas = document.createElement('canvas');
-    visibleCanvas.width = map.width * 50;
-    visibleCanvas.height = map.height * 50;
+    // const visibleCanvas = document.createElement('canvas');
+    // visibleCanvas.width = map.width * 50;
+    // visibleCanvas.height = map.height * 50;
 
-    // Get the drawing context
-    this.fogContext = fogCanvas.getContext('2d');
-    this.visibleContext = visibleCanvas.getContext('2d');
+    // // Get the drawing context
+    // this.fogContext = fogCanvas.getContext('2d');
+    // this.visibleContext = visibleCanvas.getContext('2d');
+
+    this.renderList = new RenderList(this.images.pixelJson);
   }
 
   centerAround(x, y) {
@@ -358,16 +362,17 @@ export default class Game {
    * Render the game. Also performs updates if necessary.
    */
   render() {
-    this.context.clearRect(0, 0, this.width, this.height);
+    this.renderList.reset();
 
-    this.context.save();
+    this.context.clearColor(0.0, 0.0, 0.0, 1.0);
+    this.context.clear(this.context.COLOR_BUFFER_BIT);
 
-    this.context.translate(25, 25);
+    this.renderList.translate(25, 25);
 
-    this.context.translate(-this.x, -this.y);
+    this.renderList.translate(-this.x, -this.y);
 
     // Render the map and everything on it.
-    this.map.render(this.context, this.images, this.selectionState, this.fogContext, this.visibleContext, this.team);
+    this.map.render(this.renderList, this.selectionState);
 
     if (this.hoveredCoords && this.hoveredCoords.x < this.width - GUI_WIDTH && this.selectionState.gui == null) {
       if (this.mouseDownGamePosition != null) {
@@ -377,28 +382,30 @@ export default class Game {
         const dy = hoverGameCoords.mouseY - this.mouseDownGamePosition.mouseY;
 
         if (dx > 0 && dy > 0) {
-          this.context.strokeStyle = 'white';
-          this.context.strokeRect(this.mouseDownGamePosition.mouseX * 50, this.mouseDownGamePosition.mouseY * 50, dx * 50, dy * 50);
+          this.renderList.strokeRect('white', 2, this.mouseDownGamePosition.mouseX * 50, this.mouseDownGamePosition.mouseY * 50, dx * 50, dy * 50);
         }
       }
     }
 
-    this.context.restore();
+    this.renderList.translate(this.x, this.y);
+    this.renderList.translate(-25, -25);
 
     if (this.hoveredCoords && this.hoveredCoords.x >= this.width - GUI_WIDTH) {
-      this.gui.render(this.context, this.images, this.map, this.hoveredCoords);
+      this.gui.render(this.renderList, this.map, this.hoveredCoords);
     } else {
-      this.gui.render(this.context, this.images, this.map, null);
+      this.gui.render(this.renderList, this.map, null);
     }
 
     if (this.gui.displayMode === 'main') {
-      this.context.translate(this.width - 150, 50);
+      this.renderList.translate(this.width - 150, 50);
       const scale = this.map.width / 2;
-      this.context.scale(1 / scale, 1 / scale);
-      this.map.renderMiniMap(this.context, this.images, this.x, this.y, this.width - GUI_WIDTH, this.height, this.fogContext, this.visibleContext, this.team);
-      this.context.scale(scale, scale);
-      this.context.translate(-this.width + 150, -50);
+      this.renderList.scale(1 / scale);
+      this.map.renderMiniMap(this.renderList, this.x, this.y, this.width - GUI_WIDTH, this.height);
+      this.renderList.scale(scale);
+      this.renderList.translate(-this.width + 150, -50);
     }
+
+    this.renderList.render(this.context);
   }
 
   keydown(event) {

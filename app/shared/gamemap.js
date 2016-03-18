@@ -91,38 +91,6 @@ export default class GameMap {
     return this.mode;
   }
 
-  /**
-   * Render both the map and all ships on it.
-   */
-  render(context, images, selectionState, fogContext, visibleContext, team) {
-    this.renderMap(context, images, selectionState, fogContext, visibleContext, team);
-  }
-
-  renderMiniMap(context, images, x, y, width, height, fogContext, visibleContext, team) {
-    this.renderMap(context, images, { gui: null, map: [] }, fogContext, visibleContext, team, 5, this.width / 3);
-
-    context.globalCompositeOperation = 'multiply';
-    context.fillStyle = 'rgba(0,0,0,.5)';
-    context.fillRect(-25, -25, this.width * 50, y);
-
-    context.fillRect(-25, y - 25, x, height);
-
-    context.fillRect(-25 + x + width, y - 25, this.width * 50 - x - width, height);
-
-    context.fillRect(-25, -25 + y + height, this.width * 50, this.height * 50 - y - height);
-
-    context.globalCompositeOperation = 'source-over';
-    context.strokeStyle = 'black';
-
-    context.lineWidth = 20;
-    context.strokeRect(-25, -25, this.width * 50, this.height * 50);
-    context.lineWidth = 1;
-  }
-
-  renderStartScreenMiniMap(context, images) {
-    this.renderMainMap(context, images, { gui: null, map: [] }, 5, this.width / 3);
-  }
-
   countPlayerItems() {
     const result = {
       '0': 0,
@@ -138,104 +106,72 @@ export default class GameMap {
     return result;
   }
 
+  /**
+   * Render both the map and all ships on it.
+   */
+  render(renderList, selectionState) {
+    this.renderMainMap(renderList, selectionState);
+  }
+
+  renderMiniMap(renderList, x, y, width, height) {
+    this.renderMainMap(renderList, { gui: null, map: [] }, 5, this.width / 3);
+
+    renderList.addImage('quarterAlphaGray', -25, -25, this.width * 50, y);
+    renderList.addImage('quarterAlphaGray', -25, y - 25, x, height);
+    renderList.addImage('quarterAlphaGray', -25 + x + width, y - 25, this.width * 50 - x - width, height);
+    renderList.addImage('quarterAlphaGray', -25, -25 + y + height, this.width * 50, this.height * 50 - y - height);
+
+    renderList.strokeRect('black', this.width, -25, -25, this.width * 50, this.height * 50);
+  }
+
+  renderStartScreenMiniMap(renderList) {
+    const gridSize = 5;
+    const gridWidth = this.width / 3;
+
+    renderList.addImage('antiquewhite', -25, -25, this.width * 50, this.height * 50);
+
+    for (let x = 0; x < this.width; x += gridSize) {
+      for (let y = 0; y < this.height; y += gridSize) {
+        renderList.strokeRect('lightgray', gridWidth, (x - 0.5) * 50, (y - 0.5) * 50, gridSize * 50, gridSize * 50);
+      }
+    }
+
+    for (const entity of this.entities.values()) {
+      const type = Types[entity.type];
+      if (type.render != null) {
+        type.render(entity, this, renderList);
+      }
+    }
+
+    for (const entity of this.entities.values()) {
+      const type = Types[entity.type];
+      if (type.renderOverlay != null) {
+        type.renderOverlay(entity, this, renderList);
+      }
+    }
+  }
+
   renderMap(context, images, selectionState, fogContext, visibleContext, team, gridSize = 1, gridWidth = 1) {
     this.renderFoggedArea(context, images, selectionState, fogContext, visibleContext, team, gridSize, gridWidth);
     this.renderNormalArea(context, images, selectionState, fogContext, visibleContext, team, gridSize, gridWidth);
     context.globalCompositeOperation = 'source-over';
   }
 
-  renderFoggedArea(context, images, selectionState, fogContext, visibleContext, team, gridSize, gridWidth) {
-    this.updateFogContext(fogContext, team);
-
-    visibleContext.clearRect(0, 0, this.width * 50, this.height * 50);
-    visibleContext.translate(25, 25);
-
-    visibleContext.globalCompositeOperation = 'source-over';
-    visibleContext.drawImage(fogContext.canvas, -25, -25);
-
-    visibleContext.globalCompositeOperation = 'source-atop';
-
-    visibleContext.fillStyle = 'antiquewhite';
-    visibleContext.fillRect(-25, -25, this.width * 50, this.height * 50);
-
-    visibleContext.lineWidth = gridWidth;
+  renderMainMap(renderList, selectionState, gridSize = 1, gridWidth = 2) {
+    renderList.addImage('antiquewhite', -25, -25, this.width * 50, this.height * 50);
 
     for (let x = 0; x < this.width; x += gridSize) {
       for (let y = 0; y < this.height; y += gridSize) {
-        visibleContext.strokeStyle = 'lightgray';
-        visibleContext.strokeRect((x - 0.5) * 50, (y - 0.5) * 50, gridSize * 50, gridSize * 50);
+        renderList.strokeRect('lightgray', gridWidth, (x - 0.5) * 50, (y - 0.5) * 50, gridSize * 50, gridSize * 50);
       }
     }
-
-    visibleContext.lineWidth = 1.0;
-
-
-    for (const entity of this.entities.values()) {
-      const type = Types[entity.type];
-      if (type.render != null && entity.type === 'island') {
-        type.render(entity, this, visibleContext, images, false, true);
-      }
-    }
-
-    visibleContext.globalCompositeOperation = 'multiply';
-    visibleContext.fillStyle = 'grey';
-    visibleContext.fillRect(-25, -25, this.width * 50, this.height * 50);
-
-    visibleContext.translate(-25, -25);
-
-    context.globalCompositeOperation = 'source-over';
-    context.drawImage(visibleContext.canvas, -25, -25);
-  }
-
-  renderNormalArea(context, images, selectionState, fogContext, visibleContext, team, gridSize, gridWidth) {
-    visibleContext.clearRect(0, 0, this.width * 50, this.height * 50);
-    visibleContext.translate(25, 25);
-
-    visibleContext.globalCompositeOperation = 'source-over';
-
-    this.renderVisibleMask(visibleContext, team);
-
-    visibleContext.globalCompositeOperation = 'source-atop';
-
-    this.renderMainMap(visibleContext, images, selectionState, gridSize, gridWidth);
-
-    visibleContext.translate(-25, -25);
-
-    context.globalCompositeOperation = 'source-over';
-    context.drawImage(visibleContext.canvas, -25, -25);
-  }
-
-  renderVisibleMask(context, team) {
-    context.fillStyle = 'red';
-    for (const entity of this.entities.values()) {
-      if (entity.team === team) {
-        context.beginPath();
-        context.arc(entity.x * 50, entity.y * 50, 25 * 4, 0, Math.PI * 2, true);
-        context.fill();
-      }
-    }
-  }
-
-  renderMainMap(context, images, selectionState, gridSize, gridWidth) {
-    context.fillStyle = 'antiquewhite';
-    context.fillRect(-25, -25, this.width * 50, this.height * 50);
-
-    for (let x = 0; x < this.width; x += gridSize) {
-      for (let y = 0; y < this.height; y += gridSize) {
-        context.strokeStyle = 'lightgray';
-        context.lineWidth = gridWidth;
-        context.strokeRect((x - 0.5) * 50, (y - 0.5) * 50, gridSize * 50, gridSize * 50);
-      }
-    }
-
-    context.lineWidth = 1.0;
 
     for (const entity of this.entities.values()) {
       const isSelected = selectionState.map.indexOf(entity.id) !== -1;
 
       const type = Types[entity.type];
       if (type.render != null) {
-        type.render(entity, this, context, images, isSelected);
+        type.render(entity, this, renderList, isSelected);
       }
     }
 
@@ -244,7 +180,7 @@ export default class GameMap {
 
       const type = Types[entity.type];
       if (type.renderOverlay != null) {
-        type.renderOverlay(entity, this, context, images, isSelected);
+        type.renderOverlay(entity, this, renderList, isSelected);
       }
     }
   }
