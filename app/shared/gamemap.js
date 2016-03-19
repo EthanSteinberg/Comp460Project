@@ -109,13 +109,7 @@ export default class GameMap {
   /**
    * Render both the map and all ships on it.
    */
-  render(renderList, selectionState) {
-    this.renderMainMap(renderList, selectionState);
-  }
-
-  renderMiniMap(renderList, x, y, width, height) {
-    this.renderMainMap(renderList, { gui: null, map: [] }, 5, this.width / 3);
-
+  renderMiniMapFrame(renderList, x, y, width, height) {
     renderList.addImage('quarterAlphaGray', -25, -25, this.width * 50, y);
     renderList.addImage('quarterAlphaGray', -25, y - 25, x, height);
     renderList.addImage('quarterAlphaGray', -25 + x + width, y - 25, this.width * 50 - x - width, height);
@@ -151,10 +145,13 @@ export default class GameMap {
     }
   }
 
-  renderMap(context, images, selectionState, fogContext, visibleContext, team, gridSize = 1, gridWidth = 1) {
-    this.renderFoggedArea(context, images, selectionState, fogContext, visibleContext, team, gridSize, gridWidth);
-    this.renderNormalArea(context, images, selectionState, fogContext, visibleContext, team, gridSize, gridWidth);
-    context.globalCompositeOperation = 'source-over';
+  renderVisibilityMask(renderList, team) {
+    const radius = 4;
+    for (const entity of this.entities.values()) {
+      if (entity.team === team) {
+        renderList.addImage('halo', (entity.x - radius) * 50, (entity.y - radius) * 50, radius * 2 * 50, radius * 2 * 50);
+      }
+    }
   }
 
   renderMainMap(renderList, selectionState, gridSize = 1, gridWidth = 2) {
@@ -185,10 +182,23 @@ export default class GameMap {
     }
   }
 
-  updateFogContext(fogContext, team) {
-    fogContext.translate(25, 25);
-    this.renderVisibleMask(fogContext, team);
-    fogContext.translate(-25, -25);
+  renderMainMapFogged(renderList, gridSize = 1, gridWidth = 2) {
+    renderList.addImage('antiquewhite', -25, -25, this.width * 50, this.height * 50);
+
+    for (let x = 0; x < this.width; x += gridSize) {
+      for (let y = 0; y < this.height; y += gridSize) {
+        renderList.strokeRect('lightgray', gridWidth, (x - 0.5) * 50, (y - 0.5) * 50, gridSize * 50, gridSize * 50);
+      }
+    }
+
+    for (const entity of this.entities.values()) {
+      const type = Types[entity.type];
+      if (type.render != null && entity.type === 'island') {
+        type.render(entity, this, renderList, false, true);
+      }
+    }
+
+    renderList.addImage('quarterAlphaGray', -25, -25, this.width * 50, this.height * 50);
   }
 
   /**

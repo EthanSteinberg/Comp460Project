@@ -48,7 +48,7 @@ export function getPosition(ship) {
 
 export function getOrientation(ship) {
   if (ship.type === 'fort') {
-    return 0
+    return 0;
   }
 
   const lastPosition = ship.lastPositions[0] || null;
@@ -61,6 +61,10 @@ export function getOrientation(ship) {
 }
 
 export function render(ship, map, renderList, isSelected) {
+  if (isSelected) {
+    renderList.addImage('shipSelect', (-1 + ship.x) * 50, (-1 + ship.y) * 50, 2 * 50, 2 * 50);
+  }
+
   const name = (ship.team === '1' ? 'pirate' : 'empire') + 'Ship';
 
   renderList.translate(ship.x * 50, ship.y * 50);
@@ -77,10 +81,6 @@ export function render(ship, map, renderList, isSelected) {
     if (hardpoint != null) {
       Hardpoints.render(hardpoint, map, renderList);
     }
-  }
-
-  if (isSelected) {
-    renderList.addImage('shipSelect', (-0.5 + ship.x) * 50, (-0.5 + ship.y) * 50, 50, 50);
   }
 }
 

@@ -361,18 +361,64 @@ export default class Game {
   /**
    * Render the game. Also performs updates if necessary.
    */
-  render() {
+  render(mainProgram, visibleProgram, fogProgram, mapProgram, foggedMapProgram) {
+    visibleProgram.setup();
+
     this.renderList.reset();
 
     this.context.clearColor(0.0, 0.0, 0.0, 1.0);
     this.context.clear(this.context.COLOR_BUFFER_BIT);
 
     this.renderList.translate(25, 25);
+    this.map.renderVisibilityMask(this.renderList, this.team, true);
+    this.renderList.translate(-25, -25);
+
+    this.renderList.render(this.context);
+
+
+    fogProgram.setup();
+
+    this.renderList.reset();
+
+    this.renderList.translate(25, 25);
+    this.map.renderVisibilityMask(this.renderList, this.team);
+    this.renderList.translate(-25, -25);
+
+    this.renderList.render(this.context);
+
+
+    foggedMapProgram.setup(-this.x, -this.y);
+
+    this.renderList.reset();
+
+    this.context.clearColor(0.0, 0.0, 0.0, 1.0);
+    this.context.clear(this.context.COLOR_BUFFER_BIT);
+
+    this.renderList.translate(25, 25);
+    this.map.renderMainMapFogged(this.renderList);
+    this.renderList.translate(-25, -25);
+
+    this.renderList.render(this.context);
+
+
+    mapProgram.setup(-this.x, -this.y);
+
+    this.renderList.reset();
+
+    this.renderList.translate(25, 25);
+    this.map.renderMainMap(this.renderList, this.selectionState);
+    this.renderList.translate(-25, -25);
+
+    this.renderList.render(this.context);
+
+
+    mainProgram.setup();
+
+    this.renderList.reset();
+
+    this.renderList.translate(25, 25);
 
     this.renderList.translate(-this.x, -this.y);
-
-    // Render the map and everything on it.
-    this.map.render(this.renderList, this.selectionState);
 
     if (this.hoveredCoords && this.hoveredCoords.x < this.width - GUI_WIDTH && this.selectionState.gui == null) {
       if (this.mouseDownGamePosition != null) {
@@ -396,16 +442,40 @@ export default class Game {
       this.gui.render(this.renderList, this.map, null);
     }
 
-    if (this.gui.displayMode === 'main') {
-      this.renderList.translate(this.width - 150, 50);
-      const scale = this.map.width / 2;
-      this.renderList.scale(1 / scale);
-      this.map.renderMiniMap(this.renderList, this.x, this.y, this.width - GUI_WIDTH, this.height);
-      this.renderList.scale(scale);
-      this.renderList.translate(-this.width + 150, -50);
-    }
-
     this.renderList.render(this.context);
+
+
+    if (this.gui.displayMode === 'main') {
+      const scale = this.map.width / 2;
+
+      foggedMapProgram.setup(this.width - 150, 50, 1 / scale);
+      this.renderList.reset();
+
+      this.renderList.translate(25, 25);
+      this.map.renderMainMapFogged(this.renderList, 5, this.map.width / 3);
+      this.renderList.translate(-25, -25);
+
+      this.renderList.render(this.context);
+
+
+      mapProgram.setup(this.width - 150, 50, 1 / scale);
+      this.renderList.reset();
+
+      this.renderList.translate(25, 25);
+      this.map.renderMainMap(this.renderList, this.selectionState, 5, this.map.width / 3);
+      this.renderList.translate(-25, -25);
+
+      this.renderList.render(this.context);
+
+      mainProgram.setup();
+      this.renderList.reset();
+
+      this.renderList.translate(this.width - 150, 50);
+      this.renderList.scale(1 / scale);
+      this.map.renderMiniMapFrame(this.renderList, this.x, this.y, this.width - GUI_WIDTH, this.height);
+
+      this.renderList.render(this.context);
+    }
   }
 
   keydown(event) {

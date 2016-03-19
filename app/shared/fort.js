@@ -36,33 +36,23 @@ export function processUpdate(fort, map) {
   processIdleAttack(fort, map);
 }
 
-export function render(fort, map, context, images, isSelected) {
-  if (fort.team === '1') {
-    context.fillStyle = 'firebrick';
-  } else {
-    context.fillStyle = 'royalblue';
-  }
+export function render(fort, map, renderList, isSelected) {
+  const name = (fort.team === '1') ? 'pirateCircle' : 'imperialCircle';
 
-  context.beginPath();
-  context.arc(fort.x * 50, fort.y * 50, 25, 0, Math.PI * 2, true);
-  context.fill();
+  renderList.addImage(name, fort.x * 50 - 25, fort.y * 50 - 25);
 
-  context.fillStyle = 'red';
-  context.fillRect(fort.x * 50 - 20, fort.y * 50 + 30, 40, 5);
+  renderList.addImage('fort', (fort.x - 0.5) * 50, (fort.y - 0.5) * 50, 50, 50);
+
+  renderList.addImage('black', fort.x * 50 - 20, fort.y * 50 + 30, 40, 5);
+
+  renderList.addImage('red', fort.x * 50 - 20, fort.y * 50 + 30, 40, 5);
 
   const healthpercent = fort.health / 200;
 
-  context.fillStyle = 'green';
-  context.fillRect(fort.x * 50 - 20, fort.y * 50 + 30, 40 * healthpercent, 5);
-
-  context.strokeStyle = 'black';
-  context.strokeRect(fort.x * 50 - 20, fort.y * 50 + 30, 40, 5);
-
-  context.drawImage(images.fort, (fort.x - 0.5) * 50, (fort.y - 0.5) * 50, 50, 50);
+  renderList.addImage('green', fort.x * 50 - 20, fort.y * 50 + 30, 40 * healthpercent, 5);
 
   if (isSelected) {
-    context.strokeStyle = 'cyan';
-    context.strokeRect(
+    renderList.addImage('cyan',
       (this.x - 0.5) * 50,
       (this.y - 0.5) * 50,
       50,

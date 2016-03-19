@@ -31,7 +31,7 @@ export function render(template, map, renderList) {
       renderList.addImage('mine2', (template.x - 0.5) * 50, (template.y - 0.5) * 50, 50, 50);
       break;
     case 'fort':
-      context.drawImage(images.fort, (template.x - 0.5) * 50, (template.y - 0.5) * 50, 50, 50);
+      renderList.addImage('fort', (template.x - 0.5) * 50, (template.y - 0.5) * 50, 50, 50);
       break;
 
     default:

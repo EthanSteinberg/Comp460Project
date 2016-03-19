@@ -190,7 +190,7 @@ export default class RenderList {
   }
 
   addImage(name, x, y, width, height, subX, subY, subWidth, subHeight) {
-    const info = this.pixelJson[name];
+    const info = this.pixelJson[name] || { x: 0, y: 0, sizex: 1024 * 4, sizey: 1024 * 4 };
 
     if (info == null) {
       console.error('Unable to find ', name);

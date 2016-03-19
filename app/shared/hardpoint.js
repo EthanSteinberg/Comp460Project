@@ -40,14 +40,6 @@ export function render(hardpoint, map, renderList) {
   const { x, y } = getPosition(hardpoint, map);
 
   renderList.addImage('cannon', x * 50 - 20 / 4, y * 50 - 25 / 4, 10, 10);
-
-  renderList.addImage('black', x * 50 - 12, y * 50 + 3, 24, 9);
-
-  renderList.addImage('red', x * 50 - 10, y * 50 + 5, 20, 5);
-
-  const healthpercent = hardpoint.health / hardpoints[hardpoint.gunType].health;
-
-  renderList.addImage('green', x * 50 - 10, y * 50 + 5, 20 * healthpercent, 5);
 }
 
 export function renderTemplate(hardpoint, slotnum, x, y, renderList) {

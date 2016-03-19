@@ -40,11 +40,14 @@ export default class StartScreen {
     this.renderList = new RenderList(this.images.pixelJson);
   }
 
-  render() {
-    this.renderList.reset();
+  render(mainProgram) {
+    mainProgram.setup();
 
     this.context.clearColor(0.0, 0.0, 0.0, 1.0);
     this.context.clear(this.context.COLOR_BUFFER_BIT);
+
+    this.renderList.reset();
+
 
     if (this.mode === 'splash') {
       this.renderSplash();
@@ -62,23 +65,17 @@ export default class StartScreen {
   renderSetup() {
     this.renderList.addImage('linen', 0, 0, this.width, this.height);
 
-    // this.context.translate(this.width - 520, 50);
     this.renderList.translate(this.width - 520, 50);
     const map = createMap(this.mapNum);
     const scale = map.width / 5;
-    // this.context.scale(1 / scale, 1 / scale);
     this.renderList.scale(1 / scale);
-    // this.context.translate(25, 25);
     this.renderList.translate(25, 25);
 
     map.renderStartScreenMiniMap(this.renderList);
 
-    // this.context.translate(-25, -25);
     this.renderList.translate(-25, -25);
-    // this.context.scale(scale, scale);
     this.renderList.scale(scale);
 
-    // this.context.translate(-this.width + 520, -50);
     this.renderList.translate(-this.width + 520, -50);
 
     for (const button of this.buttons) {
