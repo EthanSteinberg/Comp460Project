@@ -26,6 +26,12 @@ class Main {
     this.mode = 'start';
 
     this.canvas = document.getElementById('canvas');
+
+    const loading = document.getElementById('loadingScreen');
+    loading.style.display = 'none';
+
+    this.canvas.style.display = 'inline';
+
     this.context = this.canvas.getContext('webgl');
 
     const fragDepth = this.context.getExtension('EXT_frag_depth');

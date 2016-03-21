@@ -119,13 +119,13 @@ export function attackTarget(ship, target) {
   };
 }
 
-function getAvoidencVector(sourceVector, targetVector, factor) {
+function getAvoidencVector(sourceVector, targetVector) {
   const xDistance = sourceVector.x - targetVector.x;
   const yDistance = sourceVector.y - targetVector.y;
   const distanceSquared = xDistance * xDistance + yDistance * yDistance;
   const distance = Math.sqrt(distanceSquared);
 
-  const magnitude = factor / (distance * distance * distance * distance);
+  const magnitude = 1.0 / (distance * distance * distance * distance);
 
   return {
     x: xDistance * magnitude / distance,
@@ -143,7 +143,7 @@ function getAvoidencVectors(ship, map) {
 
   for (const island of map.getIslands()) {
     for (const [x, y] of island.coordinates) {
-      const avoid = getAvoidencVector(pos, { x, y }, 0.05);
+      const avoid = getAvoidencVector(pos, { x, y });
       result.x += avoid.x;
       result.y += avoid.y;
     }
@@ -154,7 +154,7 @@ function getAvoidencVectors(ship, map) {
       continue;
     }
 
-    const avoid = getAvoidencVector(pos, { x: otherShip.x, y: otherShip.y }, 0.05);
+    const avoid = getAvoidencVector(pos, { x: otherShip.x, y: otherShip.y });
     result.x += avoid.x;
     result.y += avoid.y;
   }
@@ -193,15 +193,15 @@ function performMove(ship, map) {
   const scale = Math.min(shipMoveSpeed, getDistanceToTarget(ship, currentMove));
 
   const delta = {
-    x: (currentMove.x - ship.x) / getDistanceToTarget(ship, currentMove) * scale,
-    y: (currentMove.y - ship.y) / getDistanceToTarget(ship, currentMove) * scale,
+    x: (currentMove.x - ship.x) / getDistanceToTarget(ship, currentMove),
+    y: (currentMove.y - ship.y) / getDistanceToTarget(ship, currentMove),
   };
 
   const avoid = getAvoidencVectors(ship, map);
 
   const finalVector = {
-    x: avoid.x + delta.x,
-    y: avoid.y + delta.y,
+    x: avoid.x * scale + delta.x * scale,
+    y: avoid.y * scale + delta.y * scale,
   };
 
   const finalDistance = Math.sqrt(finalVector.x * finalVector.x + finalVector.y * finalVector.y);
