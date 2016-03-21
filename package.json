@@ -4,7 +4,7 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "repack": "PixelPacker -o ./static/pixels/pixelPacker ./static/*.png && convert ./static/pixels/pixelPacker.png -write mpr:temp -background black -alpha Remove mpr:temp -compose Copy_Opacity -composite ./static/pixels/pixelPacker.png"
+    "repack": "./PixelPacker -o ./static/pixels/pixelPacker ./static/*.png && convert ./static/pixels/pixelPacker.png -write mpr:temp -background black -alpha Remove mpr:temp -compose Copy_Opacity -composite ./static/pixels/pixelPacker.png"
   },
   "repository": {
     "type": "git",
