@@ -45,6 +45,11 @@ export default class Game {
     this.pressedKeys = new Set();
 
     this.renderList = new RenderList(this.images.pixelJson);
+
+    this.controlGroups = {};
+    for (let i = 0; i <= 9; i ++) {
+      this.controlGroups[i] = [];
+    }
   }
 
   centerAround(x, y) {
@@ -489,6 +494,20 @@ export default class Game {
   }
 
   keydown(event) {
+    if (event.keyCode >= 48 && event.keyCode <= 57) {
+      // A number key has been pressed I need to bind this to a control group, or select that group.
+
+      if (this.pressedKeys.has(17)) {
+        // Control key so create a group
+        this.controlGroups[event.keyCode - 48] = this.selectionState.map;
+        event.preventDefault();
+      } else {
+        // No control key, so switch to group
+        this.updateSelectionState({ ...this.selectionState, map: this.controlGroups[event.keyCode - 48] });
+      }
+    }
+    console.log('a', event.keyCode);
+
     this.pressedKeys.add(event.keyCode);
   }
 
