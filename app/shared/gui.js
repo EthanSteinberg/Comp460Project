@@ -20,6 +20,7 @@ import ShipSkeleton from './guibuttons/shipskeleton';
 import Gunslot from './guibuttons/gunslot';
 import Hullslot from './guibuttons/hullslot';
 import Save from './guibuttons/save';
+import Recycle from './guibuttons/recycle';
 
 export const GUI_WIDTH = 200;
 
@@ -228,23 +229,24 @@ export default class Gui {
   getUnitButtons() {
     const result = [];
     if (this.getSelectedMapItems().length !== 0 && this.getSelectedMapItems().every(entity => entity.type === 'shipyard')) {
-      result.push(new Shiptemplate('shiptemplate', this.x + 20, 250, 50, 50, 0,
+      result.push(new Shiptemplate('shiptemplate', this.x + 20, this.y + 325, 50, 50, 0,
         this.getSelectedMapItems()[0], this.templates[0]));
-      result.push(new Shiptemplate('shiptemplate', this.x + 75, 250, 50, 50, 1,
+      result.push(new Shiptemplate('shiptemplate', this.x + 75, this.y + 325, 50, 50, 1,
         this.getSelectedMapItems()[0], this.templates[1]));
-      result.push(new Shiptemplate('shiptemplate', this.x + 130, 250, 50, 50, 2,
+      result.push(new Shiptemplate('shiptemplate', this.x + 130, this.y + 325, 50, 50, 2,
         this.getSelectedMapItems()[0], this.templates[2]));
     } else {
-      result.push(new Shiptemplate('shiptemplateGrayed', this.x + 20, 250, 50, 50, 0, null, this.templates[0]));
-      result.push(new Shiptemplate('shiptemplateGrayed', this.x + 75, 250, 50, 50, 1, null, this.templates[1]));
-      result.push(new Shiptemplate('shiptemplateGrayed', this.x + 130, 250, 50, 50, 2, null, this.templates[2]));
+      result.push(new Shiptemplate('shiptemplateGrayed', this.x + 20, this.y + 325, 50, 50, 0, null, this.templates[0]));
+      result.push(new Shiptemplate('shiptemplateGrayed', this.x + 75, this.y + 325, 50, 50, 1, null, this.templates[1]));
+      result.push(new Shiptemplate('shiptemplateGrayed', this.x + 130, this.y + 325, 50, 50, 2, null, this.templates[2]));
     }
 
     result.push(new Shipyard('shipyard', this.x + 25, this.y + 175, 50, 50));
     result.push(new Mine('mine', this.x + 75, this.y + 175, 50, 50));
     result.push(new Fort('fort', this.x + 130, this.y + 175, 50, 50));
+    result.push(new Recycle('recycle', this.x + 75, this.y + 250, 50, 50));
 
-    result.push(new Shipbuilder('shipbuilder', this.x + 50, 350, 102, 26));
+    result.push(new Shipbuilder('shipbuilder', this.x + 50, 400, 102, 26));
     return result;
   }
 

@@ -47,6 +47,10 @@ MakeBuilding: {
 	y: y position of the building location
 }
 
+RecycleBuilding: {
+	buildingId: the id of the building to recycle
+}
+
 MakeShip {
 	shipyardId: the id of the shipyard to build from
 	templateNumber: the number for the template

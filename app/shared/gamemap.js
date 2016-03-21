@@ -206,7 +206,7 @@ export default class GameMap {
         if (distance <= 0.5) {
           return entity;
         }
-      } else if (entity.type === 'shipyard' || entity.type === 'mine' || entity.type === 'fort') {
+      } else if (entity.type === 'shipyard' || entity.type === 'mine' || entity.type === 'fort' || entity.type === 'buildingTemplate') {
         if (Math.round(x) === entity.x && Math.round(y) === entity.y) {
           return entity;
         }

@@ -269,6 +269,7 @@ export default class Game {
         case 'mine':
         case 'fort':
         case 'shipyard':
+        case 'recycle':
           this.updateSelectionState({ ...this.selectionState, gui: { type: item.getType(), templateNum: item.getTemplateNum() } });
           break;
 
@@ -328,6 +329,11 @@ export default class Game {
         const buildingType = this.selectionState.gui.type;
         sendMessage({ type: 'MakeBuilding', building: buildingType, x: mouseRoundedX, y: mouseRoundedY });
         this.updateSelectionState({ ...this.selectionState, gui: null });
+      } else if (this.selectionState.gui.type === 'recycle' && item != null) {
+        if (item.type === 'mine' || item.type === 'shipyard' || item.type === 'fort' || item.type === 'buildingTemplate') {
+          sendMessage({ type: 'RecycleBuilding', buildingId: item.id });
+          this.updateSelectionState({ ...this.selectionState, gui: null });
+        }
       }
     } else if (this.isDragAction(mouseX, mouseY)) {
       // Perform a drag select.

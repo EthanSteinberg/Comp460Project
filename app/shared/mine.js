@@ -29,7 +29,7 @@ export function render(mine, map, renderList, isSelected) {
 
   renderList.addImage('mine2', (mine.x - 0.5) * 50, (mine.y - 0.5) * 50, 50, 50);
 
-  renderList.addImage('black', mine.x * 50 - 20, mine.y * 50 + 30, 40, 5);
+  renderList.addImage('black', mine.x * 50 - 22, mine.y * 50 + 28, 44, 9);
 
   renderList.addImage('red', mine.x * 50 - 20, mine.y * 50 + 30, 40, 5);
 

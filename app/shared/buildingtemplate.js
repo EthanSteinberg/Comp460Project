@@ -41,7 +41,7 @@ export function render(template, map, renderList) {
   const angle = (template.progressTowardsBuild) / buildingConstants[template.buildingType].buildTime * Math.PI * 2;
   renderList.addCircleCutout('quarterAlphaGray', angle, (template.x - 0.5) * 50, (template.y - 0.5) * 50, 50, 50);
 
-  renderList.addImage('black', template.x * 50 - 20, template.y * 50 + 30, 40, 5);
+  renderList.addImage('black', template.x * 50 - 22, template.y * 50 + 28, 44, 9);
 
   renderList.addImage('red', template.x * 50 - 20, template.y * 50 + 30, 40, 5);
 

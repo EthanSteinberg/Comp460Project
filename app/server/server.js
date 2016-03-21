@@ -3,6 +3,7 @@ import buildingConstants from '../shared/buildingconstants';
 import * as Ships from '../shared/ship';
 import * as BuildingTemplates from '../shared/buildingtemplate';
 import * as Shipyards from '../shared/shipyard';
+import Types from '../shared/types';
 import { getStats } from '../shared/template';
 
 import { createMap } from '../shared/maps';
@@ -211,6 +212,27 @@ function makeShipHandler({ shipyardId, template, templateNumber }, playerTeam) {
   Shipyards.addTemplateToQueue(shipyard, templateNumber, template);
 }
 
+function recycleBuildingHandler({ buildingId }, playerTeam) {
+  const building = map.getEntity(buildingId);
+
+  if (building == null || building.team !== playerTeam) {
+    console.error('invalid recycle');
+    return;
+  }
+
+  let type;
+
+  if (building.type === 'buildingTemplate') {
+    type = building.buildingType;
+  } else {
+    type = building.type;
+  }
+
+  map.getEntity(playerTeam).coins += buildingConstants[type].cost;
+
+  Types[building.type].remove(building, map);
+}
+
 function attackShipHandler({ id, targetId }, playerTeam) {
   const sourceShip = map.getEntity(id);
   const targetShip = map.getEntity(targetId);
@@ -274,6 +296,7 @@ const messageHandlers = {
   'UpdateMode': updateModeHandler,
   'SetReadyState': updateReadyState,
   'UpdateMap': updateMap,
+  'RecycleBuilding': recycleBuildingHandler,
 };
 
 let nextTeam = 0;

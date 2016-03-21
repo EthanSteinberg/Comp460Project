@@ -43,7 +43,7 @@ export function render(fort, map, renderList, isSelected) {
 
   renderList.addImage('fort', (fort.x - 0.5) * 50, (fort.y - 0.5) * 50, 50, 50);
 
-  renderList.addImage('black', fort.x * 50 - 20, fort.y * 50 + 30, 40, 5);
+  renderList.addImage('black', fort.x * 50 - 22, fort.y * 50 + 28, 44, 9);
 
   renderList.addImage('red', fort.x * 50 - 20, fort.y * 50 + 30, 40, 5);
 

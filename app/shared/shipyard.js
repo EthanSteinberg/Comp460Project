@@ -33,7 +33,7 @@ export function render(shipyard, map, renderList, isSelected) {
 
   renderList.addImage('shipyard2', (shipyard.x - 0.5) * 50, (shipyard.y - 0.5) * 50, 50, 50);
 
-  renderList.addImage('black', shipyard.x * 50 - 20, shipyard.y * 50 + 30, 40, 5);
+  renderList.addImage('black', shipyard.x * 50 - 22, shipyard.y * 50 + 28, 44, 9);
 
   renderList.addImage('red', shipyard.x * 50 - 20, shipyard.y * 50 + 30, 40, 5);
 
