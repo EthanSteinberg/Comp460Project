@@ -339,12 +339,27 @@ export default class Game {
       // Perform a drag select.
       const hoverGameCoords = this.getMouseGamePosition(this.hoveredCoords.x, this.hoveredCoords.y);
 
-      const items = this.map.getItemsWithinRectangle(this.mouseDownGamePosition.mouseX, this.mouseDownGamePosition.mouseY, hoverGameCoords.mouseX, hoverGameCoords.mouseY);
+      let items = this.map.getItemsWithinRectangle(this.mouseDownGamePosition.mouseX, this.mouseDownGamePosition.mouseY, hoverGameCoords.mouseX, hoverGameCoords.mouseY);
+
+      if (this.pressedKeys.has(16)) {
+        // Shift key, so concat the items
+        items = this.selectionState.map.concat([item.id]);
+      } else if (this.pressedKeys.has(17)) {
+        // Control key, so filter the current selection
+        items = this.selectionState.map.filter((oldItem) => items.indexOf(oldItem) === -1);
+      }
 
       this.updateSelectionState({ ...this.selectionState, map: items });
     } else if (item != null) {
-      // Select
-      this.updateSelectionState({ ...this.selectionState, map: [item.id] });
+      let items = [item.id];
+      if (this.pressedKeys.has(16)) {
+        // Shift key, so concat the items
+        items = this.selectionState.map.concat(items);
+      } else if (this.pressedKeys.has(17)) {
+        // Control key, so filter the current selection
+        items = this.selectionState.map.filter((oldItem) => oldItem !== item.id);
+      }
+      this.updateSelectionState({ ...this.selectionState, map: items });
     } else {
       // Deselect
       this.updateSelectionState({ ...this.selectionState, map: [] });

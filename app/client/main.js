@@ -2,7 +2,6 @@ import loadAssets from './assets';
 import { createSource } from './audio';
 
 const MILLISECONDS_PER_LOGIC_UPDATE = 5;
-const MILLISECONDS_PER_RENDER_UPDATE = 25;
 
 import Game from './game';
 import StartScreen from './startscreen';
@@ -104,6 +103,8 @@ class Main {
     };
 
     this.setupGL();
+
+    this._isPlayingSound = {};
 
     this._startRenderLoop();
   }
@@ -739,7 +740,15 @@ class Main {
     if (!(soundId in this.images)) {
       console.error(soundId, ' not in this.images');
     }
-    createSource(this.images[soundId]).start(0);
+
+    if (!(soundId in this._isPlayingSound)) {
+      const sound = createSource(this.images[soundId]);
+      this._isPlayingSound[soundId] = true;
+      sound.onended = () => {
+        delete this._isPlayingSound[soundId];
+      };
+      sound.start(0);
+    }
   }
 
   _startGame({ initialState, team }) {
