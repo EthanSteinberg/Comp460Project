@@ -161,9 +161,9 @@ class Main {
     const map = new GameMap(initialState);
 
     this.visibleProgram = createVisibilityProgram(this.context, this.width, this.height, this.images.pixelJson, map.width * 50, map.height * 50);
-    this.fogProgram = createFogProgram(this.context, this.width, this.height, this.images.pixelJson, map.width * 50, map.height * 50);
     this.mapProgram = createMapProgram(this.context, this.width, this.height, this.images.pixelJson, map.width * 50, map.height * 50);
     this.foggedMapProgram = createFoggedMapProgram(this.context, this.width, this.height, this.images.pixelJson, map.width * 50, map.height * 50);
+    this.fogProgram = createFogProgram(this.context, this.width, this.height, this.images.pixelJson, map.width * 50, map.height * 50);
 
     this.game = new Game(this.images, map, team);
     this.team = team;

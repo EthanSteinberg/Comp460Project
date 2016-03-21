@@ -42,6 +42,8 @@ function createAndCompileProgram(context, vertexSource, fragmentSource) {
   const validateStatus = context.getProgramParameter(program, context.VALIDATE_STATUS);
   if (!validateStatus) {
     console.log('bad program');
+    console.log('Info Log: ', context.getProgramInfoLog(program))
+    console.log('fragmentSource: ', fragmentSource)
     console.log('vertex', context.getShaderInfoLog(vertex));
     console.log('fragment', context.getShaderInfoLog(fragment));
     return null;
@@ -471,6 +473,15 @@ export function createFogProgram(context, width, height, pixelJson, mapWidth, ma
   context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
   context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
 
+  // Dummy color output because of Apple
+  const outputTextureThree = context.createTexture();
+  context.activeTexture(context.TEXTURE3);
+  context.bindTexture(context.TEXTURE_2D, outputTextureThree);
+  context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, nextPowerOfTwo(mapWidth), nextPowerOfTwo(mapHeight), 0, context.RGBA, context.UNSIGNED_BYTE, null);
+  context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
+  context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
+
+
   const frameBuffer = context.createFramebuffer();
   context.bindFramebuffer(context.FRAMEBUFFER, frameBuffer);
 
@@ -479,6 +490,14 @@ export function createFogProgram(context, width, height, pixelJson, mapWidth, ma
     context.DEPTH_ATTACHMENT,
     context.TEXTURE_2D,
     outputTexture,
+    0,
+  );
+
+  context.framebufferTexture2D(
+    context.FRAMEBUFFER,
+    context.COLOR_ATTACHMENT0,
+    context.TEXTURE_2D,
+    outputTextureThree,
     0,
   );
 
