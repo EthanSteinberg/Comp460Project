@@ -44,19 +44,6 @@ export default class Game {
 
     this.pressedKeys = new Set();
 
-
-    // const fogCanvas = document.createElement('canvas');
-    // fogCanvas.width = map.width * 50;
-    // fogCanvas.height = map.height * 50;
-
-    // const visibleCanvas = document.createElement('canvas');
-    // visibleCanvas.width = map.width * 50;
-    // visibleCanvas.height = map.height * 50;
-
-    // // Get the drawing context
-    // this.fogContext = fogCanvas.getContext('2d');
-    // this.visibleContext = visibleCanvas.getContext('2d');
-
     this.renderList = new RenderList(this.images.pixelJson);
   }
 
@@ -257,7 +244,7 @@ export default class Game {
         this.centerAround(x, y);
         return;
       }
-      
+
       if (item == null) {
         return;
       }

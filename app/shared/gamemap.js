@@ -122,13 +122,7 @@ export default class GameMap {
     const gridSize = 5;
     const gridWidth = this.width / 3;
 
-    renderList.addImage('antiquewhite', -25, -25, this.width * 50, this.height * 50);
-
-    for (let x = 0; x < this.width; x += gridSize) {
-      for (let y = 0; y < this.height; y += gridSize) {
-        renderList.strokeRect('lightgray', gridWidth, (x - 0.5) * 50, (y - 0.5) * 50, gridSize * 50, gridSize * 50);
-      }
-    }
+    this.renderGrid(renderList, gridSize, gridWidth);
 
     for (const entity of this.entities.values()) {
       const type = Types[entity.type];
@@ -154,14 +148,20 @@ export default class GameMap {
     }
   }
 
-  renderMainMap(renderList, selectionState, gridSize = 1, gridWidth = 2) {
+  renderGrid(renderList, gridSize, gridWidth) {
     renderList.addImage('antiquewhite', -25, -25, this.width * 50, this.height * 50);
 
-    for (let x = 0; x < this.width; x += gridSize) {
-      for (let y = 0; y < this.height; y += gridSize) {
-        renderList.strokeRect('lightgray', gridWidth, (x - 0.5) * 50, (y - 0.5) * 50, gridSize * 50, gridSize * 50);
-      }
+    for (let x = 0; x <= this.width; x += gridSize) {
+      renderList.addImage('lightgray', (x - 0.5) * 50 - gridWidth / 2, -25, gridWidth, this.height * 50);
     }
+
+    for (let y = 0; y <= this.height; y += gridSize) {
+      renderList.addImage('lightgray', -25, (y - 0.5) * 50 - gridWidth / 2, this.width * 50, gridWidth);
+    }
+  }
+
+  renderMainMap(renderList, selectionState, gridSize = 1, gridWidth = 2) {
+    this.renderGrid(renderList, gridSize, gridWidth);
 
     for (const entity of this.entities.values()) {
       const isSelected = selectionState.map.indexOf(entity.id) !== -1;
@@ -183,13 +183,7 @@ export default class GameMap {
   }
 
   renderMainMapFogged(renderList, gridSize = 1, gridWidth = 2) {
-    renderList.addImage('antiquewhite', -25, -25, this.width * 50, this.height * 50);
-
-    for (let x = 0; x < this.width; x += gridSize) {
-      for (let y = 0; y < this.height; y += gridSize) {
-        renderList.strokeRect('lightgray', gridWidth, (x - 0.5) * 50, (y - 0.5) * 50, gridSize * 50, gridSize * 50);
-      }
-    }
+    this.renderGrid(renderList, gridSize, gridWidth);
 
     for (const entity of this.entities.values()) {
       const type = Types[entity.type];
