@@ -731,7 +731,7 @@ class Main {
   }
 
   _startRenderLoop() {
-    setInterval(this.render.bind(this), MILLISECONDS_PER_RENDER_UPDATE);
+    window.requestAnimationFrame(this.render.bind(this));
     this.lastUpdate = performance.now();
   }
 
@@ -816,6 +816,8 @@ class Main {
     } else if (this.mode === 'end') {
       this.endscreen.render(this.mainProgram);
     }
+
+    window.requestAnimationFrame(this.render.bind(this));
   }
 }
 

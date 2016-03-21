@@ -459,6 +459,8 @@ export default class Game {
 
       this.renderList.translate(this.width - 150, 50);
       this.renderList.scale(1 / scale);
+
+      this.renderList.translate(25, 25);
       this.map.renderMiniMapFrame(this.renderList, this.x, this.y, this.width - GUI_WIDTH, this.height);
 
       this.renderList.render(this.context);
