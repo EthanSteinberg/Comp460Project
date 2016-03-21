@@ -50,9 +50,21 @@ export const shell = {
   range: 3.2,
 };
 
+export const bombard = {
+  name: 'Bombard',
+  description: 'Massive damage. Dreadnought only.',
+  health: 100,
+  damage: 1000,
+  speed: 0,
+  weight: -20,
+  cost: 500,
+  tcost: 20,
+  range: 3.2,
+};
+
 export const gunboat = {
   name: 'Gunboat',
-  description: 'Small fast ship.',
+  description: 'Small, fast ship.',
   health: 100,
   damage: 0,
   speed: 20,
@@ -74,7 +86,7 @@ export const frigate = {
 
 export const galleon = {
   name: 'Galleon',
-  description: 'The pearl of the navy.',
+  description: 'Strong but slow.',
   health: 300,
   damage: 0,
   speed: 10,
@@ -83,17 +95,30 @@ export const galleon = {
   tcost: 180,
 };
 
+export const dreadnought = {
+  name: 'Dreadnought',
+  description: 'Nearly invincible.',
+  health: 2000,
+  damage: 0,
+  speed: 10,
+  weight: 100,
+  cost: 1000,
+  tcost: 300,
+};
+
 export const hardpoints = {
   roundshot,
   chainshot,
   grapeshot,
   shell,
+  bombard,
 };
 
 export const hulls = {
   gunboat,
   frigate,
   galleon,
+  dreadnought,
 };
 
 const empty = {

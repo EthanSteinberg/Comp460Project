@@ -1,6 +1,6 @@
 import buildingConstants from './buildingconstants';
-import { roundshot, grapeshot, chainshot, shell,
-  gunboat, frigate, galleon, getStats } from './template';
+import { roundshot, grapeshot, chainshot, shell, bombard,
+  gunboat, frigate, galleon, dreadnought, getStats } from './template';
 
 import Shipyard from './guibuttons/shipyard';
 import Mine from './guibuttons/mine';
@@ -10,12 +10,14 @@ import Shipbuilder from './guibuttons/shipbuilder';
 import Roundshot from './guibuttons/roundshot';
 import Grapeshot from './guibuttons/grapeshot';
 import Shell from './guibuttons/shell';
+import Bombard from './guibuttons/bombard';
 import Cancelshot from './guibuttons/cancelshot';
 import Exit from './guibuttons/exit';
 import Template from './guibuttons/template';
 import Gunboat from './guibuttons/gunboat';
 import Frigate from './guibuttons/frigate';
 import Galleon from './guibuttons/galleon';
+import Dreadnought from './guibuttons/dreadnought';
 import ShipSkeleton from './guibuttons/shipskeleton';
 import Gunslot from './guibuttons/gunslot';
 import Hullslot from './guibuttons/hullslot';
@@ -128,6 +130,10 @@ export default class Gui {
           case 'galleonSelected':
             details = galleon;
             break;
+          case 'dreadnought':
+          case 'dreadnoughtSelected':
+            details = dreadnought;
+            break;
           case 'roundshot':
             details = roundshot;
             break;
@@ -139,6 +145,9 @@ export default class Gui {
             break;
           case 'shell':
             details = shell;
+            break;
+          case 'bombard':
+            details = bombard;
             break;
           default:
             details = null;
@@ -271,10 +280,15 @@ export default class Gui {
         result.push(new Grapeshot('grapeshot', this.selectedSlot.x + 6, this.selectedSlot.y - 50, 40, 40));
         result.push(new Shell('shell', this.selectedSlot.x + 60, this.selectedSlot.y + 5, 40, 40));
         result.push(new Cancelshot('cancelshot', this.selectedSlot.x + 6, this.selectedSlot.y + 60, 40, 40));
+
+        // if (this.workingTemplate.hull == 'dreadnought') {
+        //   result.push(new Bombard('bombard', this.selectedSlot.x + 60, this.selectedSlot.y + 120, 40, 40));
+        // }
       } else if (this.selectedSlot.getType() === 'hullslot') {
         result.push(new Gunboat('gunboat', this.selectedSlot.x - 60, this.selectedSlot.y + 5, 40, 40));
         result.push(new Frigate('frigate', this.selectedSlot.x + 5, this.selectedSlot.y - 45, 40, 40));
         result.push(new Galleon('galleon', this.selectedSlot.x + 60, this.selectedSlot.y + 5, 40, 40));
+        // result.push(new Dreadnought('dreadnought', this.selectedSlot.x + 5, this.selectedSlot.y + 60, 40, 40));      
       }
     }
 
