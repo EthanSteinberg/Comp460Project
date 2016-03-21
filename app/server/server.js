@@ -228,7 +228,7 @@ function recycleBuildingHandler({ buildingId }, playerTeam) {
     type = building.type;
   }
 
-  map.getEntity(playerTeam).coins += buildingConstants[type].cost;
+  map.getEntity(playerTeam).coins += buildingConstants[type].coinCost;
 
   Types[building.type].remove(building, map);
 }
