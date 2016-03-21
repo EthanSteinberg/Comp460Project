@@ -2,7 +2,7 @@ import loadAssets from './assets';
 import { createSource } from './audio';
 
 const MILLISECONDS_PER_LOGIC_UPDATE = 5;
-const MILLISECONDS_PER_RENDER_UPDATE = 15;
+const MILLISECONDS_PER_RENDER_UPDATE = 25;
 
 import Game from './game';
 import StartScreen from './startscreen';
