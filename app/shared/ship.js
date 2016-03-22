@@ -159,6 +159,22 @@ function getAvoidencVectors(ship, map) {
     }
   }
 
+  for (let x = 0; x < map.width; x++) {
+    for (const y of [-1, map.height]) {
+      const avoid = getAvoidencVector(pos, { x, y });
+      result.x += avoid.x;
+      result.y += avoid.y;
+    }
+  }
+
+  for (const x of [-1, map.width]) {
+    for (let y = 0; y < map.height; y++) {
+      const avoid = getAvoidencVector(pos, { x, y });
+      result.x += avoid.x;
+      result.y += avoid.y;
+    }
+  }
+
   for (const otherShip of map.getShips()) {
     if (otherShip.id === ship.id) {
       continue;
