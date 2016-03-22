@@ -1,4 +1,6 @@
 const shipMoveSpeedFactor = 0.05 / 20;
+const defenseTicksDelay = 20;
+
 
 import { hulls, hardpoints } from './template';
 import * as Hardpoints from './hardpoint';
@@ -20,6 +22,12 @@ export function createShipAndHardpoints(map, x, y, template, team) {
     return Hardpoints.createHardpoint(map, shipId, index, hardpoint, team);
   });
 
+  const lastSeen = [];
+
+  for (let i = 0; i < defenseTicksDelay; i++) {
+    lastSeen.push([]);
+  }
+
   const ship = {
     x,
     y,
@@ -31,6 +39,8 @@ export function createShipAndHardpoints(map, x, y, template, team) {
     hardpoints: myHardpoints,
 
     lastPositions: [],
+
+    lastSeen,
 
     mode: {
       type: 'IDLE',
@@ -246,7 +256,7 @@ function getActualTarget(ship, map, target) {
  * If there are cannons which can fire, but need to be closer, returns true.
  * Returns false if there is no point moving closer.
  */
-function shootAt(ship, map, entity, target, rangePenalty) {
+function shootAt(ship, map, entity, target) {
   let shouldMoveCloser = false;
 
   const targetLocation = getPosition(entity, map);
@@ -254,7 +264,7 @@ function shootAt(ship, map, entity, target, rangePenalty) {
   for (const hardpointId of ship.hardpoints) {
     const hardpoint = map.getEntity(hardpointId);
     if (hardpoint != null && hardpoint.timeTillNextFire === 0) {
-      if (distance < hardpoints[hardpoint.gunType].range - rangePenalty) {
+      if (distance < hardpoints[hardpoint.gunType].range) {
         Hardpoints.fire(hardpoint, map, target);
       } else {
         shouldMoveCloser = true;
@@ -266,17 +276,51 @@ function shootAt(ship, map, entity, target, rangePenalty) {
 }
 
 /**
- * Shoot at any enemy ships in range with the current attack pattern
+ * Is the target in range of at least one gun?
  */
-function processIdleAttack(ship, map) {
-  for (const entity of map.entities.values()) {
-    if (entity.type === 'ship' && entity.team !== ship.team) {
-      const actualTarget = getActualTarget(ship, map, entity);
-      if (actualTarget != null) {
-        shootAt(ship, map, entity, actualTarget, 0.5);
+function isInRange(ship, map, entity) {
+  const targetLocation = getPosition(entity, map);
+  const distance = getDistanceToTarget(ship, targetLocation);
+  for (const hardpointId of ship.hardpoints) {
+    const hardpoint = map.getEntity(hardpointId);
+    if (hardpoint != null && hardpoint.timeTillNextFire === 0) {
+      if (distance < hardpoints[hardpoint.gunType].range) {
+        return true;
       }
     }
   }
+
+  return false;
+}
+
+/**
+ * Shoot at any enemy ships in range with the current attack pattern
+ */
+function processIdleAttack(ship, map) {
+  const currentSeen = ship.lastSeen[0];
+  for (const entityId of currentSeen) {
+    const entity = map.getEntity(entityId);
+    const actualTarget = getActualTarget(ship, map, entity);
+    if (actualTarget != null) {
+      shootAt(ship, map, entity, actualTarget);
+    }
+  }
+}
+
+/**
+ * Update the simple last seen thingy
+ */
+function updateLastSeen(ship, map) {
+  ship.lastSeen.shift();
+  const temp = [];
+  for (const entity of map.entities.values()) {
+    if (entity.type === 'ship' && entity.team !== ship.team) {
+      if (isInRange(ship, map, entity)) {
+        temp.push(entity.id);
+      }
+    }
+  }
+  ship.lastSeen.push(temp);
 }
 
 /**
@@ -337,6 +381,8 @@ export function processUpdate(ship, map) {
     default:
       console.error('Unexcepted type ' + ship.mode.type);
   }
+
+  updateLastSeen(ship, map);
 }
 
 export function getHealth(ship) {
