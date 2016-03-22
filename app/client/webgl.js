@@ -42,8 +42,8 @@ function createAndCompileProgram(context, vertexSource, fragmentSource) {
   const validateStatus = context.getProgramParameter(program, context.VALIDATE_STATUS);
   if (!validateStatus) {
     console.log('bad program');
-    console.log('Info Log: ', context.getProgramInfoLog(program))
-    console.log('fragmentSource: ', fragmentSource)
+    console.log('Info Log: ', context.getProgramInfoLog(program));
+    console.log('fragmentSource: ', fragmentSource);
     console.log('vertex', context.getShaderInfoLog(vertex));
     console.log('fragment', context.getShaderInfoLog(fragment));
     return null;
@@ -402,7 +402,7 @@ export function createVisibilityProgram(context, width, height, pixelJson, mapWi
     setup() {
       context.disable(context.DEPTH_TEST);
       context.bindFramebuffer(context.FRAMEBUFFER, frameBuffer);
-      context.viewport(0, 0, mapWidth, mapHeight);
+      context.viewport(0, 0, nextPowerOfTwo(mapWidth), nextPowerOfTwo(mapHeight));
       context.useProgram(program);
 
       bindAttributes(context, program);
@@ -506,7 +506,7 @@ export function createFogProgram(context, width, height, pixelJson, mapWidth, ma
     setup() {
       context.enable(context.DEPTH_TEST);
       context.bindFramebuffer(context.FRAMEBUFFER, frameBuffer);
-      context.viewport(0, 0, mapWidth, mapHeight);
+      context.viewport(0, 0, nextPowerOfTwo(mapWidth), nextPowerOfTwo(mapHeight));
       context.useProgram(program);
 
       bindAttributes(context, program);

@@ -40,11 +40,16 @@ export default class StartScreen {
     buttons[1].rendertype = 'tropics2';
     buttons[2].rendertype = 'greatlakes2';
 
+    let readyButton;
     if (this.team === '1') {
-      buttons.push(new Ready('notready2', 240, 355, 128, 26));
+      readyButton = new Ready('notready2', 240, 355, 128, 26);
     } else {
-      buttons.push(new Ready('notready2', 240, 305, 128, 26));
+      readyButton = new Ready('notready2', 240, 305, 128, 26);
     }
+
+    readyButton.setType(this.readyStates[this.team] ? 'ready2' : 'notready2');
+
+    buttons.push(readyButton);
 
     buttons[this.mapNum].selected = true;
 
@@ -189,7 +194,7 @@ export default class StartScreen {
         if (button.getType() === 'mapselect') {
           sendMessage({ type: 'UpdateMap', mapNum: button.getSlotNum() });
         } else {
-          button.setType((!this.readyStates[this.team] ? 'ready2' : 'notready2'));
+          button.setType();
           sendMessage({ type: 'SetReadyState', readyState: !this.readyStates[this.team] });
         }
       }

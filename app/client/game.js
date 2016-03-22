@@ -506,7 +506,6 @@ export default class Game {
         this.updateSelectionState({ ...this.selectionState, map: this.controlGroups[event.keyCode - 48] });
       }
     }
-    console.log('a', event.keyCode);
 
     this.pressedKeys.add(event.keyCode);
   }
