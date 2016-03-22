@@ -21,16 +21,6 @@ export default class StartScreen {
     this.images = images;
     this.team = null;
 
-    this.buttons = [];
-    this.buttons.push(new MapSelect('mapselect', 675, 325, 102, 26, 0));
-    this.buttons.push(new MapSelect('mapselect', 825, 325, 102, 26, 1));
-    this.buttons.push(new MapSelect('mapselect', 750, 375, 102, 26, 2));
-    this.buttons[0].rendertype = 'westindies2';
-    this.buttons[1].rendertype = 'tropics2';
-    this.buttons[2].rendertype = 'greatlakes2';
-
-    this.buttons[0].selected = true;
-
     this.mode = 'splash';
 
     this.epicSound = createSource(images['bensound-epic']);
@@ -38,6 +28,27 @@ export default class StartScreen {
     this.epicSound.start(0);
 
     this.renderList = new RenderList(this.images.pixelJson);
+  }
+
+  getMapSelectButtons() {
+    const buttons = [];
+
+    buttons.push(new MapSelect('mapselect', 675, 325, 102, 26, 0));
+    buttons.push(new MapSelect('mapselect', 825, 325, 102, 26, 1));
+    buttons.push(new MapSelect('mapselect', 750, 375, 102, 26, 2));
+    buttons[0].rendertype = 'westindies2';
+    buttons[1].rendertype = 'tropics2';
+    buttons[2].rendertype = 'greatlakes2';
+
+    if (this.team === '1') {
+      buttons.push(new Ready('notready2', 240, 355, 128, 26));
+    } else {
+      buttons.push(new Ready('notready2', 240, 305, 128, 26));
+    }
+
+    buttons[this.mapNum].selected = true;
+
+    return buttons;
   }
 
   render(mainProgram) {
@@ -78,7 +89,7 @@ export default class StartScreen {
 
     this.renderList.translate(-this.width + 520, -50);
 
-    for (const button of this.buttons) {
+    for (const button of this.getMapSelectButtons()) {
       button.render(this.renderList);
     }
 
@@ -122,12 +133,6 @@ export default class StartScreen {
     this.game.team = team;
     this.mapNum = mapNum;
     this.readyStates = readyStates;
-
-    if (this.team === '1') {
-      this.buttons.push(new Ready('notready2', 240, 355, 128, 26));
-    } else {
-      this.buttons.push(new Ready('notready2', 240, 305, 128, 26));
-    }
   }
 
   _updateReadyStates({ readyStates }) {
@@ -135,14 +140,6 @@ export default class StartScreen {
   }
 
   selectMap(mapNum) {
-    for (const button of this.buttons) {
-      if (button.getSlotNum() === mapNum) {
-        button.selected = true;
-      } else {
-        button.selected = false;
-      }
-    }
-
     this.mapNum = mapNum;
   }
 
@@ -187,7 +184,7 @@ export default class StartScreen {
     this.game.gui.designerSelection(item);
     this.game.gui.displayMode = 'designer';
 
-    for (const button of this.buttons) {
+    for (const button of this.getMapSelectButtons()) {
       if (button.isOver(rawX, rawY)) {
         if (button.getType() === 'mapselect') {
           sendMessage({ type: 'UpdateMap', mapNum: button.getSlotNum() });
