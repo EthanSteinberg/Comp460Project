@@ -280,7 +280,7 @@ function updateReadyState({ readyState }, playerTeam) {
 
   // Start the game!
 
-  setNewMap(createMap(currentMapNum));
+  setNewMap(createMap(currentMapNum, true));
 
   for (const team of Object.keys(playerSockets)) {
     playerSockets[team].send(JSON.stringify({ type: 'StartGame', initialState: map.getInitialState(), team }));
@@ -302,7 +302,7 @@ const messageHandlers = {
 let nextTeam = 0;
 
 if (debug) {
-  setNewMap(createMap(0));
+  setNewMap(createMap(0, true));
 }
 
 wss.on('connection', function connection(socket) {

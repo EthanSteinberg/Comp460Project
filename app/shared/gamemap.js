@@ -118,7 +118,7 @@ export default class GameMap {
     renderList.strokeRect('black', this.width, -25, -25, this.width * 50, this.height * 50);
   }
 
-  renderStartScreenMiniMap(renderList) {
+  renderStartScreenMiniMap(renderList, mapNumber) {
     const gridSize = 5;
     const gridWidth = this.width / 3;
 
@@ -136,6 +136,9 @@ export default class GameMap {
       if (type.renderOverlay != null) {
         type.renderOverlay(entity, this, renderList);
       }
+    }
+    if (mapNumber === 3) {
+      renderList.addImage('unknownMapOverlay', -25, -25, this.width * 50, this.height * 50);
     }
   }
 

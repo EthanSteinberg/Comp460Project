@@ -142,6 +142,32 @@ const maps = [
       },
     ],
   },
+  {
+    width: 30,
+    height: 30,
+    ships: [
+      {
+        team: '0',
+        x: 1,
+        y: 3,
+      },
+      {
+        team: '1',
+        x: 27,
+        y: 26,
+      },
+    ],
+    islands: [
+      {
+        topLeft: [1, 1],
+        size: [1, 2],
+      },
+      {
+        topLeft: [27, 27],
+        size: [1, 2],
+      },
+    ],
+  },
 ];
 
 const template = {
@@ -149,7 +175,36 @@ const template = {
   hardpoints: ['roundshot'],
 };
 
-export function createMap(mapNum) {
+function canPlace(map, xPosition, yPosition, islandWidth, islandHeight) {
+  for (let dx = 0; dx < islandWidth; dx++) {
+    for (let dy = 0; dy < islandHeight; dy++) {
+      if (dx + xPosition >= map.width || dy + yPosition >= map.height) {
+        return false;
+      }
+
+      if (map.getItem(dx + xPosition, dy + yPosition) != null) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+function addRandomIsland(map, islandWidth, islandHeight) {
+  for (;;) {
+    // Keep on trying to add an island
+    const xPosition = Math.floor(Math.random() * map.width);
+    const yPosition = Math.floor(Math.random() * map.height);
+
+    if (canPlace(map, xPosition, yPosition, islandWidth, islandHeight)) {
+      Islands.createIsland(map, [xPosition, yPosition], [islandWidth, islandHeight]);
+      return;
+    }
+  }
+}
+
+export function createMap(mapNum, fullCreation) {
   const { ships, width, height, islands } = maps[mapNum];
 
   const map = new GameMap({
@@ -180,6 +235,23 @@ export function createMap(mapNum) {
 
   for (const island of islands) {
     Islands.createIsland(map, island.topLeft, island.size);
+  }
+
+  if (mapNum === 3 && fullCreation) {
+    // Add random island
+    for (let i = 0; i < 8; i++) {
+      addRandomIsland(map, 1, 1);
+    }
+
+    for (let i = 0; i < 2; i++) {
+      addRandomIsland(map, 2, 1);
+    }
+
+    for (let i = 0; i < 2; i++) {
+      addRandomIsland(map, 1, 2);
+    }
+
+    addRandomIsland(map, 2, 2);
   }
 
   return map;

@@ -35,10 +35,12 @@ export default class StartScreen {
 
     buttons.push(new MapSelect('mapselect', 675, 325, 102, 26, 0));
     buttons.push(new MapSelect('mapselect', 825, 325, 102, 26, 1));
-    buttons.push(new MapSelect('mapselect', 750, 375, 102, 26, 2));
+    buttons.push(new MapSelect('mapselect', 675, 375, 102, 26, 2));
+    buttons.push(new MapSelect('mapselect', 825, 375, 102, 26, 3));
     buttons[0].rendertype = 'westindies2';
     buttons[1].rendertype = 'tropics2';
     buttons[2].rendertype = 'greatlakes2';
+    buttons[3].rendertype = 'randomMap';
 
     let readyButton;
     if (this.team === '1') {
@@ -87,7 +89,7 @@ export default class StartScreen {
     this.renderList.scale(1 / scale);
     this.renderList.translate(25, 25);
 
-    map.renderStartScreenMiniMap(this.renderList);
+    map.renderStartScreenMiniMap(this.renderList, this.mapNum);
 
     this.renderList.translate(-25, -25);
     this.renderList.scale(scale);
