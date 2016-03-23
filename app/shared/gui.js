@@ -95,11 +95,25 @@ export default class Gui {
     }
 
     // // Display stats at the bottom of the gui
+
+    renderList.renderText(this.workingTemplate.hull.toUpperCase(),
+      this.x + 5, this.height - 50, 0.5);
+
+    if (this.workingTemplate.hardpoints[0] != undefined) {
+     renderList.renderText(this.workingTemplate.hardpoints[0],
+      this.x + 5, this.height - 35, 0.5);     
+    }
+
+    if (this.workingTemplate.hardpoints[1] != undefined) {
+     renderList.renderText(this.workingTemplate.hardpoints[1],
+      this.x + 80, this.height - 35, 0.5);     
+    }
+
     renderList.renderText('Cost: ' + getStats(this.workingTemplate).cost + ' coin',
-      this.x + 5, this.height - 50, 0.7);
+      this.x + 5, this.height - 20, 0.5);
 
     renderList.renderText('Time: ' + getStats(this.workingTemplate).tcost + ' sec',
-      this.x + 5, this.height - 30, 0.7);
+      this.x + 5, this.height - 10, 0.5);
 
 
     // Hovering logic
@@ -178,17 +192,17 @@ export default class Gui {
 
     const moneyText = Math.floor(map.getEntity(this.team).coins).toString();
 
-    renderList.renderText(moneyText, this.x + 32, this.y + 5);
+    renderList.renderText(moneyText, this.x + 32, this.y + 10);
 
-    const width = 19 * moneyText.length;
+    const width = 14.5 * moneyText.length;
 
     renderList.strokeRect('black', 2, this.x + 2, this.y + 4, width + 50, 40);
     renderList.addImage('coin2', (this.x) + 2, (this.y) + 10, 25, 25);
 
     if (this.team === '1') {
-      renderList.renderText('Pirates', (this.x) + 110, (this.y) + 5, 0.5);
+      renderList.renderText('Pirates', (this.x) + 95, (this.y) + 10);
     } else {
-      renderList.renderText('Imperials', (this.x) + 110, (this.y) + 5, 0.5);
+      renderList.renderText('Imperials', (this.x) + 90, (this.y) + 10);
     }
 
     for (const button of this.getButtons()) {
@@ -292,9 +306,6 @@ export default class Gui {
       }
     }
 
-    result.push(new Save('save', this.x + 50, this.y + 77, 102, 26));
-
-
     for (const button of result) {
       button.setVisible(this.chosenIndex != null);
 
@@ -326,10 +337,13 @@ export default class Gui {
   }
 
   designerSelection(item) {
+
     if (item == null) {
       this.selectedSlot = null;
       return;
     }
+
+    this.templates[this.chosenIndex] = this.workingTemplate;
 
     const withItem = JSON.parse(JSON.stringify(this.workingTemplate));
 
@@ -368,14 +382,11 @@ export default class Gui {
         this.selectedSlot = null;
         this.changing = true;
         break;
-      case 'save':
-        this.templates[this.chosenIndex] = this.workingTemplate;
-        this.displayMode = 'main';
-        this.workingTemplate = JSON.parse(JSON.stringify(this.templates[this.chosenIndex]));
-        this.changing = false;
       default:
         this.selectedSlot = null;
     }
+
+    this.templates[this.chosenIndex] = this.workingTemplate;    
   }
 
   getButtons() {

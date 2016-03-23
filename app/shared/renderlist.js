@@ -71,16 +71,17 @@ export default class RenderList {
       this.renderText(text, startX / scale, y / scale);
       this.scale(1 / scale);
     } else {
-      const letterWidth = 19;
+      // const letterWidth = 19;
+      const letterWidth = 14.5;
 
       for (let i = 0; i < text.length; i++) {
         const letter = text[i];
         const x = startX + letterWidth * i;
 
         const options = [
-          ['abcdefghijklmnopqrstuvwxyz', 'lowercase'],
-          ['abcdefghijklmnopqrstuvwxyz'.toUpperCase(), 'uppercase'],
-          ['0123456789 .!?\'\"()*#$%^&,:', 'digits'],
+          ['abcdefghijklmnopqrstuvwxyz', 'pixel_love_lowercase'],
+          ['abcdefghijklmnopqrstuvwxyz'.toUpperCase(), 'pixel_love_uppercase'],
+          ['0123456789 .!?\'\"()*#$%^&,:', 'pixel_love_digits'],
         ];
         const image = options.find(a => a[0].indexOf(letter) !== -1);
 

@@ -44,9 +44,9 @@ export default class StartScreen {
 
     let readyButton;
     if (this.team === '1') {
-      readyButton = new Ready('notready2', 240, 355, 128, 26);
+      readyButton = new Ready('notready2', 230, 355, 128, 26);
     } else {
-      readyButton = new Ready('notready2', 240, 305, 128, 26);
+      readyButton = new Ready('notready2', 190, 305, 128, 26);
     }
 
     readyButton.setType(this.readyStates[this.team] ? 'ready2' : 'notready2');
@@ -111,7 +111,6 @@ export default class StartScreen {
 
       this.renderList.addImage('status', 40, 250);
 
-      this.context.font = '30px Perpetua';
       let startingY = 300;
       for (const team of Object.keys(this.readyStates)) {
         if (team !== this.team) {
