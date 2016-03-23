@@ -64,6 +64,10 @@ export function processUpdate(template, map) {
   }
 }
 
+export function getPosition(template) {
+  return { x: template.x, y: template.y };
+}
+
 export function remove(template, map) {
   map.removeEntity(template.id);
 }
