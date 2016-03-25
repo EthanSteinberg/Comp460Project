@@ -354,7 +354,6 @@ function processAttack(ship, map) {
     return;
   }
 
-  console.log(pseudoTarget)
   const targetLocation = Types[pseudoTarget.type].getPosition(pseudoTarget, map);
 
   const shouldMoveCloser = shootAt(ship, map, pseudoTarget, target, 0);
