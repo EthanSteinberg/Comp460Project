@@ -87,7 +87,7 @@ export default class Gui {
     const skeleton = new ShipSkeleton('shipskeleton', this.x + 50, this.y + 110, 100, 340);
     skeleton.render(renderList);
 
-    for (const button of this.getDesignerButtons()) {
+    for (const button of this.getDesignerButtons().reverse()) {
       const isSelected = this.selectionState.gui != null && this.selectionState.gui.type === button.type &&
         this.selectionState.gui.slotNum === button.slotNum;
       button.selected = isSelected;
@@ -270,14 +270,6 @@ export default class Gui {
       result.push(new Exit('exit', this.x + this.width - 20, this.y, 20, 20));
     }
 
-    result.push(new Template('template', this.x + 20, this.y + 25, 50, 50, 0, null, this.templates[0]));
-    result.push(new Template('template', this.x + 75, this.y + 25, 50, 50, 1, null, this.templates[1]));
-    result.push(new Template('template', this.x + 130, this.y + 25, 50, 50, 2, null, this.templates[2]));
-
-    result.push(new Gunslot('gunslot', this.x + 75, this.y + 210, 40, 40, 0));
-    result.push(new Gunslot('gunslot', this.x + 75, this.y + 350, 40, 40, 1));
-    result.push(new Hullslot('hullslot', this.x + 75, this.y + 280, 40, 40, 1));
-
     if (this.selectedSlot != null) {
       if (this.selectedSlot.getType() === 'gunslot') {
         result.push(new Roundshot('roundshot', this.selectedSlot.x - 60, this.selectedSlot.y + 5, 40, 40));
@@ -292,9 +284,17 @@ export default class Gui {
         result.push(new Gunboat('gunboat', this.selectedSlot.x - 60, this.selectedSlot.y + 5, 40, 40));
         result.push(new Frigate('frigate', this.selectedSlot.x + 5, this.selectedSlot.y - 45, 40, 40));
         result.push(new Galleon('galleon', this.selectedSlot.x + 60, this.selectedSlot.y + 5, 40, 40));
-        // result.push(new Dreadnought('dreadnought', this.selectedSlot.x + 5, this.selectedSlot.y + 60, 40, 40));      
+        // result.push(new Dreadnought('dreadnought', this.selectedSlot.x + 5, this.selectedSlot.y + 60, 40, 40));
       }
     }
+
+    result.push(new Template('template', this.x + 20, this.y + 25, 50, 50, 0, null, this.templates[0]));
+    result.push(new Template('template', this.x + 75, this.y + 25, 50, 50, 1, null, this.templates[1]));
+    result.push(new Template('template', this.x + 130, this.y + 25, 50, 50, 2, null, this.templates[2]));
+
+    result.push(new Gunslot('gunslot', this.x + 75, this.y + 210, 40, 40, 0));
+    result.push(new Gunslot('gunslot', this.x + 75, this.y + 350, 40, 40, 1));
+    result.push(new Hullslot('hullslot', this.x + 75, this.y + 280, 40, 40, 1));
 
     for (const button of result) {
       button.setVisible(this.chosenIndex != null);
