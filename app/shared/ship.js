@@ -67,7 +67,7 @@ export function getOrientation(ship) {
     return 0;
   }
 
-  return Math.atan2(ship.y - lastPosition.y, ship.x - lastPosition.x) + Math.PI / 2;
+  return (Math.atan2(ship.y - lastPosition.y, ship.x - lastPosition.x) + Math.PI / 2 + 2 * Math.PI) % (2 * Math.PI);
 }
 
 export function render(ship, map, renderList, isSelected) {
@@ -75,23 +75,52 @@ export function render(ship, map, renderList, isSelected) {
     renderList.addImage('shipSelect', (-1 + ship.x) * 50, (-1 + ship.y) * 50, 2 * 50, 2 * 50);
   }
 
-  const name = (ship.team === '1' ? 'pirate' : 'empire') + 'Ship';
+  const name = (ship.team === '1' ? 'pirateCircle' : 'imperialCircle');
 
   renderList.translate(ship.x * 50, ship.y * 50);
 
   const angle = getOrientation(ship);
 
-  renderList.rotate(angle);
+  if (angle > Math.PI) {
+    renderList.scale(-1, 1)
+  }
+  // renderList.rotate(angle);
   renderList.addImage(name, (-0.5) * 50, (-0.5) * 50, 50, 50);
-  renderList.rotate(-angle);
+  // renderList.rotate(-angle);
+
+  switch (ship.template.hull) {
+    case 'gunboat':
+      renderList.addImage('gunboat2', -25, -25, 50, 50);
+      break;
+    case 'frigate':
+      renderList.addImage('frigate2', -25, -25, 50, 50);
+      break;
+    case 'galleon':
+      renderList.addImage('galleon2', -25, -25, 50, 50);
+      break;
+    default:
+      throw new Error('unhandled switch statement in shiptemplate');
+  }
+
+  var i = 0;
+  for (const hardpoint of ship.template.hardpoints) {
+    if (hardpoint != null) {
+      Hardpoints.renderTemplate(hardpoint, i,  -25 + 10, -25 + 38, renderList);
+    }
+    i += 1;
+  }
+
+  if (angle > Math.PI) {
+    renderList.scale(-1, 1)
+  }
   renderList.translate(-ship.x * 50, -ship.y * 50);
 
-  for (const hardpointId of ship.hardpoints) {
-    const hardpoint = map.getEntity(hardpointId);
-    if (hardpoint != null) {
-      Hardpoints.render(hardpoint, map, renderList);
-    }
-  }
+  // for (const hardpointId of ship.hardpoints) {
+  //   const hardpoint = map.getEntity(hardpointId);
+  //   if (hardpoint != null) {
+  //     Hardpoints.render(hardpoint, map, renderList);
+  //   }
+  // }
 }
 
 export function renderOverlay(ship, map, renderList) {

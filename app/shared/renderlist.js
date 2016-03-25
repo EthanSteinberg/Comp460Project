@@ -41,10 +41,13 @@ export default class RenderList {
     ]);
   }
 
-  scale(newScale) {
+  scale(scaleX, scaleY) {
+    if (scaleY == null) {
+      scaleY = scaleX;
+    }
     this.mmultiply([
-      [newScale, 0, 0],
-      [0, newScale, 0],
+      [scaleX, 0, 0],
+      [0, scaleY, 0],
       [0, 0, 1],
     ]);
   }
@@ -191,7 +194,7 @@ export default class RenderList {
   }
 
   addImage(name, x, y, width, height, subX, subY, subWidth, subHeight) {
-    const info = this.pixelJson[name] || { x: 0, y: 0, sizex: 1024 * 4, sizey: 1024 * 4 };
+    const info = this.pixelJson[name];
 
     if (info == null) {
       console.error('Unable to find ', name);

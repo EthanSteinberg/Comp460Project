@@ -36,11 +36,11 @@ export function createHardpoint(map, shipId, index, gunType, team) {
   return point.id;
 }
 
-export function render(hardpoint, map, renderList) {
-  const { x, y } = getPosition(hardpoint, map);
+// export function render(hardpoint, map, renderList) {
+//   const { x, y } = getPosition(hardpoint, map);
 
-  renderList.addImage('cannon', x * 50 - 20 / 4, y * 50 - 25 / 4, 10, 10);
-}
+//   renderList.addImage('cannon', x * 50 - 20 / 4, y * 50 - 25 / 4, 10, 10);
+// }
 
 export function renderTemplate(hardpoint, slotnum, x, y, renderList) {
   let modifier = 0;
@@ -48,7 +48,7 @@ export function renderTemplate(hardpoint, slotnum, x, y, renderList) {
     modifier = 20;
   }
 
-  renderList.addImage('coral', x + modifier, y, 10, 10);
+  renderList.addImage('linen', x + modifier, y, 10, 10);
 
   switch (hardpoint) {
     case 'roundshot':
