@@ -98,6 +98,12 @@ class Main {
       }
     });
 
+    this.canvas.addEventListener('mouseout', (event) => {
+      if (this.mode === 'game') {
+        this.game.mouseout(event);
+      }
+    });
+
     this.messageHandlerMap = {
       'AddEntity': m => this.game._addEntity(m),
       'UpdateEntity': m => this.game._updateEntity(m),

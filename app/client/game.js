@@ -37,9 +37,13 @@ export default class Game {
 
     this.actionMap = {
       37: () => this.moveGame(-1, 0),
+      ['A'.charCodeAt(0)]: () => this.moveGame(-1, 0),
       38: () => this.moveGame(0, -1),
+      ['W'.charCodeAt(0)]: () => this.moveGame(0, -1),
       39: () => this.moveGame(1, 0),
+      ['D'.charCodeAt(0)]: () => this.moveGame(1, 0),
       40: () => this.moveGame(0, 1),
+      ['S'.charCodeAt(0)]: () => this.moveGame(0, 1),
     };
 
     this.pressedKeys = new Set();
@@ -162,6 +166,8 @@ export default class Game {
 
     if (rawX < this.width - GUI_WIDTH) {
       this.mouseDownGamePosition = this.getMouseGamePosition(rawX, rawY);
+    } else {
+      this.mouseDownGamePosition = null;
     }
   }
 
@@ -201,6 +207,29 @@ export default class Game {
   mousemove(event) {
     const { rawX, rawY } = this.getRawMouseCords(event);
     this.hoveredCoords = { x: rawX, y: rawY };
+
+    if (rawX > this.width - GUI_WIDTH) {
+      // I am now entering the gui.
+      // Try to discard selection if possible.
+
+      if (this.mouseDownGamePosition != null) {
+        this.performDrag(this.hoveredCoords);
+      }
+
+      this.mouseDownRawPosition = null;
+      this.mouseDownGamePosition = null;
+    }
+  }
+
+  mouseout(event) {
+    const { rawX, rawY } = this.getRawMouseCords(event);
+    const coords = { x: rawX, y: rawY };
+    if (this.mouseDownGamePosition != null) {
+      this.performDrag(coords);
+    }
+
+    this.mouseDownRawPosition = null;
+    this.mouseDownGamePosition = null;
   }
 
   getRawMouseCords(event) {
@@ -297,21 +326,36 @@ export default class Game {
       return false;
     }
 
-    const hoverGameCoords = this.getMouseGamePosition(this.hoveredCoords.x, this.hoveredCoords.y);
-
     if (this.mouseDownGamePosition == null ||
       this.mouseDownGamePosition.mouseX === mouseX ||
       this.mouseDownGamePosition.mouseY === mouseY) {
       return false;
     }
 
-    if (
-      hoverGameCoords.mouseX < this.mouseDownGamePosition.mouseX ||
-      hoverGameCoords.mouseY < this.mouseDownGamePosition.mouseY) {
-      return false;
+    return true;
+  }
+
+  performDrag(coords) {
+    // Perform a drag select.
+    const hoverGameCoords = this.getMouseGamePosition(coords.x, coords.y);
+
+    const leftX = Math.min(this.mouseDownGamePosition.mouseX, hoverGameCoords.mouseX);
+    const rightX = Math.max(this.mouseDownGamePosition.mouseX, hoverGameCoords.mouseX);
+
+    const leftY = Math.min(this.mouseDownGamePosition.mouseY, hoverGameCoords.mouseY);
+    const rightY = Math.max(this.mouseDownGamePosition.mouseY, hoverGameCoords.mouseY);
+
+    let items = this.map.getItemsWithinRectangle(leftX, leftY, rightX, rightY);
+
+    if (this.pressedKeys.has(16)) {
+      // Shift key, so concat the items
+      items = this.selectionState.map.concat(items);
+    } else if (this.pressedKeys.has(17)) {
+      // Control key, so filter the current selection
+      items = this.selectionState.map.filter((oldItem) => items.indexOf(oldItem) === -1);
     }
 
-    return true;
+    this.updateSelectionState({ ...this.selectionState, map: items });
   }
 
   processMapLeftMouseClick(rawX, rawY, sendMessage) {
@@ -327,6 +371,11 @@ export default class Game {
 
     let item = this.map.getItem(mouseX, mouseY);
 
+    if (this.mouseDownRawPosition == null) {
+      // Must have been off screen.
+      return;
+    }
+
     if (this.selectionState.gui != null) {
       // The gui stuff always has priority.
       // If an empty tile on an island is selected then add a building
@@ -341,20 +390,7 @@ export default class Game {
         }
       }
     } else if (this.isDragAction(mouseX, mouseY)) {
-      // Perform a drag select.
-      const hoverGameCoords = this.getMouseGamePosition(this.hoveredCoords.x, this.hoveredCoords.y);
-
-      let items = this.map.getItemsWithinRectangle(this.mouseDownGamePosition.mouseX, this.mouseDownGamePosition.mouseY, hoverGameCoords.mouseX, hoverGameCoords.mouseY);
-
-      if (this.pressedKeys.has(16)) {
-        // Shift key, so concat the items
-        items = this.selectionState.map.concat([item.id]);
-      } else if (this.pressedKeys.has(17)) {
-        // Control key, so filter the current selection
-        items = this.selectionState.map.filter((oldItem) => items.indexOf(oldItem) === -1);
-      }
-
-      this.updateSelectionState({ ...this.selectionState, map: items });
+      this.performDrag(this.hoveredCoords);
     } else if (item != null) {
       let items = [item.id];
       if (this.pressedKeys.has(16)) {
@@ -440,9 +476,7 @@ export default class Game {
         const dx = hoverGameCoords.mouseX - this.mouseDownGamePosition.mouseX;
         const dy = hoverGameCoords.mouseY - this.mouseDownGamePosition.mouseY;
 
-        if (dx > 0 && dy > 0) {
-          this.renderList.strokeRect('white', 2, this.mouseDownGamePosition.mouseX * 50, this.mouseDownGamePosition.mouseY * 50, dx * 50, dy * 50);
-        }
+        this.renderList.strokeRect('white', 2, this.mouseDownGamePosition.mouseX * 50, this.mouseDownGamePosition.mouseY * 50, dx * 50, dy * 50);
       }
     }
 
