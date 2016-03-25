@@ -99,21 +99,11 @@ export default class Gui {
     renderList.renderText(this.workingTemplate.hull.toUpperCase(),
       this.x + 5, this.height - 50, 0.5);
 
-    if (this.workingTemplate.hardpoints[0] != undefined) {
-     renderList.renderText(this.workingTemplate.hardpoints[0],
-      this.x + 5, this.height - 35, 0.5);     
-    }
-
-    if (this.workingTemplate.hardpoints[1] != undefined) {
-     renderList.renderText(this.workingTemplate.hardpoints[1],
-      this.x + 80, this.height - 35, 0.5);     
-    }
-
     renderList.renderText('Cost: ' + getStats(this.workingTemplate).cost + ' coin',
-      this.x + 5, this.height - 20, 0.5);
+      this.x + 5, this.height - 35, 0.7);
 
     renderList.renderText('Time: ' + getStats(this.workingTemplate).tcost + ' sec',
-      this.x + 5, this.height - 10, 0.5);
+      this.x + 5, this.height - 20, 0.7);
 
 
     // Hovering logic
@@ -202,7 +192,7 @@ export default class Gui {
     if (this.team === '1') {
       renderList.renderText('Pirates', (this.x) + 95, (this.y) + 10);
     } else {
-      renderList.renderText('Imperials', (this.x) + 90, (this.y) + 10);
+      renderList.renderText('Imperials', (this.x) + 93, (this.y) + 12, 0.7);
     }
 
     for (const button of this.getButtons()) {

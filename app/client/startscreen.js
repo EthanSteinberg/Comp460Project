@@ -175,8 +175,11 @@ export default class StartScreen {
   }
 
   mousedownSplash() {
-    this.epicSound.stop(0);
     this.mode = 'setup';
+  }
+
+  stopSound() {
+    this.epicSound.stop(0);
   }
 
   mousedownSetup(event, sendMessage) {
