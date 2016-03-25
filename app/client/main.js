@@ -57,21 +57,35 @@ class Main {
     this.startscreen = new StartScreen(images, this.game);
     this.endscreen = null;
 
-    document.addEventListener('keydown', (event) => {
+    window.addEventListener('keydown', (event) => {
       if (this.mode === 'game') {
-        this.game.keydown(event, this.pressedKeys);
+        this.game.keydown(event);
       }
     });
 
-    document.addEventListener('keyup', (event) => {
+    window.addEventListener('keyup', (event) => {
       if (this.mode === 'game') {
-        this.game.keyup(event, this.pressedKeys);
+        this.game.keyup(event);
+      }
+    });
+
+    window.addEventListener('contextmenu', () => {
+      if (this.mode === 'game') {
+        this.game.clearkeydowns();
+      }
+    });
+
+    window.addEventListener('blur', () => {
+      if (this.mode === 'game') {
+        this.game.clearkeydowns();
       }
     });
 
     // Ignore right click events on the canvas
     this.canvas.addEventListener('contextmenu', (event) => {
       event.preventDefault();
+      event.stopPropagation();
+      return false;
     });
 
     this.canvas.addEventListener('mousedown', (event) => {

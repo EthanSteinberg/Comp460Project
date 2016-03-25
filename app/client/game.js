@@ -547,4 +547,8 @@ export default class Game {
   keyup(event) {
     this.pressedKeys.delete(event.keyCode);
   }
+
+  clearkeydowns() {
+    this.pressedKeys.clear();
+  }
 }
