@@ -50,7 +50,7 @@ export function render(island, map, renderList, isSelected, noFlag = false) {
   const [width, height] = island.size;
 
   renderList.addImage('1x1islandDot', (x - 0.5) * 50, (y - 0.5) * 50, width * 50, height * 50);
-  
+
   if (island.team != null && !noFlag) {
     const flag = (island.team === '0') ? 'blueFlag' : 'redFlag';
 
@@ -80,7 +80,7 @@ export function isNextToIsland(island, x, y) {
 function getOwningTeam(island, map) {
   // First scan for buildings on this island
   for (const entity of map.entities.values()) {
-    if (entity.type === 'shipyard' || entity.type === 'mine' || entity.type === 'fort') {
+    if (entity.type === 'shipyard' || entity.type === 'mine' || entity.type === 'fort' || entity.type === 'buildingTemplate') {
       for (const [iX, iY] of island.coordinates) {
         if (entity.x === iX && entity.y === iY) {
           return entity.team;
