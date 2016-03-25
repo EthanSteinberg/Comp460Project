@@ -69,7 +69,7 @@ export const gunboat = {
   damage: 0,
   speed: 20,
   weight: 25,
-  cost: 50,
+  cost: 75,
   tcost: 60,
 };
 
