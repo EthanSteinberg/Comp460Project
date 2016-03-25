@@ -149,7 +149,7 @@ class Main {
    * Start the game by setting up the render intervals.
    */
   start() {
-    this.ws = new WebSocket('ws://10.115.79.117:3000');
+    this.ws = new WebSocket('ws://localhost:3000');
     this.ws.onmessage = this._onMessage.bind(this);
 
     window.onbeforeunload = () => {
