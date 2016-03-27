@@ -22,7 +22,7 @@ export default class Gunslot extends GuiButton {
         break;
       case 'gunslot':
         renderList.addImage('coral', this.x, this.y, 50, 50);
-        renderList.addImage('cannon', this.x, this.y, 50, 50);
+        renderList.addImage('cancelshot', this.x, this.y, 50, 50);
         break;
       default:
         console.error('Trying to render unknown button: ', this.rendertype);

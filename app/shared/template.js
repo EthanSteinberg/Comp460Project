@@ -28,14 +28,14 @@ export const chainshot = {
 
 export const grapeshot = {
   name: 'Grapeshot',
-  description: 'Short range.',
+  description: 'Short range. Area damage',
   health: 100,
-  damage: 50,
+  damage: 20,
   speed: 0,
   weight: -5,
   cost: 50,
   tcost: 20,
-  range: 1.15,
+  range: 1.7,
 };
 
 export const shell = {
