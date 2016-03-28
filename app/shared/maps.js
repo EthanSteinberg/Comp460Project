@@ -1,21 +1,38 @@
 import GameMap from './gamemap';
 import * as Ships from './ship';
 import * as Islands from './island';
+import * as Mines from './mine';
 
 const maps = [
   {
     width: 20,
     height: 20,
-    ships: [
+    entities: [
       {
+        type: 'ship',
         team: '0',
         x: 0,
         y: 3,
       },
       {
+        type: 'ship',
         team: '1',
         x: 17,
         y: 17,
+      },
+
+      {
+        type: 'mine',
+        team: '0',
+        x: 1,
+        y: 1,
+      },
+
+      {
+        type: 'mine',
+        team: '1',
+        x: 18,
+        y: 18,
       },
     ],
     islands: [
@@ -40,21 +57,37 @@ const maps = [
   {
     width: 30,
     height: 30,
-    ships: [
+    entities: [
       {
+        type: 'ship',
         team: '0',
         x: 1,
         y: 3,
       },
       {
+        type: 'ship',
         team: '0',
         x: 27,
         y: 26,
       },
       {
+        type: 'ship',
         team: '1',
         x: 16,
         y: 16,
+      },
+      {
+        type: 'mine',
+        team: '0',
+        x: 1,
+        y: 1,
+      },
+
+      {
+        type: 'mine',
+        team: '1',
+        x: 28,
+        y: 28,
       },
     ],
     islands: [
@@ -91,16 +124,31 @@ const maps = [
   {
     width: 40,
     height: 40,
-    ships: [
+    entities: [
       {
+        type: 'ship',
         team: '0',
         x: 2,
         y: 3,
       },
       {
+        type: 'ship',
         team: '1',
         x: 37,
         y: 36,
+      },
+      {
+        type: 'mine',
+        team: '0',
+        x: 1,
+        y: 1,
+      },
+
+      {
+        type: 'mine',
+        team: '1',
+        x: 38,
+        y: 38,
       },
     ],
     islands: [
@@ -145,16 +193,31 @@ const maps = [
   {
     width: 30,
     height: 30,
-    ships: [
+    entities: [
       {
+        type: 'ship',
         team: '0',
         x: 1,
         y: 3,
       },
       {
+        type: 'ship',
         team: '1',
         x: 27,
         y: 26,
+      },
+      {
+        type: 'mine',
+        team: '0',
+        x: 1,
+        y: 1,
+      },
+
+      {
+        type: 'mine',
+        team: '1',
+        x: 27,
+        y: 27,
       },
     ],
     islands: [
@@ -182,7 +245,9 @@ function canPlace(map, xPosition, yPosition, islandWidth, islandHeight) {
         return false;
       }
 
-      if (map.getItem(dx + xPosition, dy + yPosition) != null) {
+      const posX = dx + xPosition;
+      const posY = dy + yPosition;
+      if (map.getIsland(posX, posY) != null && map.getItem(posX, posY) != null) {
         return false;
       }
     }
@@ -205,7 +270,7 @@ function addRandomIsland(map, islandWidth, islandHeight) {
 }
 
 export function createMap(mapNum, fullCreation) {
-  const { ships, width, height, islands } = maps[mapNum];
+  const { entities, width, height, islands } = maps[mapNum];
 
   const map = new GameMap({
     entries: [],
@@ -229,12 +294,24 @@ export function createMap(mapNum, fullCreation) {
     numItems: 0,
   });
 
-  for (const { team, x, y } of ships) {
-    Ships.createShipAndHardpoints(map, x, y, template, team);
-  }
-
   for (const island of islands) {
     Islands.createIsland(map, island.topLeft, island.size);
+  }
+
+  for (const { team, x, y, type } of entities) {
+    switch (type) {
+      case 'ship':
+        Ships.createShipAndHardpoints(map, x, y, template, team);
+        break;
+
+      case 'mine':
+        const islandId = map.getIsland(x, y).id;
+        Mines.createMine(map, x, y, islandId, team);
+        break;
+
+      default:
+        console.error('Unhandled case: ', type);
+    }
   }
 
   if (mapNum === 3 && fullCreation) {

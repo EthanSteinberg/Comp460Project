@@ -142,11 +142,25 @@ export default class GameMap {
     }
   }
 
-  renderVisibilityMask(renderList, team) {
-    const radius = 4;
+  enemyBuildingsExist(team) {
     for (const entity of this.entities.values()) {
-      if (entity.team === team) {
-        renderList.addImage('halo', (entity.x - radius) * 50, (entity.y - radius) * 50, radius * 2 * 50, radius * 2 * 50);
+      if (entity.team !== team && ['mine', 'shipyard', 'buildingTemplate', 'fort'].indexOf(entity.type) !== -1) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  renderVisibilityMask(renderList, team) {
+    if (!this.enemyBuildingsExist(team)) {
+      renderList.addImage('white', -25, -25, this.width * 50, this.height * 50);
+    } else {
+      const radius = 4;
+      for (const entity of this.entities.values()) {
+        if (entity.team === team) {
+          renderList.addImage('halo', (entity.x - radius) * 50, (entity.y - radius) * 50, radius * 2 * 50, radius * 2 * 50);
+        }
       }
     }
   }
