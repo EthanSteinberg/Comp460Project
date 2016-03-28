@@ -247,7 +247,7 @@ function canPlace(map, xPosition, yPosition, islandWidth, islandHeight) {
 
       const posX = dx + xPosition;
       const posY = dy + yPosition;
-      if (map.getIsland(posX, posY) != null && map.getItem(posX, posY) != null) {
+      if (map.getIsland(posX, posY) != null || map.getItem(posX, posY) != null) {
         return false;
       }
     }

@@ -110,12 +110,9 @@ export default class GameMap {
    * Render both the map and all ships on it.
    */
   renderMiniMapFrame(renderList, x, y, width, height) {
-    renderList.addImage('quarterAlphaGray', -25, -25, this.width * 50, y);
-    renderList.addImage('quarterAlphaGray', -25, y - 25, x, height);
-    renderList.addImage('quarterAlphaGray', -25 + x + width, y - 25, this.width * 50 - x - width, height);
-    renderList.addImage('quarterAlphaGray', -25, -25 + y + height, this.width * 50, this.height * 50 - y - height);
+    renderList.strokeRect('cyan', this.width, x + this.width / 2, y + this.width / 2, width - this.width, height - this.width);
 
-    renderList.strokeRect('black', this.width, -25, -25, this.width * 50, this.height * 50);
+    renderList.strokeRect('black', this.width, -this.width / 2, -this.width / 2, this.width * 50 + this.width, this.height * 50 + this.width);
   }
 
   renderStartScreenMiniMap(renderList, mapNumber) {
