@@ -94,8 +94,12 @@ function getOwningTeam(island, map) {
   const shipTeams = [];
   for (const entity of map.entities.values()) {
     if (entity.type === 'ship') {
-      for (const [iX, iY] of island.perimeter) {
-        if (Math.round(entity.x) === iX && Math.round(entity.y) === iY) {
+      for (const [iX, iY] of island.coordinates) {
+        const dx = entity.x - iX;
+        const dy = entity.y - iY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < 3.0) {
           shipTeams.push(entity.team);
         }
       }
