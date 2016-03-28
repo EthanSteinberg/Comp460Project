@@ -77,7 +77,7 @@ export function getPosition(hardpoint, map) {
 export function fire(hardpoint, map, target) {
   const position = getPosition(hardpoint, map);
 
-  Projectiles.createProjectile(map, position, target, hardpoint.gunType, hardpoint.shipId);
+  Projectiles.createProjectile(map, position, target, hardpoint.gunType, map.getEntity(hardpoint.shipId).team);
 
   hardpoint.timeTillNextFire = 100;
 }

@@ -1,14 +1,14 @@
 import Types from './types';
 import { hardpoints } from './template';
 
-export function createProjectile(map, position, target, projectileType, sourceShip) {
+export function createProjectile(map, position, target, projectileType, sourceTeam) {
   const projectile = {
     id: map.getNextEntityId(),
     position,
     targetId: target.id,
     type: 'projectile',
     projectileType,
-    sourceShip,
+    sourceTeam,
     dead: false,
     deadTime: 100,
   };
@@ -39,9 +39,13 @@ export function processUpdate(projectile, map) {
   if (dist < 0.1) {
 
     if (projectile.projectileType == 'grapeshot') {
-      for (const neighbor of map.getShips()) {
+      for (const neighbor of map.entities.values()) {
 
-        if (neighbor.id == projectile.sourceShip) {
+        if (neighbor.type != 'ship' && neighbor.type != 'mine' && neighbor.type != 'shipyard' && neighbor.type != 'fort') {
+          continue;
+        }
+
+        if (map.getEntity(neighbor.id).team == projectile.sourceTeam) {
           continue;
         }
 
@@ -52,14 +56,17 @@ export function processUpdate(projectile, map) {
 
         const ndist = Math.sqrt(ndx * ndx + ndy * ndy);
 
-        if (ndist < 2.0) {
-          neighbor.health -= hardpoints[projectile.projectileType].damage;
+        if (ndist < 2.5) {
+          neighbor.health -= hardpoints[projectile.projectileType].damage / 2;
 
           if (neighbor.health <= 0) {
             Types[neighbor.type].remove(neighbor, map);
           }
         }
       }
+
+      target.health -= hardpoints[projectile.projectileType].damage / 2;
+
     } else {
       projectile.deadTime = 0
 
