@@ -50,6 +50,12 @@ export function getPosition(shipyard) {
   return { x: shipyard.x, y: shipyard.y };
 }
 
+export function heal(shipyard, map) {
+  if (shipyard.health < 100) {
+    shipyard.health += 5
+  }
+}
+
 export function processUpdate(shipyard, map) {
   if (shipyard.buildingQueue.length > 0) {
     shipyard.progressTowardsNextBuild += 1;

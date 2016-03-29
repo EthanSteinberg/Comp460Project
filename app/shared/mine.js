@@ -22,6 +22,12 @@ export function processUpdate(mine, map) {
   map.getEntity(mine.team).coins += 0.2;
 }
 
+export function heal(mine, map) {
+  if (mine.health < 100) {
+    mine.health += 5
+  }
+}
+
 export function render(mine, map, renderList, isSelected) {
   const name = (mine.team === '1') ? 'pirateCircle' : 'imperialCircle';
 

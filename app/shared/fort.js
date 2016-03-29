@@ -2,6 +2,9 @@ import { hulls, hardpoints } from './template';
 import * as Hardpoints from './hardpoint';
 import Types from './types';
 import { getDistance } from './vector';
+import * as Mine from './mine';
+import * as Shipyard from './shipyard';
+
 
 /**
  * A fort entity.
@@ -33,6 +36,21 @@ export function processUpdate(fort, map) {
     }
   }
 
+  for (const entity of map.entities.values()) {
+    if (entity.type != 'mine' && entity.type != 'shipyard') {
+      continue;
+    }
+
+    if (entity.islandID == fort.islandID) {
+      if (entity.type == 'mine') {
+        Mine.heal(entity, map)
+      } else if (entity.type = 'shipyard') {
+        Shipyard.heal(entity, map)
+      }
+    }
+  }
+
+
   processIdleAttack(fort, map);
 }
 
@@ -47,7 +65,7 @@ export function render(fort, map, renderList, isSelected) {
 
   renderList.addImage('red', fort.x * 50 - 20, fort.y * 50 + 30, 40, 5);
 
-  const healthpercent = fort.health / 200;
+  const healthpercent = fort.health / 300;
 
   renderList.addImage('green', fort.x * 50 - 20, fort.y * 50 + 30, 40 * healthpercent, 5);
 

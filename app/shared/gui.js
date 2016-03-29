@@ -190,9 +190,9 @@ export default class Gui {
     renderList.addImage('coin2', (this.x) + 2, (this.y) + 10, 25, 25);
 
     if (this.team === '1') {
-      renderList.renderText('Pirates', (this.x) + 95, (this.y) + 10);
+      renderList.renderText('Pirates', (this.x) + 50, (this.y) + 470);
     } else {
-      renderList.renderText('Imperials', (this.x) + 93, (this.y) + 12, 0.7);
+      renderList.renderText('Imperials', (this.x) + 35, (this.y) + 470);
     }
 
     for (const button of this.getButtons()) {
