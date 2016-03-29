@@ -27,6 +27,10 @@ export function createShipyard(map, x, y, islandID, team) {
 }
 
 export function render(shipyard, map, renderList, isSelected) {
+  if (isSelected) {
+    renderList.addImage('shipSelect', (-1 + shipyard.x) * 50, (-1 + shipyard.y) * 50, 2 * 50, 2 * 50);
+  }
+
   const name = (shipyard.team === '1') ? 'pirateCircle' : 'imperialCircle';
 
   renderList.addImage(name, shipyard.x * 50 - 25, shipyard.y * 50 - 25);
@@ -40,15 +44,6 @@ export function render(shipyard, map, renderList, isSelected) {
   const healthpercent = shipyard.health / 100;
 
   renderList.addImage('green', shipyard.x * 50 - 20, shipyard.y * 50 + 30, 40 * healthpercent, 5);
-
-  if (isSelected) {
-    renderList.strokeRect('cyan', 2,
-      (shipyard.x - 0.5) * 50,
-      (shipyard.y - 0.5) * 50,
-      50,
-      50
-    );
-  }
 }
 
 export function getPosition(shipyard) {

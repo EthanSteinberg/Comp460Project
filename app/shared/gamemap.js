@@ -214,13 +214,13 @@ export default class GameMap {
    */
   getItem(x, y) {
     for (const entity of this.entities.values()) {
-      if (entity.type === 'ship') {
+      if (entity.type === 'ship' || entity.type === 'shipyard') {
         const distanceSquared = (entity.x - x) * (entity.x - x) + (entity.y - y) * (entity.y - y);
         const distance = Math.sqrt(distanceSquared);
         if (distance <= 0.5) {
           return entity;
         }
-      } else if (entity.type === 'shipyard' || entity.type === 'mine' || entity.type === 'fort' || entity.type === 'buildingTemplate') {
+      } else if (entity.type === 'mine' || entity.type === 'fort' || entity.type === 'buildingTemplate') {
         if (Math.round(x) === entity.x && Math.round(y) === entity.y) {
           return entity;
         }
@@ -257,7 +257,7 @@ export default class GameMap {
     const result = [];
 
     for (const entity of this.entities.values()) {
-      if (entity.type === 'ship') {
+      if (entity.type === 'ship' || entity.type === 'shipyard') {
         if (this.interecting(x1, y1, x2, y2, entity)) {
           result.push(entity.id);
         }

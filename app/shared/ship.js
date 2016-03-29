@@ -82,11 +82,10 @@ export function render(ship, map, renderList, isSelected) {
   const angle = getOrientation(ship);
 
   if (angle > Math.PI) {
-    renderList.scale(-1, 1)
+    renderList.scale(-1, 1);
   }
-  // renderList.rotate(angle);
+
   renderList.addImage(name, (-0.5) * 50, (-0.5) * 50, 50, 50);
-  // renderList.rotate(-angle);
 
   switch (ship.template.hull) {
     case 'gunboat':

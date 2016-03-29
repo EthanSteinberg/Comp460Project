@@ -235,8 +235,8 @@ export default class Game {
   getRawMouseCords(event) {
     const rect = this.canvas.getBoundingClientRect();
     return {
-      rawX: event.clientX - rect.left,
-      rawY: event.clientY - rect.top,
+      rawX: event.clientX - rect.left - 5,
+      rawY: event.clientY - rect.top - 5,
     };
   }
 
@@ -347,6 +347,15 @@ export default class Game {
 
     let items = this.map.getItemsWithinRectangle(leftX, leftY, rightX, rightY);
 
+    const ships = items.filter((id) => this.map.getEntity(id).type === 'ship');
+    const shipyards = items.filter((id) => this.map.getEntity(id).type === 'shipyard');
+
+    if (ships.length > 0) {
+      items = ships;
+    } else {
+      items = shipyards;
+    }
+
     if (this.pressedKeys.has(16)) {
       // Shift key, so concat the items
       items = this.selectionState.map.concat(items);
@@ -370,9 +379,11 @@ export default class Game {
     const mouseRoundedY = Math.round(mouseY);
 
     let item = this.map.getItem(mouseX, mouseY);
+    console.log(mouseRoundedX, mouseRoundedY, item);
 
     if (this.mouseDownRawPosition == null) {
       // Must have been off screen.
+      console.log('Off screen?');
       return;
     }
 

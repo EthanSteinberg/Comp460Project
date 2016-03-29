@@ -36,7 +36,7 @@ export default class Shiptemplate extends GuiButton {
         }
 
         const count = this.selection.counters[this.slotNum];
-        renderList.renderText(count.toString(), this.x, this.y, 0.5);
+        renderList.renderText(count.toString(), this.x, this.y);
 
         if (this.selection.buildingQueue.length > 0 &&
           this.selection.buildingQueue[0].templateNumber === this.slotNum) {
