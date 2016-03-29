@@ -19,6 +19,8 @@ export function createShipyard(map, x, y, islandID, team) {
     buildingQueue: [],
     progressTowardsNextBuild: 0,
     counters: { 0: 0, 1: 0, 2: 0 },
+    renderHeal: false,
+    healTimer: 2,
   };
 
   map.addEntity(shipyard);
@@ -44,6 +46,12 @@ export function render(shipyard, map, renderList, isSelected) {
   const healthpercent = shipyard.health / 100;
 
   renderList.addImage('green', shipyard.x * 50 - 20, shipyard.y * 50 + 30, 40 * healthpercent, 5);
+
+  if (shipyard.renderHeal) {
+    var randomX = Math.floor(Math.random()*(50 - (-5) + 1) + -5);
+    var randomY = Math.floor(Math.random()*(50 - (-5) + 1) + -5);
+    renderList.addImage('cross', (shipyard.x - 0.5) * 50 + randomX , (shipyard.y - 0.5) * 50 + randomY, 10, 10);
+  }
 }
 
 export function getPosition(shipyard) {
@@ -51,8 +59,18 @@ export function getPosition(shipyard) {
 }
 
 export function heal(shipyard, map) {
+  if (shipyard.healTimer > 0) {
+    shipyard.healTimer -= 1
+    return;
+  } else {
+    shipyard.healTimer = 2
+  }
+
   if (shipyard.health < 100) {
     shipyard.health += 5
+    shipyard.renderHeal = true
+  } else {
+    shipyard.renderHeal = false;
   }
 }
 

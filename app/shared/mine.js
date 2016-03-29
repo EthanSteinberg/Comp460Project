@@ -11,6 +11,8 @@ export function createMine(map, x, y, islandID, team) {
     islandID,
     team,
     health: 100,
+    renderHeal: false,
+    healTimer: 2,
   };
 
   map.addEntity(mine);
@@ -23,8 +25,18 @@ export function processUpdate(mine, map) {
 }
 
 export function heal(mine, map) {
+  if (mine.healTimer > 0) {
+    mine.healTimer -= 1
+    return;
+  } else {
+    mine.healTimer = 2
+  }
+
   if (mine.health < 100) {
     mine.health += 5
+    mine.renderHeal = true
+  } else {
+    mine.renderHeal = false;
   }
 }
 
@@ -50,6 +62,12 @@ export function render(mine, map, renderList, isSelected) {
       50,
       50
     );
+  }
+
+  if (mine.renderHeal) {
+    var randomX = Math.floor(Math.random()*(50 - (-5) + 1) + -5);
+    var randomY = Math.floor(Math.random()*(50 - (-5) + 1) + -5);
+    renderList.addImage('cross', (mine.x - 0.5) * 50 + randomX , (mine.y - 0.5) * 50 + randomY, 10, 10);
   }
 }
 

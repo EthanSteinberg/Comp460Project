@@ -20,7 +20,8 @@ export function createFort(map, x, y, islandID, team) {
     islandID,
     team,
     health: 300,
-    hardpoints: [Hardpoints.createHardpoint(map, fortId, 0, "shell", team)],
+    hardpoints: [Hardpoints.createHardpoint(map, fortId, 0, "shell", team), 
+                  Hardpoints.createHardpoint(map, fortId, 1, "roundshot", team)],
   };
 
   map.addEntity(fort);
