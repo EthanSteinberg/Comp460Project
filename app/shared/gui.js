@@ -23,6 +23,7 @@ import Gunslot from './guibuttons/gunslot';
 import Hullslot from './guibuttons/hullslot';
 import Save from './guibuttons/save';
 import Recycle from './guibuttons/recycle';
+import InfinityProduce from './guibuttons/infinityproduce';
 
 export const GUI_WIDTH = 200;
 
@@ -55,6 +56,8 @@ export default class Gui {
     this.workingTemplate = JSON.parse(JSON.stringify(this.templates[this.chosenIndex]));
 
     this.team = team;
+
+    this.infProduceInfo = null;
   }
 
   setSelectionState(newSelectionState) {
@@ -63,6 +66,10 @@ export default class Gui {
 
   getSelectedMapItems() {
     return this.selectionState.map.map(id => this.map.getEntity(id)).filter(item => item != null);
+  }
+
+  selectTemplate(info) {
+    this.infProduceInfo = info
   }
 
   /**
@@ -248,7 +255,55 @@ export default class Gui {
         this.getSelectedMapItems()[0], this.templates[1]));
       result.push(new Shiptemplate('shiptemplate', this.x + 130, this.y + 325, 50, 50, 2,
         this.getSelectedMapItems()[0], this.templates[2]));
+
+      if (this.infProduceInfo) {
+        if (this.getSelectedMapItems().every(entity => entity.id === this.infProduceInfo.shipyardId)) {
+          switch (this.infProduceInfo.templateNumber) {
+            case 0:
+              result.push(new InfinityProduce('infinitySelected', this.x + 20, this.y + 377, 50, 26, 0,
+                this.getSelectedMapItems()[0], this.templates[0]));
+
+              result.push(new InfinityProduce('infinity', this.x + 75, this.y + 377, 50, 26, 1,
+                this.getSelectedMapItems()[0], this.templates[1]));
+              result.push(new InfinityProduce('infinity', this.x + 130, this.y + 377, 50, 26, 2,
+                this.getSelectedMapItems()[0], this.templates[2]));
+              break;
+            case 1:
+              result.push(new InfinityProduce('infinitySelected', this.x + 75, this.y + 377, 50, 26, 1,
+                this.getSelectedMapItems()[0], this.templates[1]));  
+
+              result.push(new InfinityProduce('infinity', this.x + 20, this.y + 377, 50, 26, 0,
+                this.getSelectedMapItems()[0], this.templates[0]));
+              result.push(new InfinityProduce('infinity', this.x + 130, this.y + 377, 50, 26, 2,
+                this.getSelectedMapItems()[0], this.templates[2]));     
+              break;
+            case 2:
+              result.push(new InfinityProduce('infinitySelected', this.x + 130, this.y + 377, 50, 26, 2,
+                this.getSelectedMapItems()[0], this.templates[2]));
+              result.push(new InfinityProduce('infinity', this.x + 20, this.y + 377, 50, 26, 0,
+                this.getSelectedMapItems()[0], this.templates[0]));
+              result.push(new InfinityProduce('infinity', this.x + 75, this.y + 377, 50, 26, 1,
+                this.getSelectedMapItems()[0], this.templates[1]));
+              break;
+          }
+        } else {
+        result.push(new InfinityProduce('infinityGrayed', this.x + 20, this.y + 377, 50, 26, 0, null, this.templates[0]));
+        result.push(new InfinityProduce('infinityGrayed', this.x + 75, this.y + 377, 50, 26, 1, null, this.templates[1]));
+        result.push(new InfinityProduce('infinityGrayed', this.x + 130, this.y + 377, 50, 26, 2, null, this.templates[2]));          
+        }        
+      } else {
+        result.push(new InfinityProduce('infinity', this.x + 20, this.y + 377, 50, 26, 0,
+          this.getSelectedMapItems()[0], this.templates[0]));
+        result.push(new InfinityProduce('infinity', this.x + 75, this.y + 377, 50, 26, 1,
+          this.getSelectedMapItems()[0], this.templates[1]));
+        result.push(new InfinityProduce('infinity', this.x + 130, this.y + 377, 50, 26, 2,
+          this.getSelectedMapItems()[0], this.templates[2]));        
+      }
     } else {
+      result.push(new InfinityProduce('infinityGrayed', this.x + 20, this.y + 377, 50, 26, 0, null, this.templates[0]));
+      result.push(new InfinityProduce('infinityGrayed', this.x + 75, this.y + 377, 50, 26, 1, null, this.templates[1]));
+      result.push(new InfinityProduce('infinityGrayed', this.x + 130, this.y + 377, 50, 26, 2, null, this.templates[2]));
+
       result.push(new Shiptemplate('shiptemplateGrayed', this.x + 20, this.y + 325, 50, 50, 0, null, this.templates[0]));
       result.push(new Shiptemplate('shiptemplateGrayed', this.x + 75, this.y + 325, 50, 50, 1, null, this.templates[1]));
       result.push(new Shiptemplate('shiptemplateGrayed', this.x + 130, this.y + 325, 50, 50, 2, null, this.templates[2]));
@@ -259,7 +314,7 @@ export default class Gui {
     result.push(new Fort('fort', this.x + 130, this.y + 175, 50, 50));
     result.push(new Recycle('recycle', this.x + 75, this.y + 250, 50, 50));
 
-    result.push(new Shipbuilder('shipbuilder', this.x + 50, 400, 102, 26));
+    result.push(new Shipbuilder('shipbuilder', this.x + 50, 415, 102, 26));
     return result;
   }
 

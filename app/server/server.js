@@ -200,7 +200,7 @@ function makeShipHandler({ shipyardId, template, templateNumber }, playerTeam) {
   const stats = getStats(template);
 
   if (stats.cost > map.getEntity(playerTeam).coins) {
-    console.error('Trying to build a ship you cant afford');
+    // console.error('Trying to build a ship you cant afford');
 
     const soundId = playerTeam === '0' ? 'empireMoreGold' : 'pirateMoreGold';
     sendMessageToPlayer(playerTeam, { type: 'PlaySound', soundId });

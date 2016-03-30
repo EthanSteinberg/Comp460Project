@@ -2,7 +2,7 @@ import Gui from '../shared/gui';
 import { GUI_WIDTH } from '../shared/gui';
 import { createSource } from './audio';
 
-import { defaultTemplate } from '../shared/template';
+import { defaultTemplate, getStats } from '../shared/template';
 
 import RenderList from '../shared/renderlist';
 
@@ -54,6 +54,9 @@ export default class Game {
     for (let i = 0; i <= 9; i ++) {
       this.controlGroups[i] = [];
     }
+
+    this.infiniteProduce = null
+    this.infTimer = 10
   }
 
   centerAround(x, y) {
@@ -293,6 +296,35 @@ export default class Game {
             sendMessage({ type: 'MakeShip', templateNumber: item.templateNum, shipyardId: shipyard.id, template })
           );
           break;
+        case 'infinity':
+        case 'infinitySelected':
+          const templateinf = templates[item.templateNum];
+
+          var newInf = null
+
+          this.getSelectedMapItems().forEach(shipyard =>
+            newInf = { templateNumber: item.templateNum, shipyardId: shipyard.id, template: templateinf }
+          );
+
+          if (newInf == null) {
+            break;
+          }
+
+          if (this.infiniteProduce == null) {
+            this.infiniteProduce = newInf
+            this.gui.selectTemplate(this.infiniteProduce)
+            break;
+          }
+
+          if (this.infiniteProduce.templateNumber == newInf.templateNumber 
+            && this.infiniteProduce.shipyardId == newInf.shipyardId) {
+            this.infiniteProduce = null
+          } else {
+            this.infiniteProduce = newInf
+          }
+
+          this.gui.selectTemplate(this.infiniteProduce)            
+          break;
         case 'hull':
           sendMessage({ type: 'UpdateMode', targetMode: 'hardpoints' });
           break;
@@ -379,7 +411,7 @@ export default class Game {
     const mouseRoundedY = Math.round(mouseY);
 
     let item = this.map.getItem(mouseX, mouseY);
-    console.log(mouseRoundedX, mouseRoundedY, item);
+    // console.log(mouseRoundedX, mouseRoundedY, item);
 
     if (this.mouseDownRawPosition == null) {
       // Must have been off screen.
@@ -421,7 +453,19 @@ export default class Game {
   /**
    * Render the game. Also performs updates if necessary.
    */
-  render(mainProgram, visibleProgram, fogProgram, mapProgram, foggedMapProgram) {
+  render(mainProgram, visibleProgram, fogProgram, mapProgram, foggedMapProgram, sendMessage) {
+    if (this.infTimer < 0 && this.infiniteProduce) {
+      this.infTimer = 10
+      var info = this.infiniteProduce
+      if (this.map.getEntity(this.team).coins > getStats(this.gui.templates[info.templateNumber]).cost) {
+        sendMessage({ type: 'MakeShip', templateNumber: info.templateNumber,
+          shipyardId: info.shipyardId, template:info.template });
+      }
+    } else {
+      this.infTimer--
+    }
+
+
     visibleProgram.setup();
 
     this.renderList.reset();

@@ -253,7 +253,7 @@ class Main {
     this.update(time);
 
     if (this.mode === 'game') {
-      this.game.render(this.mainProgram, this.visibleProgram, this.fogProgram, this.mapProgram, this.foggedMapProgram);
+      this.game.render(this.mainProgram, this.visibleProgram, this.fogProgram, this.mapProgram, this.foggedMapProgram, this.sendMessage.bind(this));
     } else if (this.mode === 'start') {
       this.startscreen.render(this.mainProgram);
     } else if (this.mode === 'end') {
