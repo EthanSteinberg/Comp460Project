@@ -4,6 +4,7 @@ import * as Shipyards from './shipyard';
 import * as Hardpoints from './hardpoint';
 import * as Islands from './island';
 import * as Ships from './ship';
+import * as Health from './health';
 import Types from './types';
 
 export const GUI_WIDTH = 200;
@@ -184,6 +185,10 @@ export default class GameMap {
       if (type.render != null) {
         type.render(entity, this, renderList, isSelected);
       }
+
+      if (entity.health != null) {
+        Health.render(entity.health, this, renderList);
+      }
     }
 
     for (const entity of this.entities.values()) {
@@ -362,6 +367,9 @@ export default class GameMap {
       if (type == null) { console.log(entity.type); }
       if (type.processUpdate != null) {
         type.processUpdate(entity, this);
+      }
+      if (entity.health != null) {
+        Health.processUpdate(entity.health, this);
       }
     }
   }

@@ -1,16 +1,19 @@
+import * as Health from './health';
+
 /**
  * A mine entity.
  */
 
 export function createMine(map, x, y, islandID, team) {
+  const id = map.getNextEntityId();
   const mine = {
     type: 'mine',
     x,
     y,
-    id: map.getNextEntityId(),
+    id,
     islandID,
     team,
-    health: 100,
+    health: Health.createHealth(100, id),
     renderHeal: false,
     healTimer: 2,
   };
@@ -26,15 +29,15 @@ export function processUpdate(mine, map) {
 
 export function heal(mine, map) {
   if (mine.healTimer > 0) {
-    mine.healTimer -= 1
+    mine.healTimer -= 1;
     return;
   } else {
-    mine.healTimer = 2
+    mine.healTimer = 2;
   }
 
-  if (mine.health < 100) {
-    mine.health += 5
-    mine.renderHeal = true
+  if (mine.health.health < 100) {
+    mine.health.health += 5;
+    mine.renderHeal = true;
   } else {
     mine.renderHeal = false;
   }
@@ -46,14 +49,6 @@ export function render(mine, map, renderList, isSelected) {
   renderList.addImage(name, mine.x * 50 - 25, mine.y * 50 - 25);
 
   renderList.addImage('mine2', (mine.x - 0.5) * 50, (mine.y - 0.5) * 50, 50, 50);
-
-  renderList.addImage('black', mine.x * 50 - 22, mine.y * 50 + 28, 44, 9);
-
-  renderList.addImage('red', mine.x * 50 - 20, mine.y * 50 + 30, 40, 5);
-
-  const healthpercent = mine.health / 100;
-
-  renderList.addImage('green', mine.x * 50 - 20, mine.y * 50 + 30, 40 * healthpercent, 5);
 
   if (isSelected) {
     renderList.addImage('cyan',

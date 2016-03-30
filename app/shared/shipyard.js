@@ -1,19 +1,21 @@
 import * as Ships from './ship';
 import { getStats } from '../shared/template';
+import * as Health from './health';
 
 /**
  * A shipyard entity.
  */
 
 export function createShipyard(map, x, y, islandID, team) {
+  const id = map.getNextEntityId();
   const shipyard = {
     map,
     x,
     y,
     islandID,
-    health: 100,
+    health: Health.createHealth(100, id),
     team,
-    id: map.getNextEntityId(),
+    id,
     set: true,
     type: 'shipyard',
     buildingQueue: [],
@@ -41,12 +43,6 @@ export function render(shipyard, map, renderList, isSelected) {
 
   renderList.addImage('black', shipyard.x * 50 - 22, shipyard.y * 50 + 28, 44, 9);
 
-  renderList.addImage('red', shipyard.x * 50 - 20, shipyard.y * 50 + 30, 40, 5);
-
-  const healthpercent = shipyard.health / 100;
-
-  renderList.addImage('green', shipyard.x * 50 - 20, shipyard.y * 50 + 30, 40 * healthpercent, 5);
-
   if (shipyard.renderHeal) {
     var randomX = Math.floor(Math.random()*(50 - (-5) + 1) + -5);
     var randomY = Math.floor(Math.random()*(50 - (-5) + 1) + -5);
@@ -66,8 +62,8 @@ export function heal(shipyard, map) {
     shipyard.healTimer = 2
   }
 
-  if (shipyard.health < 100) {
-    shipyard.health += 5
+  if (shipyard.health.health < 100) {
+    shipyard.health.health += 5
     shipyard.renderHeal = true
   } else {
     shipyard.renderHeal = false;

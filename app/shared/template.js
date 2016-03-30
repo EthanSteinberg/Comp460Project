@@ -42,7 +42,7 @@ export const shell = {
   name: 'Shell',
   description: 'Long range.',
   health: 100,
-  damage: 17,
+  damage: 50,
   speed: 0,
   weight: -20,
   cost: 50,

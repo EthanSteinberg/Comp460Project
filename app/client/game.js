@@ -199,7 +199,7 @@ export default class Game {
         this.getSelectedMapItems().forEach(ship => sendMessage({ type: 'MoveShip', shipId: ship.id, targetLocation }));
       }
     } else {
-      if ((item.type === 'ship' || item.type === 'shipyard' || item.type === 'mine' || item.type === 'fort' || item.type === 'buildingTemplate') && this.getSelectedMapItems().every(entity => entity.type === 'ship')
+      if (item.health != null && this.getSelectedMapItems().every(entity => entity.type === 'ship')
         && item.team !== this.team) {
         // Trying to attack something
         this.getSelectedMapItems().forEach(ship => sendMessage({ type: 'AttackShip', id: ship.id, targetId: item.id }));
@@ -316,14 +316,14 @@ export default class Game {
             break;
           }
 
-          if (this.infiniteProduce.templateNumber == newInf.templateNumber 
+          if (this.infiniteProduce.templateNumber == newInf.templateNumber
             && this.infiniteProduce.shipyardId == newInf.shipyardId) {
             this.infiniteProduce = null
           } else {
             this.infiniteProduce = newInf
           }
 
-          this.gui.selectTemplate(this.infiniteProduce)            
+          this.gui.selectTemplate(this.infiniteProduce)
           break;
         case 'hull':
           sendMessage({ type: 'UpdateMode', targetMode: 'hardpoints' });
@@ -411,11 +411,9 @@ export default class Game {
     const mouseRoundedY = Math.round(mouseY);
 
     let item = this.map.getItem(mouseX, mouseY);
-    // console.log(mouseRoundedX, mouseRoundedY, item);
 
     if (this.mouseDownRawPosition == null) {
       // Must have been off screen.
-      console.log('Off screen?');
       return;
     }
 

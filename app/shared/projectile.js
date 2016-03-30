@@ -1,5 +1,6 @@
 import Types from './types';
 import { hardpoints } from './template';
+import * as Health from './health';
 
 export function createProjectile(map, position, target, projectileType, sourceTeam) {
   const projectile = {
@@ -19,7 +20,7 @@ export function createProjectile(map, position, target, projectileType, sourceTe
 }
 
 export function processUpdate(projectile, map) {
-  if (projectile.dead == true) {
+  if (projectile.dead === true) {
     return;
   }
 
@@ -37,15 +38,13 @@ export function processUpdate(projectile, map) {
   const dist = Math.sqrt(dx * dx + dy * dy);
 
   if (dist < 0.1) {
-
-    if (projectile.projectileType == 'grapeshot') {
+    if (projectile.projectileType === 'grapeshot') {
       for (const neighbor of map.entities.values()) {
-
-        if (neighbor.type != 'ship' && neighbor.type != 'mine' && neighbor.type != 'shipyard' && neighbor.type != 'fort') {
+        if (neighbor.health == null) {
           continue;
         }
 
-        if (map.getEntity(neighbor.id).team == projectile.sourceTeam) {
+        if (map.getEntity(neighbor.id).team === projectile.sourceTeam) {
           continue;
         }
 
@@ -57,28 +56,22 @@ export function processUpdate(projectile, map) {
         const ndist = Math.sqrt(ndx * ndx + ndy * ndy);
 
         if (ndist < 2.5) {
-          neighbor.health -= hardpoints[projectile.projectileType].damage / 2;
-
-          if (neighbor.health <= 0) {
-            Types[neighbor.type].remove(neighbor, map);
-          }
+          Health.damage(neighbor.health, map, hardpoints[projectile.projectileType].damage / 2);
         }
       }
 
-      target.health -= hardpoints[projectile.projectileType].damage / 2;
+      Health.damage(target.health, map, hardpoints[projectile.projectileType].damage / 2);
+    } else if (projectile.projectileType === 'shell') {
+      Health.setOnFire(target.health, hardpoints[projectile.projectileType].damage);
 
+      projectile.deadTime = 0;
     } else {
-      projectile.deadTime = 0
+      projectile.deadTime = 0;
 
-      target.health -= hardpoints[projectile.projectileType].damage;
-
-      if (target.health <= 0) {
-        Types[target.type].remove(target, map);
-      }      
+      Health.damage(target.health, map, hardpoints[projectile.projectileType].damage);
     }
 
     projectile.dead = true;
-
   } else {
     const movement = Math.min(dist, 0.2);
 
@@ -90,17 +83,17 @@ export function processUpdate(projectile, map) {
 export function render(projectile, map, renderList) {
   const radius = 10;
 
-  if (projectile.dead && projectile.projectileType == 'grapeshot') {
-    renderList.addImage('explosion', projectile.position.x * 50 - (radius * projectile.deadTime/10) / 2, 
-      projectile.position.y * 50 - (radius * projectile.deadTime/10) / 2, 
-      radius * projectile.deadTime/10, radius * projectile.deadTime/10);
+  if (projectile.dead && projectile.projectileType === 'grapeshot') {
+    renderList.addImage('explosion', projectile.position.x * 50 - (radius * projectile.deadTime / 10) / 2,
+      projectile.position.y * 50 - (radius * projectile.deadTime / 10) / 2,
+      radius * projectile.deadTime / 10, radius * projectile.deadTime / 10);
 
     projectile.deadTime--;
   } else {
     renderList.addImage(projectile.projectileType, projectile.position.x * 50 - radius / 2, projectile.position.y * 50 - radius / 2, radius, radius);
   }
 
-  if (projectile.deadTime == 0) {
+  if (projectile.deadTime === 0) {
     map.removeEntity(projectile.id);
-  }  
+  }
 }

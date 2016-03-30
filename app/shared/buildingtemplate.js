@@ -1,16 +1,19 @@
 import buildingConstants from './buildingconstants';
+import * as Health from './health';
+
 
 export function createBuildingTemplate(map, x, y, team, islandID, buildingType) {
+  const id = map.getNextEntityId();
   const template = {
     x,
     y,
-    id: map.getNextEntityId(),
+    id,
     buildingType,
     progressTowardsBuild: 0,
     type: 'buildingTemplate',
     team,
     islandID,
-    health: 100,
+    health: Health.createHealth(100, id),
   };
 
   map.addEntity(template);
@@ -40,14 +43,6 @@ export function render(template, map, renderList) {
 
   const angle = (template.progressTowardsBuild) / buildingConstants[template.buildingType].buildTime * Math.PI * 2;
   renderList.addCircleCutout('quarterAlphaGray', angle, (template.x - 0.5) * 50, (template.y - 0.5) * 50, 50, 50);
-
-  renderList.addImage('black', template.x * 50 - 22, template.y * 50 + 28, 44, 9);
-
-  renderList.addImage('red', template.x * 50 - 20, template.y * 50 + 30, 40, 5);
-
-  const healthpercent = template.health / 100;
-
-  renderList.addImage('green', template.x * 50 - 20, template.y * 50 + 30, 40 * healthpercent, 5);
 }
 
 export function processUpdate(template, map) {

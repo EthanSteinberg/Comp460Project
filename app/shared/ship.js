@@ -4,6 +4,7 @@ const defenseTicksDelay = 20;
 
 import { hulls, hardpoints } from './template';
 import * as Hardpoints from './hardpoint';
+import * as Health from './health';
 import Types from './types';
 import { getDistance } from './vector';
 
@@ -35,7 +36,7 @@ export function createShipAndHardpoints(map, x, y, template, team) {
     team,
     type: 'ship',
     template: template,
-    health: JSON.parse(JSON.stringify(hulls[template.hull])).health,
+    health: Health.createHealth(JSON.parse(JSON.stringify(hulls[template.hull])).health, shipId),
     hardpoints: myHardpoints,
 
     lastPositions: [],
@@ -101,35 +102,28 @@ export function render(ship, map, renderList, isSelected) {
       throw new Error('unhandled switch statement in shiptemplate');
   }
 
-  var i = 0;
+  let i = 0;
   for (const hardpoint of ship.template.hardpoints) {
     if (hardpoint != null) {
-      Hardpoints.renderTemplate(hardpoint, i,  -25 + 10, -25 + 38, renderList);
+      Hardpoints.renderTemplate(hardpoint, i, -25 + 10, -25 + 38, renderList);
     }
     i += 1;
   }
 
+
+  if (ship.health.burningDamageLeft > 0) {
+    renderList.addImage('fire', -25, -25, 25 * 899 / 1280, 25);
+    renderList.addImage('fire', 0, -20, 25 * 899 / 1280, 25);
+  }
+
   if (angle > Math.PI) {
-    renderList.scale(-1, 1)
+    renderList.scale(-1, 1);
   }
   renderList.translate(-ship.x * 50, -ship.y * 50);
-
-  // for (const hardpointId of ship.hardpoints) {
-  //   const hardpoint = map.getEntity(hardpointId);
-  //   if (hardpoint != null) {
-  //     Hardpoints.render(hardpoint, map, renderList);
-  //   }
-  // }
 }
 
 export function renderOverlay(ship, map, renderList) {
-  renderList.addImage('black', ship.x * 50 - 22, ship.y * 50 + 28, 44, 9);
-
-  renderList.addImage('red', ship.x * 50 - 20, ship.y * 50 + 30, 40, 5);
-
-  const healthpercent = ship.health / hulls[ship.template.hull].health;
-
-  renderList.addImage('green', ship.x * 50 - 20, ship.y * 50 + 30, 40 * healthpercent, 5);
+  Health.render(ship.health, map, renderList);
 }
 
 function setPosition(ship, x, y) {
@@ -287,20 +281,12 @@ function processMove(ship, map) {
   performMove(ship, map);
 }
 
-function getActualTarget(ship, map, target) {
-  if (target == null) {
-    return null;
-  }
-
-  return target;
-}
-
 /**
  * Tries to shoot at the target (entity is the parent entity).
  * If there are cannons which can fire, but need to be closer, returns true.
  * Returns false if there is no point moving closer.
  */
-function shootAt(ship, map, entity, target) {
+function shootAt(ship, map, entity) {
   let shouldMoveCloser = false;
 
   const targetLocation = getPosition(entity, map);
@@ -309,7 +295,7 @@ function shootAt(ship, map, entity, target) {
     const hardpoint = map.getEntity(hardpointId);
     if (hardpoint != null && hardpoint.timeTillNextFire === 0) {
       if (distance < hardpoints[hardpoint.gunType].range) {
-        Hardpoints.fire(hardpoint, map, target);
+        Hardpoints.fire(hardpoint, map, entity);
       } else {
         shouldMoveCloser = true;
       }
@@ -344,9 +330,8 @@ function processIdleAttack(ship, map) {
   const currentSeen = ship.lastSeen[0];
   for (const entityId of currentSeen) {
     const entity = map.getEntity(entityId);
-    const actualTarget = getActualTarget(ship, map, entity);
-    if (actualTarget != null) {
-      shootAt(ship, map, entity, actualTarget);
+    if (entity != null) {
+      shootAt(ship, map, entity);
     }
   }
 }
@@ -358,7 +343,7 @@ function updateLastSeen(ship, map) {
   ship.lastSeen.shift();
   const temp = [];
   for (const entity of map.entities.values()) {
-    if (entity.type === 'ship' && entity.team !== ship.team) {
+    if (entity.health != null && entity.team !== ship.team) {
       if (isInRange(ship, map, entity)) {
         temp.push(entity.id);
       }
@@ -371,8 +356,7 @@ function updateLastSeen(ship, map) {
  * Try to attack if in range, or move into range otherwise
  */
 function processAttack(ship, map) {
-  const pseudoTarget = map.getEntity(ship.mode.targetId);
-  const target = getActualTarget(ship, map, pseudoTarget);
+  const target = map.getEntity(ship.mode.targetId);
 
   if (target == null) {
     // Target is gone or dead
@@ -382,9 +366,9 @@ function processAttack(ship, map) {
     return;
   }
 
-  const targetLocation = Types[pseudoTarget.type].getPosition(pseudoTarget, map);
+  const targetLocation = Types[target.type].getPosition(target, map);
 
-  const shouldMoveCloser = shootAt(ship, map, pseudoTarget, target, 0);
+  const shouldMoveCloser = shootAt(ship, map, target, 0);
 
   if (shouldMoveCloser) {
     ship.mode.targetLocation = targetLocation;
@@ -427,10 +411,6 @@ export function processUpdate(ship, map) {
   }
 
   updateLastSeen(ship, map);
-}
-
-export function getHealth(ship) {
-  return ship.health;
 }
 
 export function remove(ship, map) {

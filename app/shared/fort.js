@@ -1,9 +1,9 @@
-import { hulls, hardpoints } from './template';
+import { hardpoints } from './template';
 import * as Hardpoints from './hardpoint';
-import Types from './types';
 import { getDistance } from './vector';
 import * as Mine from './mine';
 import * as Shipyard from './shipyard';
+import * as Health from './health';
 
 
 /**
@@ -11,7 +11,7 @@ import * as Shipyard from './shipyard';
  */
 
 export function createFort(map, x, y, islandID, team) {
-  var fortId = map.getNextEntityId();
+  const fortId = map.getNextEntityId();
   const fort = {
     type: 'fort',
     x,
@@ -19,8 +19,8 @@ export function createFort(map, x, y, islandID, team) {
     id: fortId,
     islandID,
     team,
-    health: 300,
-    hardpoints: [Hardpoints.createHardpoint(map, fortId, 0, "shell", team), 
+    health: Health.createHealth(300, fortId),
+    hardpoints: [Hardpoints.createHardpoint(map, fortId, 0, "shell", team),
                   Hardpoints.createHardpoint(map, fortId, 1, "roundshot", team)],
   };
 
@@ -38,12 +38,12 @@ export function processUpdate(fort, map) {
   }
 
   for (const entity of map.entities.values()) {
-    if (entity.type != 'mine' && entity.type != 'shipyard') {
+    if (entity.type !== 'mine' && entity.type !== 'shipyard') {
       continue;
     }
 
-    if (entity.islandID == fort.islandID) {
-      if (entity.type == 'mine') {
+    if (entity.islandID === fort.islandID) {
+      if (entity.type === 'mine') {
         Mine.heal(entity, map)
       } else if (entity.type = 'shipyard') {
         Shipyard.heal(entity, map)
@@ -61,14 +61,6 @@ export function render(fort, map, renderList, isSelected) {
   renderList.addImage(name, fort.x * 50 - 25, fort.y * 50 - 25);
 
   renderList.addImage('fort', (fort.x - 0.5) * 50, (fort.y - 0.5) * 50, 50, 50);
-
-  renderList.addImage('black', fort.x * 50 - 22, fort.y * 50 + 28, 44, 9);
-
-  renderList.addImage('red', fort.x * 50 - 20, fort.y * 50 + 30, 40, 5);
-
-  const healthpercent = fort.health / 300;
-
-  renderList.addImage('green', fort.x * 50 - 20, fort.y * 50 + 30, 40 * healthpercent, 5);
 
   if (isSelected) {
     renderList.addImage('cyan',
