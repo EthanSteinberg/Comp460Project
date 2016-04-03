@@ -4,6 +4,7 @@ const buildingConstants = {
     description: 'Generates coin.',
     coinCost: 50,
     buildTime: 50, // In ticks
+    maxCoinFlow: 2,
   },
 
   shipyard: {
@@ -11,6 +12,7 @@ const buildingConstants = {
     description: 'Produces ships.',
     coinCost: 100,
     buildTime: 100, // In ticks
+    maxCoinFlow: 1,
   },
 
   fort: {
@@ -18,6 +20,7 @@ const buildingConstants = {
     description: 'A building to protect our lands.',
     coinCost: 100,
     buildTime: 100, // In ticks
+    maxCoinFlow: 1,
   },
 };
 

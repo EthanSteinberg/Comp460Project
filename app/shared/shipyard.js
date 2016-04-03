@@ -23,6 +23,7 @@ export function createShipyard(map, x, y, islandID, team) {
     counters: { 0: 0, 1: 0, 2: 0 },
     renderHeal: false,
     healTimer: 2,
+    maxCoinFlow: 0,    
   };
 
   map.addEntity(shipyard);
@@ -72,13 +73,21 @@ export function heal(shipyard, map) {
 
 export function processUpdate(shipyard, map) {
   if (shipyard.buildingQueue.length > 0) {
-    shipyard.progressTowardsNextBuild += 1;
 
     const { template, templateNumber } = shipyard.buildingQueue[0];
     const stats = getStats(template);
 
+    if (map.getMaxCoinFlow() > map.getEntity(shipyard.team).coins) {
+      var cost = map.getEntity(shipyard.team).coins / map.getBuildQueue().length;
+      shipyard.progressTowardsNextBuild += cost
+      map.getEntity(shipyard.team).coins -= cost;
+    } else {
+      var cost = stats.maxCoinFlow; 
+      shipyard.progressTowardsNextBuild += cost;
+      map.getEntity(shipyard.team).coins -= cost;
+    }
 
-    if (shipyard.progressTowardsNextBuild === stats.tcost) {
+    if (shipyard.progressTowardsNextBuild >= stats.cost) {
       shipyard.buildingQueue.shift();
       shipyard.counters[templateNumber]--;
 
@@ -92,6 +101,7 @@ export function processUpdate(shipyard, map) {
       }
 
       shipyard.progressTowardsNextBuild = 0;
+      map.removeEntityFromQueue(stats)    
     }
   }
 }
@@ -102,13 +112,14 @@ export function remove(shipyard, map) {
   // Refund in progress ships
   for (const { template } of shipyard.buildingQueue) {
     const stats = getStats(template);
-    map.getEntity(shipyard.team).coins += stats.cost;
+    map.getEntity(shipyard.team).coins += shipyard.progressTowardsNextBuild;
   }
 }
 
 export function addTemplateToQueue(shipyard, templateNumber, template) {
   shipyard.counters[templateNumber]++;
   shipyard.buildingQueue.push({ template, templateNumber });
+  shipyard.maxCoinFlow += getStats(template).maxCoinFlow
 }
 
 export function removeTemplateFromQueue(shipyard, map, templateNumber) {
@@ -130,6 +141,9 @@ export function removeTemplateFromQueue(shipyard, map, templateNumber) {
 
   const [removed] = shipyard.buildingQueue.splice(optionIndex, 1);
 
+  shipyard.maxCoinFlow -= getStats(removed.template).maxCoinFlow
   const stats = getStats(removed.template);
-  map.getEntity(shipyard.team).coins += stats.cost;
+  map.getEntity(shipyard.team).coins += shipyard.progressTowardsNextBuild;
+  map.removeEntityFromQueue(stats);
+  shipyard.progressTowardsNextBuild = 0;
 }

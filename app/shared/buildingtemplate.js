@@ -14,6 +14,7 @@ export function createBuildingTemplate(map, x, y, team, islandID, buildingType) 
     team,
     islandID,
     health: Health.createHealth(100, id),
+    maxCoinFlow: buildingConstants[buildingType].maxCoinFlow
   };
 
   map.addEntity(template);
@@ -41,13 +42,22 @@ export function render(template, map, renderList) {
       console.error('No support for building type', template.buildingType);
   }
 
-  const angle = (template.progressTowardsBuild) / buildingConstants[template.buildingType].buildTime * Math.PI * 2;
+  const angle = (template.progressTowardsBuild) / buildingConstants[template.buildingType].coinCost * Math.PI * 2;
   renderList.addCircleCutout('quarterAlphaGray', angle, (template.x - 0.5) * 50, (template.y - 0.5) * 50, 50, 50);
 }
 
 export function processUpdate(template, map) {
-  template.progressTowardsBuild += 1;
-  if (template.progressTowardsBuild === buildingConstants[template.buildingType].buildTime) {
+  if (map.getMaxCoinFlow() > map.getEntity(template.team).coins) {
+    var cost = map.getEntity(template.team).coins / map.getBuildQueue().length;
+    template.progressTowardsBuild += cost
+    map.getEntity(template.team).coins -= cost;
+  } else {
+    var cost = buildingConstants[template.buildingType].maxCoinFlow; 
+    template.progressTowardsBuild += cost;
+    map.getEntity(template.team).coins -= cost;
+  }
+
+  if (template.progressTowardsBuild >= buildingConstants[template.buildingType].coinCost) {
     map.addBuilding(
       template.buildingType,
       template.x,
@@ -55,6 +65,7 @@ export function processUpdate(template, map) {
       template.islandID,
       template.team
     );
+    map.removeEntityFromQueue(template)
     map.removeEntity(template.id);
   }
 }

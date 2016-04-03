@@ -161,15 +161,8 @@ function makeBuildingHandler({ building, x, y }, playerTeam) {
     return;
   }
 
-  const buildingStats = buildingConstants[building];
-  if (buildingStats.coinCost > map.getEntity(playerTeam).coins) {
-    console.error('Trying to build a buildng you cant afford');
-    const soundId = playerTeam === '0' ? 'empireMoreGold' : 'pirateMoreGold';
-    sendMessageToPlayer(playerTeam, { type: 'PlaySound', soundId });
-    return;
-  }
-  map.getEntity(playerTeam).coins -= buildingStats.coinCost;
-  BuildingTemplates.createBuildingTemplate(map, x, y, playerTeam, island.id, building);
+  var newBuildingId = BuildingTemplates.createBuildingTemplate(map, x, y, playerTeam, island.id, building);
+  map.addEntityToQueue(map.getEntity(newBuildingId))
 }
 
 function cancelShipHandler({ shipyardId, templateNumber }, playerTeam) {
@@ -199,17 +192,8 @@ function makeShipHandler({ shipyardId, template, templateNumber }, playerTeam) {
 
   const stats = getStats(template);
 
-  if (stats.cost > map.getEntity(playerTeam).coins) {
-    // console.error('Trying to build a ship you cant afford');
-
-    const soundId = playerTeam === '0' ? 'empireMoreGold' : 'pirateMoreGold';
-    sendMessageToPlayer(playerTeam, { type: 'PlaySound', soundId });
-    return;
-  }
-
-  map.getEntity(playerTeam).coins -= stats.cost;
-
   Shipyards.addTemplateToQueue(shipyard, templateNumber, template);
+  map.addEntityToQueue(stats)
 }
 
 function recycleBuildingHandler({ buildingId }, playerTeam) {
@@ -224,11 +208,11 @@ function recycleBuildingHandler({ buildingId }, playerTeam) {
 
   if (building.type === 'buildingTemplate') {
     type = building.buildingType;
+    map.getEntity(playerTeam).coins += building.progressTowardsBuild;
   } else {
     type = building.type;
+    map.getEntity(playerTeam).coins += buildingConstants[type].coinCost;
   }
-
-  map.getEntity(playerTeam).coins += buildingConstants[type].coinCost;
 
   Types[building.type].remove(building, map);
 }

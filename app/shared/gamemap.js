@@ -27,6 +27,9 @@ export default class GameMap {
 
     this.width = width;
     this.height = height;
+
+    this.buildingQueue = []
+    this.maxCoinFlow = 0
   }
 
   getInitialState() {
@@ -105,6 +108,35 @@ export default class GameMap {
     }
 
     return result;
+  }
+
+  addEntityToQueue(entity) {
+    this.maxCoinFlow += entity.maxCoinFlow
+    this.buildingQueue.push({ entity });
+  }
+
+  removeEntityFromQueue(entity) {
+    let optionIndex = null;
+    for (let i = 0; i < this.buildingQueue.length; i++) {
+      if (this.buildingQueue[i].entity.id === entity.id) {
+        optionIndex = i;
+      }
+    }
+
+    if (optionIndex == null) {
+      console.error('Trying to remove non-existant item from the queue? What?');
+    }
+
+    this.maxCoinFlow -= entity.maxCoinFlow
+    const [removed] = this.buildingQueue.splice(optionIndex, 1);
+  }
+
+  getBuildQueue() {
+    return this.buildingQueue
+  }
+
+  getMaxCoinFlow() {
+    return this.maxCoinFlow
   }
 
   /**
@@ -362,6 +394,14 @@ export default class GameMap {
    * Update the map and get the corresponding update messages.
    */
   processUpdate() {
+    // for (const entity of this.entities.values()) {
+    //   const type = Types[entity.type];
+    //   if (type == 'mine') {
+    //     type.processUpdate(entity, this);
+    //   }
+    // }
+
+
     for (const entity of this.entities.values()) {
       const type = Types[entity.type];
       if (type == null) { console.log(entity.type); }
