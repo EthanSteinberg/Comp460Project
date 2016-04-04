@@ -287,9 +287,9 @@ export default class Gui {
               break;
           }
         } else {
-        result.push(new InfinityProduce('infinityGrayed', this.x + 20, this.y + 377, 50, 26, 0, null, this.templates[0]));
-        result.push(new InfinityProduce('infinityGrayed', this.x + 75, this.y + 377, 50, 26, 1, null, this.templates[1]));
-        result.push(new InfinityProduce('infinityGrayed', this.x + 130, this.y + 377, 50, 26, 2, null, this.templates[2]));          
+          result.push(new InfinityProduce('infinityGrayed', this.x + 20, this.y + 377, 50, 26, 0, null, this.templates[0]));
+          result.push(new InfinityProduce('infinityGrayed', this.x + 75, this.y + 377, 50, 26, 1, null, this.templates[1]));
+          result.push(new InfinityProduce('infinityGrayed', this.x + 130, this.y + 377, 50, 26, 2, null, this.templates[2]));          
         }        
       } else {
         result.push(new InfinityProduce('infinity', this.x + 20, this.y + 377, 50, 26, 0,

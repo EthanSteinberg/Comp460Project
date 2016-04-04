@@ -23,7 +23,8 @@ export function createShipyard(map, x, y, islandID, team) {
     counters: { 0: 0, 1: 0, 2: 0 },
     renderHeal: false,
     healTimer: 2,
-    maxCoinFlow: 0,    
+    maxCoinFlow: 0,
+    infiniteProduce: null,
   };
 
   map.addEntity(shipyard);
@@ -103,6 +104,14 @@ export function processUpdate(shipyard, map) {
       shipyard.progressTowardsNextBuild = 0;
       map.removeEntityFromQueue(stats)    
     }
+  } else {
+    if (shipyard.infiniteProduce) {
+      const info = shipyard.infiniteProduce
+      const stats = getStats(info.template);
+
+      addTemplateToQueue(shipyard, info.templateNumber, info.template);
+      map.addEntityToQueue(stats)
+    } 
   }
 }
 

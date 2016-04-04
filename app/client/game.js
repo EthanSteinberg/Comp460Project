@@ -56,7 +56,6 @@ export default class Game {
     }
 
     this.infiniteProduce = null
-    this.infTimer = 10
   }
 
   centerAround(x, y) {
@@ -312,14 +311,20 @@ export default class Game {
 
           if (this.infiniteProduce == null) {
             this.infiniteProduce = newInf
+            sendMessage({ type: 'SetInfProduce', oldInfProduce: this.infiniteProduce, newInfProduce: this.infiniteProduce });
+            // this.map.getEntity(this.infiniteProduce.shipyardId).infiniteProduce = this.infiniteProduce
             this.gui.selectTemplate(this.infiniteProduce)
             break;
           }
 
           if (this.infiniteProduce.templateNumber == newInf.templateNumber
             && this.infiniteProduce.shipyardId == newInf.shipyardId) {
+            sendMessage({ type: 'SetInfProduce', oldInfProduce: this.infiniteProduce, newInfProduce: null });
+            // this.map.getEntity(this.infiniteProduce.shipyardId).infiniteProduce = null
             this.infiniteProduce = null
           } else {
+            sendMessage({ type: 'SetInfProduce', oldInfProduce: this.infiniteProduce, newInfProduce: this.infiniteProduce });
+            // this.map.getEntity(this.infiniteProduce.shipyardId).infiniteProduce = this.infiniteProduce
             this.infiniteProduce = newInf
           }
 
@@ -452,18 +457,6 @@ export default class Game {
    * Render the game. Also performs updates if necessary.
    */
   render(mainProgram, visibleProgram, fogProgram, mapProgram, foggedMapProgram, sendMessage) {
-    if (this.infTimer < 0 && this.infiniteProduce) {
-      this.infTimer = 10
-      var info = this.infiniteProduce
-      if (this.map.getEntity(this.team).coins > getStats(this.gui.templates[info.templateNumber]).cost) {
-        sendMessage({ type: 'MakeShip', templateNumber: info.templateNumber,
-          shipyardId: info.shipyardId, template:info.template });
-      }
-    } else {
-      this.infTimer--
-    }
-
-
     visibleProgram.setup();
 
     this.renderList.reset();

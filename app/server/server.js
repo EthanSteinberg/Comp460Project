@@ -271,6 +271,10 @@ function updateReadyState({ readyState }, playerTeam) {
   }
 }
 
+function setInfProduce({ oldInfProduce, newInfProduce }, playerTeam) {
+  map.getEntity(oldInfProduce.shipyardId).infiniteProduce = newInfProduce
+}
+
 const messageHandlers = {
   'MoveShip': moveShipHandler,
   'MakeBuilding': makeBuildingHandler,
@@ -281,6 +285,7 @@ const messageHandlers = {
   'SetReadyState': updateReadyState,
   'UpdateMap': updateMap,
   'RecycleBuilding': recycleBuildingHandler,
+  'SetInfProduce': setInfProduce,
 };
 
 let nextTeam = 0;
