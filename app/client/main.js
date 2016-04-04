@@ -257,6 +257,7 @@ class Main {
     } else if (this.mode === 'start') {
       this.startscreen.render(this.mainProgram);
     } else if (this.mode === 'end') {
+      this.game.render(this.mainProgram, this.visibleProgram, this.fogProgram, this.mapProgram, this.foggedMapProgram, this.sendMessage.bind(this));
       this.endscreen.render(this.mainProgram);
     }
 

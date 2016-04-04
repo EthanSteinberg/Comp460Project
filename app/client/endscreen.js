@@ -15,7 +15,7 @@ export default class EndScreen {
     this.team = team;
 
     this.buttons = [];
-    this.buttons.push(new Restart('restart', 530, 300, 102, 26, 0));
+    this.buttons.push(new Restart('restart', 535, 300, 102, 26, 0));
 
     this.renderList = new RenderList(this.images.pixelJson);
   }
@@ -23,12 +23,12 @@ export default class EndScreen {
   render(mainProgram) {
     mainProgram.setup();
 
-    this.context.clearColor(0.0, 0.0, 0.0, 1.0);
-    this.context.clear(this.context.COLOR_BUFFER_BIT);
+    // this.context.clearColor(0.0, 0.0, 0.0, 1.0);
+    // this.context.clear(this.context.COLOR_BUFFER_BIT);
 
     this.renderList.reset();
 
-    this.renderList.addImage('linen', 0, 0, this.width, this.height);
+    // this.renderList.addImage('linen', 0, 0, this.width, this.height);
 
     if (this.winningTeam === '1') {
       this.renderList.addImage('piratesWinTag', 0, 0);
