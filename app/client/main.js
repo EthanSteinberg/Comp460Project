@@ -70,22 +70,17 @@ class Main {
     });
 
     window.addEventListener('contextmenu', () => {
+      event.preventDefault();
       if (this.mode === 'game') {
         this.game.clearkeydowns();
       }
+      return false;
     });
 
     window.addEventListener('blur', () => {
       if (this.mode === 'game') {
         this.game.clearkeydowns();
       }
-    });
-
-    // Ignore right click events on the canvas
-    this.canvas.addEventListener('contextmenu', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      return false;
     });
 
     this.canvas.addEventListener('mousedown', (event) => {
