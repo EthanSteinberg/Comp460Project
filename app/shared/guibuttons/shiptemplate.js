@@ -44,7 +44,7 @@ export default class Shiptemplate extends GuiButton {
           const stats = getStats(nextTemplate);
 
           const angle = this.selection.progressTowardsNextBuild / stats.cost * Math.PI * 2;
-          renderList.addCircleCutout('quarterAlphaGray', angle, this.x, this.y, this.width, this.height);
+          renderList.addCircleCutout('quarterAlphaGray', (Math.PI * 2) - angle, this.x, this.y, this.width, this.height);
         }
         break;
       case 'shiptemplateGrayed':

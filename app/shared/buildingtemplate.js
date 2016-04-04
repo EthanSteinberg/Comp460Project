@@ -43,7 +43,7 @@ export function render(template, map, renderList) {
   }
 
   const angle = (template.progressTowardsBuild) / buildingConstants[template.buildingType].coinCost * Math.PI * 2;
-  renderList.addCircleCutout('quarterAlphaGray', angle, (template.x - 0.5) * 50, (template.y - 0.5) * 50, 50, 50);
+  renderList.addCircleCutout('quarterAlphaGray', (Math.PI * 2) - angle, (template.x - 0.5) * 50, (template.y - 0.5) * 50, 50, 50);
 }
 
 export function processUpdate(template, map) {
