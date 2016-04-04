@@ -76,7 +76,7 @@ export const gunboat = {
   weight: 25,
   cost: 75,
   tcost: 60,
-  maxCoinFlow: 3,
+  maxCoinFlow: 1,
 };
 
 export const frigate = {
@@ -88,7 +88,7 @@ export const frigate = {
   weight: 50,
   cost: 100,
   tcost: 120,
-  maxCoinFlow: 2,
+  maxCoinFlow: 1,
 };
 
 export const galleon = {
