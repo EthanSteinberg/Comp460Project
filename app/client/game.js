@@ -186,7 +186,11 @@ export default class Game {
 
   processRightClickOnMap(rawX, rawY, sendMessage) {
     const { mouseX, mouseY } = this.getMouseGamePosition(rawX, rawY);
+    this.rightClickMapHelper(mouseX, mouseY, sendMessage);
 
+  }
+
+  rightClickMapHelper(mouseX, mouseY, sendMessage) {
     const item = this.map.getItem(mouseX, mouseY);
 
     if (item == null) {
@@ -248,6 +252,14 @@ export default class Game {
 
     if (this.gui.displayMode === 'designer') {
       // Right clicks in the designer do nothing.
+      return;
+    }
+
+    if (rawX >= this.width - 150 && rawX < this.width - 50 && rawY >= 50 && rawY < 150) {
+      // You are in the mini map;
+      const x = (rawX - (this.width - 150)) * this.map.width/ 100;
+      const y = (rawY - 50) * this.map.height / 100;
+      this.rightClickMapHelper(x, y, sendMessage);
       return;
     }
 

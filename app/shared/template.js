@@ -13,7 +13,7 @@ export const roundshot = {
   cost: 30,
   tcost: 10,
   range: 2.2,
-  maxCoinFlow: 0,  
+  maxCoinFlow: 0,
 };
 
 export const chainshot = {
@@ -25,7 +25,7 @@ export const chainshot = {
   weight: -20,
   cost: 25,
   tcost: 10,
-  maxCoinFlow: 0,    
+  maxCoinFlow: 0,
 };
 
 export const grapeshot = {
@@ -38,12 +38,12 @@ export const grapeshot = {
   cost: 50,
   tcost: 20,
   range: 1.7,
-  maxCoinFlow: 0,  
+  maxCoinFlow: 0,
 };
 
 export const shell = {
   name: 'Shell',
-  description: 'Long range.',
+  description: 'Long range. Deals fire damage.',
   health: 100,
   damage: 50,
   speed: 0,
@@ -51,7 +51,7 @@ export const shell = {
   cost: 50,
   tcost: 20,
   range: 3.2,
-  maxCoinFlow: 0,    
+  maxCoinFlow: 0,
 };
 
 export const bombard = {
@@ -64,7 +64,7 @@ export const bombard = {
   cost: 500,
   tcost: 20,
   range: 3.2,
-  maxCoinFlow: 0,    
+  maxCoinFlow: 0,
 };
 
 export const gunboat = {
@@ -100,7 +100,7 @@ export const galleon = {
   weight: 100,
   cost: 125,
   tcost: 180,
-  maxCoinFlow: 1,  
+  maxCoinFlow: 1,
 };
 
 export const dreadnought = {
@@ -112,7 +112,7 @@ export const dreadnought = {
   weight: 100,
   cost: 1000,
   tcost: 300,
-  maxCoinFlow: 1,  
+  maxCoinFlow: 1,
 };
 
 export const hardpoints = {

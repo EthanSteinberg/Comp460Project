@@ -394,14 +394,6 @@ export default class GameMap {
    * Update the map and get the corresponding update messages.
    */
   processUpdate() {
-    // for (const entity of this.entities.values()) {
-    //   const type = Types[entity.type];
-    //   if (type == 'mine') {
-    //     type.processUpdate(entity, this);
-    //   }
-    // }
-
-
     for (const entity of this.entities.values()) {
       const type = Types[entity.type];
       if (type == null) { console.log(entity.type); }
