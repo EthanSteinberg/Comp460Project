@@ -30,7 +30,7 @@ let currentMapNum = 0;
 
 const playerSockets = {};
 
-const debug = true;
+const debug = false;
 
 function sendMessageToPlayer(team, message) {
   playerSockets[team].send(JSON.stringify(message));
