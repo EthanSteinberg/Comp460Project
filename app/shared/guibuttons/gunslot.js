@@ -9,7 +9,7 @@ export default class Gunslot extends GuiButton {
     }
 
     if (this.selected) {
-      renderList.addImage('cyan', this.x, this.y, 50, 50);
+      renderList.addImage('cyan', this.x, this.y, this.width, this.height);
     }
 
     switch (this.rendertype) {
@@ -17,12 +17,12 @@ export default class Gunslot extends GuiButton {
       case 'chainshot':
       case 'grapeshot':
       case 'shell':
-        renderList.addImage('coral', this.x, this.y, 50, 50);
-        renderList.addImage(this.rendertype, this.x, this.y, 50, 50);
+        renderList.addImage('coral', this.x, this.y, this.width, this.height);
+        renderList.addImage(this.rendertype, this.x, this.y, this.width, this.height);
         break;
       case 'gunslot':
-        renderList.addImage('coral', this.x, this.y, 50, 50);
-        renderList.addImage('cancelshot', this.x, this.y, 50, 50);
+        renderList.addImage('coral', this.x, this.y, this.width, this.height);
+        renderList.addImage('cancelshot', this.x, this.y, this.width, this.height);
         break;
       default:
         console.error('Trying to render unknown button: ', this.rendertype);

@@ -347,9 +347,9 @@ export default class Gui {
     result.push(new Template('template', this.x + 75, this.y + 25, 50, 50, 1, null, this.templates[1]));
     result.push(new Template('template', this.x + 130, this.y + 25, 50, 50, 2, null, this.templates[2]));
 
-    result.push(new Gunslot('gunslot', this.x + 75, this.y + 210, 40, 40, 0));
-    result.push(new Gunslot('gunslot', this.x + 75, this.y + 350, 40, 40, 1));
-    result.push(new Hullslot('hullslot', this.x + 75, this.y + 280, 40, 40, 1));
+    result.push(new Gunslot('gunslot', this.x + 75, this.y + 210, 50, 50, 0));
+    result.push(new Gunslot('gunslot', this.x + 75, this.y + 350, 50, 50, 1));
+    result.push(new Hullslot('hullslot', this.x + 75, this.y + 280, 50, 50, 1));
 
     for (const button of result) {
       button.setVisible(this.chosenIndex != null);
