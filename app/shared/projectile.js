@@ -39,7 +39,13 @@ export function processUpdate(projectile, map) {
 
   if (dist < 0.1) {
     if (projectile.projectileType === 'grapeshot') {
-      for (const neighbor of map.entities.values()) {
+
+      const ids = [...map.entities.keys()];
+
+      for (const id of ids) {
+        const neighbor = map.getEntity(id);
+        if (neighbor == null) continue;
+
         if (neighbor.health == null) {
           continue;
         }

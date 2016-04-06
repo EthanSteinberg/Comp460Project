@@ -15,11 +15,10 @@ export function damage(health, map, amount) {
   health.health -= amount;
   if (health.health <= 0) {
     const parent = map.getEntity(health.parentId);
-    if (parent != null) {
-      Types[parent.type].remove(parent, map);
-    } else {
-      console.log("Parent was null", parent)
+    if (parent == null) {
+      console.log("Parent: ", parent, health.parentId)
     }
+    Types[parent.type].remove(parent, map);
   }
 }
 

@@ -71,6 +71,7 @@ export default class GameMap {
     if (typeof entityId !== 'string') {
       console.error('Bad entitity id', entityId);
     }
+    // console.log("Killed: ", entityId)
     this.entities.delete(entityId);
   }
 
@@ -394,7 +395,11 @@ export default class GameMap {
    * Update the map and get the corresponding update messages.
    */
   processUpdate() {
-    for (const entity of this.entities.values()) {
+    const ids = [...this.entities.keys()];
+
+    for (const id of ids) {
+      const entity = this.getEntity(id);
+      if (entity == null) continue;
       const type = Types[entity.type];
       if (type == null) { console.log(entity.type); }
       if (type.processUpdate != null) {
@@ -404,6 +409,7 @@ export default class GameMap {
         if (entity.id != entity.health.parentId) {
           console.log("Mismatch in processUpdate in gamemap", entity)
         }
+        // console.log("Updating Health: ", entity.id)
         Health.processUpdate(entity.health, this);
       }
     }
