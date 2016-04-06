@@ -311,36 +311,14 @@ export default class Game {
         case 'infinitySelected':
           const templateinf = templates[item.templateNum];
 
-          var newInf = null
-
           this.getSelectedMapItems().forEach(shipyard =>
-            newInf = { templateNumber: item.templateNum, shipyardId: shipyard.id, template: templateinf }
+            this.gui.selectTemplate({ templateNumber: item.templateNum, shipyardId: shipyard.id, template: templateinf })
           );
 
-          if (newInf == null) {
-            break;
-          }
+          this.getSelectedMapItems().forEach(shipyard =>
+            sendMessage({ type: 'SetInfProduce', infproduce: { templateNumber: item.templateNum, shipyardId: shipyard.id, template: templateinf } })
+          );
 
-          if (this.infiniteProduce == null) {
-            this.infiniteProduce = newInf
-            sendMessage({ type: 'SetInfProduce', oldInfProduce: this.infiniteProduce, newInfProduce: this.infiniteProduce });
-            // this.map.getEntity(this.infiniteProduce.shipyardId).infiniteProduce = this.infiniteProduce
-            this.gui.selectTemplate(this.infiniteProduce)
-            break;
-          }
-
-          if (this.infiniteProduce.templateNumber == newInf.templateNumber
-            && this.infiniteProduce.shipyardId == newInf.shipyardId) {
-            sendMessage({ type: 'SetInfProduce', oldInfProduce: this.infiniteProduce, newInfProduce: null });
-            // this.map.getEntity(this.infiniteProduce.shipyardId).infiniteProduce = null
-            this.infiniteProduce = null
-          } else {
-            sendMessage({ type: 'SetInfProduce', oldInfProduce: this.infiniteProduce, newInfProduce: this.infiniteProduce });
-            // this.map.getEntity(this.infiniteProduce.shipyardId).infiniteProduce = this.infiniteProduce
-            this.infiniteProduce = newInf
-          }
-
-          this.gui.selectTemplate(this.infiniteProduce)
           break;
         case 'hull':
           sendMessage({ type: 'UpdateMode', targetMode: 'hardpoints' });

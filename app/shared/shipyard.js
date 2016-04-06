@@ -72,6 +72,16 @@ export function heal(shipyard, map) {
   }
 }
 
+export function setInfiniteProduce(shipyard, newInfProduce) {
+  if (shipyard.infiniteProduce == null) {
+    shipyard.infiniteProduce = newInfProduce
+  } else if (shipyard.infiniteProduce.templateNumber == newInfProduce.templateNumber) {
+    shipyard.infiniteProduce = null
+  } else {
+    shipyard.infiniteProduce = newInfProduce
+  }
+}
+
 export function processUpdate(shipyard, map) {
   if (shipyard.buildingQueue.length > 0) {
 

@@ -57,7 +57,7 @@ export default class Gui {
 
     this.team = team;
 
-    this.infProduceInfo = null;
+    this.infProduceInfo = [];
   }
 
   setSelectionState(newSelectionState) {
@@ -69,7 +69,19 @@ export default class Gui {
   }
 
   selectTemplate(info) {
-    this.infProduceInfo = info
+    for (var i = 0; i < this.infProduceInfo.length; i++) {
+      if (this.infProduceInfo[i].shipyardId == info.shipyardId) {
+        if (this.infProduceInfo[i].templateNumber == info.templateNumber) {
+          this.infProduceInfo.splice(i, 1)
+          return;
+        }
+
+        this.infProduceInfo.splice(i, 1)
+      }
+    }
+
+    this.infProduceInfo.push(info)
+
   }
 
   /**
@@ -256,9 +268,11 @@ export default class Gui {
       result.push(new Shiptemplate('shiptemplate', this.x + 130, this.y + 325, 50, 50, 2,
         this.getSelectedMapItems()[0], this.templates[2]));
 
-      if (this.infProduceInfo) {
-        if (this.getSelectedMapItems().every(entity => entity.id === this.infProduceInfo.shipyardId)) {
-          switch (this.infProduceInfo.templateNumber) {
+      var set = false
+      for (var i = 0; i < this.infProduceInfo.length; i++) {
+        var infInfo = this.infProduceInfo[i]
+        if (this.getSelectedMapItems().every(entity => entity.id === infInfo.shipyardId)) {
+          switch (infInfo.templateNumber) {
             case 0:
               result.push(new InfinityProduce('infinitySelected', this.x + 20, this.y + 377, 50, 26, 0,
                 this.getSelectedMapItems()[0], this.templates[0]));
@@ -286,19 +300,17 @@ export default class Gui {
                 this.getSelectedMapItems()[0], this.templates[1]));
               break;
           }
-        } else {
-          result.push(new InfinityProduce('infinityGrayed', this.x + 20, this.y + 377, 50, 26, 0, null, this.templates[0]));
-          result.push(new InfinityProduce('infinityGrayed', this.x + 75, this.y + 377, 50, 26, 1, null, this.templates[1]));
-          result.push(new InfinityProduce('infinityGrayed', this.x + 130, this.y + 377, 50, 26, 2, null, this.templates[2]));          
-        }        
-      } else {
-        result.push(new InfinityProduce('infinity', this.x + 20, this.y + 377, 50, 26, 0,
-          this.getSelectedMapItems()[0], this.templates[0]));
-        result.push(new InfinityProduce('infinity', this.x + 75, this.y + 377, 50, 26, 1,
-          this.getSelectedMapItems()[0], this.templates[1]));
-        result.push(new InfinityProduce('infinity', this.x + 130, this.y + 377, 50, 26, 2,
-          this.getSelectedMapItems()[0], this.templates[2]));        
+
+          set = true;
+          break;
+        }       
       }
+
+      if (set === false) {
+        result.push(new InfinityProduce('infinity', this.x + 20, this.y + 377, 50, 26, 0, null, this.templates[0]));
+        result.push(new InfinityProduce('infinity', this.x + 75, this.y + 377, 50, 26, 1, null, this.templates[1]));
+        result.push(new InfinityProduce('infinity', this.x + 130, this.y + 377, 50, 26, 2, null, this.templates[2]));          
+      }  
     } else {
       result.push(new InfinityProduce('infinityGrayed', this.x + 20, this.y + 377, 50, 26, 0, null, this.templates[0]));
       result.push(new InfinityProduce('infinityGrayed', this.x + 75, this.y + 377, 50, 26, 1, null, this.templates[1]));

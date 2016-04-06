@@ -271,8 +271,9 @@ function updateReadyState({ readyState }, playerTeam) {
   }
 }
 
-function setInfProduce({ oldInfProduce, newInfProduce }, playerTeam) {
-  map.getEntity(oldInfProduce.shipyardId).infiniteProduce = newInfProduce
+function setInfProduce({ infproduce }, playerTeam) {
+  const shipyard = map.getEntity(infproduce.shipyardId)
+  Shipyards.setInfiniteProduce(shipyard, infproduce)
 }
 
 const messageHandlers = {

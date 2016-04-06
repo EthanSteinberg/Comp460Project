@@ -400,7 +400,10 @@ export default class GameMap {
       if (type.processUpdate != null) {
         type.processUpdate(entity, this);
       }
-      if (entity.health != null) {
+      if (entity.health != null && this.getEntity(entity.id) != null) {
+        if (entity.id != entity.health.parentId) {
+          console.log("Mismatch in processUpdate in gamemap", entity)
+        }
         Health.processUpdate(entity.health, this);
       }
     }
