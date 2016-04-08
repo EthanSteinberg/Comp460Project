@@ -44,7 +44,7 @@ export function processUpdate(projectile, map) {
 
       for (const id of ids) {
         const neighbor = map.getEntity(id);
-        if (neighbor == null) continue;
+        if (neighbor == null || neighbor == target) continue;
 
         if (neighbor.health == null) {
           continue;
@@ -61,12 +61,12 @@ export function processUpdate(projectile, map) {
 
         const ndist = Math.sqrt(ndx * ndx + ndy * ndy);
 
-        if (ndist < 2.5) {
+        if (ndist < 3) {
           Health.damage(neighbor.health, map, hardpoints[projectile.projectileType].damage / 2);
         }
       }
 
-      Health.damage(target.health, map, hardpoints[projectile.projectileType].damage / 2);
+      Health.damage(target.health, map, hardpoints[projectile.projectileType].damage);
     } else if (projectile.projectileType === 'shell') {
       Health.setOnFire(target.health, hardpoints[projectile.projectileType].damage);
 
