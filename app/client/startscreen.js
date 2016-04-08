@@ -33,14 +33,20 @@ export default class StartScreen {
   getMapSelectButtons() {
     const buttons = [];
 
-    buttons.push(new MapSelect('mapselect', 675, 325, 102, 26, 0));
-    buttons.push(new MapSelect('mapselect', 825, 325, 102, 26, 1));
-    buttons.push(new MapSelect('mapselect', 675, 375, 102, 26, 2));
-    buttons.push(new MapSelect('mapselect', 825, 375, 102, 26, 3));
+    buttons.push(new MapSelect('mapselect', 680, 325, 102, 26, 0));
+    buttons.push(new MapSelect('mapselect', 680, 375, 102, 26, 1));
+    buttons.push(new MapSelect('mapselect', 680, 425, 102, 26, 2));
+    buttons.push(new MapSelect('mapselect', 825, 325, 102, 26, 3));
+    buttons.push(new MapSelect('mapselect', 825, 375, 102, 26, 4));
+    buttons.push(new MapSelect('mapselect', 825, 425, 102, 26, 5));
+
     buttons[0].rendertype = 'westindies2';
     buttons[1].rendertype = 'tropics2';
     buttons[2].rendertype = 'greatlakes2';
-    buttons[3].rendertype = 'randomMap';
+    buttons[3].rendertype = 'smallRandomMap';
+    buttons[4].rendertype = 'mediumRandomMap';
+    buttons[5].rendertype = 'largeRandomMap';
+
 
     let readyButton;
     if (this.team === '1') {

@@ -168,7 +168,7 @@ export default class GameMap {
         type.renderOverlay(entity, this, renderList);
       }
     }
-    if (mapNumber === 3) {
+    if (mapNumber === 3 || mapNumber === 4 || mapNumber === 5) {
       renderList.addImage('unknownMapOverlay', -25, -25, this.width * 50, this.height * 50);
     }
   }
