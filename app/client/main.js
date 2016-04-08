@@ -90,9 +90,6 @@ class Main {
         this.startscreen.mousedown(event, this.sendMessage.bind(this));
       } else if (this.mode === 'end') {
         this.mode = this.endscreen.mousedown(event, this.sendMessage.bind(this));
-        if (this.mode === 'start') {
-          this.startscreen = new StartScreen(this.images, this.game);
-        }
       }
     });
 
