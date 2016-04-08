@@ -58,27 +58,27 @@ class Main {
     this.endscreen = null;
 
     window.addEventListener('keydown', (event) => {
-      if (this.mode === 'game') {
+      if (this.mode === 'game' || this.mode === 'end') {
         this.game.keydown(event);
       }
     });
 
     window.addEventListener('keyup', (event) => {
-      if (this.mode === 'game') {
+      if (this.mode === 'game' || this.mode === 'end') {
         this.game.keyup(event);
       }
     });
 
     window.addEventListener('contextmenu', () => {
       event.preventDefault();
-      if (this.mode === 'game') {
+      if (this.mode === 'game' || this.mode === 'end') {
         this.game.clearkeydowns();
       }
       return false;
     });
 
     window.addEventListener('blur', () => {
-      if (this.mode === 'game') {
+      if (this.mode === 'game' || this.mode === 'end') {
         this.game.clearkeydowns();
       }
     });
@@ -90,6 +90,9 @@ class Main {
         this.startscreen.mousedown(event, this.sendMessage.bind(this));
       } else if (this.mode === 'end') {
         this.mode = this.endscreen.mousedown(event, this.sendMessage.bind(this));
+        if (this.mode === 'start') {
+          this.startscreen = new StartScreen(this.images, this.game);
+        }
       }
     });
 
@@ -195,8 +198,8 @@ class Main {
 
   _gameOverHandler({ winningTeam }) {
     this.mode = 'end';
+    this.game.triggerEnd();
     this.endscreen = new EndScreen(this.images, winningTeam, this.team);
-    this.startscreen = new StartScreen(this.images, this.game);
   }
 
   _updateMap({ mapNum }) {
@@ -230,7 +233,7 @@ class Main {
    * Perform a discrete update of the logic.
    */
   tick() {
-    if (this.mode === 'game') {
+    if (this.mode === 'game' || this.mode == 'end') {
       this.game.tick();
     }
   }

@@ -455,7 +455,7 @@ export default class Game {
     this.context.clear(this.context.COLOR_BUFFER_BIT);
 
     this.renderList.translate(25, 25);
-    this.map.renderVisibilityMask(this.renderList, this.team, true);
+    this.map.renderVisibilityMask(this.renderList, this.team, this.disableFogOfWar);
     this.renderList.translate(-25, -25);
 
     this.renderList.render(this.context);
@@ -466,7 +466,7 @@ export default class Game {
     this.renderList.reset();
 
     this.renderList.translate(25, 25);
-    this.map.renderVisibilityMask(this.renderList, this.team);
+    this.map.renderVisibilityMask(this.renderList, this.team, this.disableFogOfWar);
     this.renderList.translate(-25, -25);
 
     this.renderList.render(this.context);
@@ -588,5 +588,10 @@ export default class Game {
 
   clearkeydowns() {
     this.pressedKeys.clear();
+  }
+
+  triggerEnd() {
+    this.disableFogOfWar = true;
+    this.gui.displayMode = 'main';
   }
 }

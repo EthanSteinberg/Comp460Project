@@ -43,7 +43,7 @@ export const grapeshot = {
 
 export const shell = {
   name: 'Shell',
-  description: 'Long range. Deals fire damage.',
+  description: 'Long range. Fire damage.',
   health: 100,
   damage: 50,
   speed: 0,

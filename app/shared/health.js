@@ -55,6 +55,12 @@ export function render(health, map, renderList) {
   const x = parent.x;
   const y = parent.y;
 
+
+  if (health.burningDamageLeft > 0) {
+    renderList.addImage('fire', x * 50 -25, y * 50 - 25, 25 * 899 / 1280, 25);
+    renderList.addImage('fire', x * 50, y * 50 - 20, 25 * 899 / 1280, 25);
+  }
+
   renderList.addImage('black', x * 50 - 22, y * 50 + 28, 44, 9);
 
   renderList.addImage('red', x * 50 - 20, y * 50 + 30, 40, 5);

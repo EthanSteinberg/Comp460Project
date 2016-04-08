@@ -17,7 +17,7 @@ const buildingConstants = {
 
   fort: {
     name: 'Fort',
-    description: 'A building to protect our lands.',
+    description: 'Protects an island',
     coinCost: 150,
     buildTime: 100, // In ticks
     maxCoinFlow: 1,

@@ -183,8 +183,8 @@ export default class GameMap {
     return false;
   }
 
-  renderVisibilityMask(renderList, team) {
-    if (!this.enemyBuildingsExist(team)) {
+  renderVisibilityMask(renderList, team, disable) {
+    if (disable || !this.enemyBuildingsExist(team)) {
       renderList.addImage('white', -25, -25, this.width * 50, this.height * 50);
     } else {
       const radius = 4;

@@ -121,10 +121,6 @@ export default class Gui {
     renderList.renderText('Cost: ' + getStats(this.workingTemplate).cost + ' coin',
       this.x + 5, this.height - 35, 0.7);
 
-    renderList.renderText('Time: ' + getStats(this.workingTemplate).tcost + ' sec',
-      this.x + 5, this.height - 20, 0.7);
-
-
     // Hovering logic
     if (hoverCoords != null) {
       const roundedX = hoverCoords.x;
@@ -179,18 +175,14 @@ export default class Gui {
 
         if (details != null) {
           // Display a tooltip
-          let modifier = 0;
-          if ((roundedX - 2) > this.x + this.width / 2 - 100) {
-            modifier = this.width / 2 * -1;
-          }
+          const modifier = -200;
 
-          renderList.strokeRect('black', 4, (roundedX - 2) + modifier, (roundedY + 1), 200, 65);
-          renderList.addImage('white', (roundedX - 2) + modifier, (roundedY + 1), 200, 65);
+          renderList.strokeRect('black', 4, (roundedX - 2) + modifier, (roundedY + 1), 200, 45);
+          renderList.addImage('white', (roundedX - 2) + modifier, (roundedY + 1), 200, 45);
 
           renderList.renderText(details.name, (roundedX - 2) + modifier, (roundedY + 1), 0.5);
           renderList.renderText(details.description, (roundedX - 2) + modifier, (roundedY + 1) + 20, 0.5);
           renderList.renderText('Cost: ' + details.cost + ' coin', (roundedX - 2) + modifier, (roundedY + 1) + 34, 0.5);
-          renderList.renderText('Time: ' + details.tcost + ' seconds', (roundedX - 2) + modifier, (roundedY + 1) + 47, 0.5);
         }
       }
     }
@@ -222,38 +214,34 @@ export default class Gui {
     }
 
     if (hoverCoords != null) {
-      const roundedX = hoverCoords.x;
+      let roundedX = hoverCoords.x;
       const roundedY = hoverCoords.y;
-
-      let modifier = 0;
-      if ((roundedX - 2) > this.x + this.width / 2 - 100) {
-        modifier = this.width / 2 * -1;
-      }
 
       const item = this.getItem(roundedX, roundedY);
 
       if (item != null && item.isBuilding()) {
+        const modifier = -200;
         const buildingType = item.getBuilding();
 
         const details = buildingConstants[buildingType];
 
         // Display a tooltip
-        renderList.strokeRect('black', 2, (roundedX - 2) + modifier, (roundedY + 1), 200, 65);
-        renderList.addImage('white', (roundedX - 2) + modifier, (roundedY + 1), 200, 65);
+        renderList.strokeRect('black', 2, (roundedX - 2) + modifier, (roundedY + 1), 200, 45);
+        renderList.addImage('white', (roundedX - 2) + modifier, (roundedY + 1), 200, 45);
 
         renderList.renderText(details.name, (roundedX - 2) + modifier, (roundedY + 1), 0.5);
         renderList.renderText(details.description, (roundedX - 2) + modifier, (roundedY + 1) + 20, 0.5);
         renderList.renderText('Cost: ' + details.coinCost + ' coin', (roundedX - 2) + modifier, (roundedY + 1) + 34, 0.5);
-        renderList.renderText('Time: ' + details.buildTime + ' seconds', (roundedX - 2) + modifier, (roundedY + 1) + 47, 0.5);
       } else if (item != null && (item.getType() === 'shiptemplate' || item.getType() === 'shiptemplateGrayed')) {
+        const modifier = -120;
+
         const template = this.templates[item.slotNum];
         renderList.strokeRect('cyan', 2, item.x, item.y, item.width, item.height);
 
-        renderList.strokeRect('black', 2, (roundedX - 2) + modifier, (roundedY + 1), 200, 31);
-        renderList.addImage('white', (roundedX - 2) + modifier, (roundedY + 1), 200, 31);
+        renderList.strokeRect('black', 2, (roundedX - 2) + modifier, (roundedY + 1), 120, 11);
+        renderList.addImage('white', (roundedX - 2) + modifier, (roundedY + 1), 120, 11);
 
         renderList.renderText('Cost: ' + getStats(template).cost + ' coin', (roundedX - 2) + modifier, (roundedY + 1), 0.5);
-        renderList.renderText('Time: ' + getStats(template).tcost + ' seconds', (roundedX - 2) + modifier, (roundedY + 1) + 13, 0.5);
       }
     }
   }
@@ -284,12 +272,12 @@ export default class Gui {
               break;
             case 1:
               result.push(new InfinityProduce('infinitySelected', this.x + 75, this.y + 377, 50, 26, 1,
-                this.getSelectedMapItems()[0], this.templates[1]));  
+                this.getSelectedMapItems()[0], this.templates[1]));
 
               result.push(new InfinityProduce('infinity', this.x + 20, this.y + 377, 50, 26, 0,
                 this.getSelectedMapItems()[0], this.templates[0]));
               result.push(new InfinityProduce('infinity', this.x + 130, this.y + 377, 50, 26, 2,
-                this.getSelectedMapItems()[0], this.templates[2]));     
+                this.getSelectedMapItems()[0], this.templates[2]));
               break;
             case 2:
               result.push(new InfinityProduce('infinitySelected', this.x + 130, this.y + 377, 50, 26, 2,
@@ -303,14 +291,14 @@ export default class Gui {
 
           set = true;
           break;
-        }       
+        }
       }
 
       if (set === false) {
         result.push(new InfinityProduce('infinity', this.x + 20, this.y + 377, 50, 26, 0, null, this.templates[0]));
         result.push(new InfinityProduce('infinity', this.x + 75, this.y + 377, 50, 26, 1, null, this.templates[1]));
-        result.push(new InfinityProduce('infinity', this.x + 130, this.y + 377, 50, 26, 2, null, this.templates[2]));          
-      }  
+        result.push(new InfinityProduce('infinity', this.x + 130, this.y + 377, 50, 26, 2, null, this.templates[2]));
+      }
     } else {
       result.push(new InfinityProduce('infinityGrayed', this.x + 20, this.y + 377, 50, 26, 0, null, this.templates[0]));
       result.push(new InfinityProduce('infinityGrayed', this.x + 75, this.y + 377, 50, 26, 1, null, this.templates[1]));
@@ -443,7 +431,7 @@ export default class Gui {
         this.selectedSlot = null;
     }
 
-    this.templates[this.chosenIndex] = this.workingTemplate;    
+    this.templates[this.chosenIndex] = this.workingTemplate;
   }
 
   getButtons() {

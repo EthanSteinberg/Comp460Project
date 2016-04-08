@@ -110,12 +110,6 @@ export function render(ship, map, renderList, isSelected) {
     i += 1;
   }
 
-
-  if (ship.health.burningDamageLeft > 0) {
-    renderList.addImage('fire', -25, -25, 25 * 899 / 1280, 25);
-    renderList.addImage('fire', 0, -20, 25 * 899 / 1280, 25);
-  }
-
   if (angle > Math.PI) {
     renderList.scale(-1, 1);
   }
