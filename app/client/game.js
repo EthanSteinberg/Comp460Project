@@ -563,7 +563,7 @@ export default class Game {
   }
 
   keydown(event) {
-    if (event.keyCode >= 48 && event.keyCode <= 57) {
+    if (event.keyCode >= '0'.charCodeAt(0) && event.keyCode <= '9'.charCodeAt(0)) {
       // A number key has been pressed I need to bind this to a control group, or select that group.
 
       if (this.pressedKeys.has(17)) {
@@ -574,6 +574,10 @@ export default class Game {
         // No control key, so switch to group
         this.updateSelectionState({ ...this.selectionState, map: this.controlGroups[event.keyCode - 48] });
       }
+    } else if (event.keyCode == 'A'.charCodeAt(0) && this.pressedKeys.has(17)) {
+      console.log('wat');
+      const ships = this.map.getShips().filter((ship) => ship.team === this.team).map((ship) => ship.id);
+      this.updateSelectionState({ ...this.selectionState, map: ships});
     }
 
     this.pressedKeys.add(event.keyCode);
