@@ -37,9 +37,9 @@ export default class EndScreen {
     }
 
     if (this.team === this.winningTeam) {
-      this.renderList.renderText('You Win!', 550, 200);
+      this.renderList.renderText('You Win!', 535, 270);
     } else {
-      this.renderList.renderText('You Lose!', 550, 200);
+      this.renderList.renderText('You Lose!', 535, 270);
     }
 
     for (const button of this.buttons) {
