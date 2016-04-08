@@ -191,6 +191,47 @@ const maps = [
     ],
   },
   {
+    width: 20,
+    height: 20,
+    entities: [
+      {
+        type: 'ship',
+        team: '0',
+        x: 1,
+        y: 3,
+      },
+      {
+        type: 'ship',
+        team: '1',
+        x: 17,
+        y: 16,
+      },
+      {
+        type: 'mine',
+        team: '0',
+        x: 1,
+        y: 1,
+      },
+
+      {
+        type: 'mine',
+        team: '1',
+        x: 17,
+        y: 17,
+      },
+    ],
+    islands: [
+      {
+        topLeft: [1, 1],
+        size: [1, 2],
+      },
+      {
+        topLeft: [17, 17],
+        size: [1, 2],
+      },
+    ],
+  },
+  {
     width: 30,
     height: 30,
     entities: [
@@ -227,6 +268,47 @@ const maps = [
       },
       {
         topLeft: [27, 27],
+        size: [1, 2],
+      },
+    ],
+  },
+  {
+    width: 40,
+    height: 40,
+    entities: [
+      {
+        type: 'ship',
+        team: '0',
+        x: 1,
+        y: 3,
+      },
+      {
+        type: 'ship',
+        team: '1',
+        x: 37,
+        y: 36,
+      },
+      {
+        type: 'mine',
+        team: '0',
+        x: 1,
+        y: 1,
+      },
+
+      {
+        type: 'mine',
+        team: '1',
+        x: 37,
+        y: 37,
+      },
+    ],
+    islands: [
+      {
+        topLeft: [1, 1],
+        size: [1, 2],
+      },
+      {
+        topLeft: [37, 37],
         size: [1, 2],
       },
     ],
@@ -316,6 +398,23 @@ export function createMap(mapNum, fullCreation) {
 
   if (mapNum === 3 && fullCreation) {
     // Add random island
+    for (let i = 0; i < 2; i++) {
+      addRandomIsland(map, 1, 1);
+    }
+
+    for (let i = 0; i < 1; i++) {
+      addRandomIsland(map, 2, 1);
+    }
+
+    for (let i = 0; i < 1; i++) {
+      addRandomIsland(map, 1, 2);
+    }
+
+    // addRandomIsland(map, 2, 2);
+  }
+
+  if (mapNum === 4 && fullCreation) {
+    // Add random island
     for (let i = 0; i < 8; i++) {
       addRandomIsland(map, 1, 1);
     }
@@ -329,6 +428,25 @@ export function createMap(mapNum, fullCreation) {
     }
 
     addRandomIsland(map, 2, 2);
+  }
+
+  if (mapNum === 5 && fullCreation) {
+    // Add random island
+    for (let i = 0; i < 12; i++) {
+      addRandomIsland(map, 1, 1);
+    }
+
+    for (let i = 0; i < 3; i++) {
+      addRandomIsland(map, 2, 1);
+    }
+
+    for (let i = 0; i < 3; i++) {
+      addRandomIsland(map, 1, 2);
+    }
+
+    for (let i = 0; i < 2; i++) {
+      addRandomIsland(map, 2, 2);
+    }
   }
 
   return map;
