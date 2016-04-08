@@ -575,7 +575,6 @@ export default class Game {
         this.updateSelectionState({ ...this.selectionState, map: this.controlGroups[event.keyCode - 48] });
       }
     } else if (event.keyCode == 'A'.charCodeAt(0) && this.pressedKeys.has(17)) {
-      console.log('wat');
       const ships = this.map.getShips().filter((ship) => ship.team === this.team).map((ship) => ship.id);
       this.updateSelectionState({ ...this.selectionState, map: ships});
     }
