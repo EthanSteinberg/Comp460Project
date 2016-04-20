@@ -82,12 +82,17 @@ const maps = [
         x: 1,
         y: 1,
       },
-
       {
         type: 'mine',
-        team: '1',
+        team: '0',
         x: 28,
         y: 28,
+      },
+       {
+        type: 'mine',
+        team: '1',
+        x: 14,
+        y: 14,
       },
     ],
     islands: [
